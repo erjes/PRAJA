@@ -14,14 +14,43 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+use App\Http\Controllers\DashboardController;
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+
+    // Staff-only routes
+    Route::middleware('role:staff')->group(function () {
+        // Events
+        Route::resource('events', \App\Http\Controllers\EventController::class);
+
+        // Projects & Tasks
+        Route::resource('projects', \App\Http\Controllers\ProjectController::class);
+        Route::resource('tasks', \App\Http\Controllers\TaskController::class);
+        Route::post('/tasks/{task}/status', [\App\Http\Controllers\TaskController::class, 'changeStatus'])->name('tasks.status');
+        Route::post('/subtasks/{subTask}/toggle', [\App\Http\Controllers\TaskController::class, 'toggleSubTask'])->name('subtasks.toggle');
+
+        // Documents
+        Route::resource('documents', \App\Http\Controllers\DocumentController::class);
+        Route::get('/documents/download/{version}', [\App\Http\Controllers\DocumentController::class, 'download'])->name('documents.download');
+    });
+
+    // Admin-only User management & Activity Logs
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('users', \App\Http\Controllers\UserController::class);
+        Route::get('/activity-logs', [\App\Http\Controllers\DocumentActivityLogController::class, 'index'])->name('activity-logs.index');
+    });
 });
 
 require __DIR__.'/auth.php';

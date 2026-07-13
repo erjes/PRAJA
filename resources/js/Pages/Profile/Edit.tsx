@@ -1,6 +1,7 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppSidebarLayout from '@/Layouts/app/app-sidebar-layout';
 import { PageProps } from '@/types';
 import { Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
@@ -10,34 +11,40 @@ export default function Edit({
     status,
 }: PageProps<{ mustVerifyEmail: boolean; status?: string }>) {
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Profile
-                </h2>
-            }
-        >
-            <Head title="Profile" />
-
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
+        <>
+            <Head title="Profile Settings" />
+            <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 max-w-4xl">
+                <div>
+                    <h1 className="text-2xl font-bold text-foreground">Pengaturan Profil</h1>
+                    <p className="text-sm text-muted-foreground">Perbarui informasi profil dan keamanan akun Anda.</p>
+                </div>
+                
+                <div className="space-y-6">
+                    <div className="bg-card border text-card-foreground p-6 rounded-xl shadow-sm">
                         <UpdateProfileInformationForm
                             mustVerifyEmail={mustVerifyEmail}
                             status={status}
-                            className="max-w-xl"
+                            className="max-w-xl text-foreground"
                         />
                     </div>
 
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
-                        <UpdatePasswordForm className="max-w-xl" />
+                    <div className="bg-card border text-card-foreground p-6 rounded-xl shadow-sm">
+                        <UpdatePasswordForm className="max-w-xl text-foreground" />
                     </div>
 
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
-                        <DeleteUserForm className="max-w-xl" />
+                    <div className="bg-card border text-card-foreground p-6 rounded-xl shadow-sm">
+                        <DeleteUserForm className="max-w-xl text-foreground" />
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Edit.layout = (page: ReactNode) => (
+    <AppSidebarLayout
+        breadcrumbs={[{ title: 'Profile Settings', href: '/profile' }]}
+    >
+        {page}
+    </AppSidebarLayout>
+);
