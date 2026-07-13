@@ -24,17 +24,26 @@ export default function Register() {
 
     return (
         <GuestLayout>
-            <Head title="Register" />
+            <Head title="Create account" />
 
-            <form onSubmit={submit}>
-                <div>
+            <form onSubmit={submit} className='py-3'>
+                <div className="text-center">
+                    <h1 className="text-2xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-[1.55rem]">
+                        Create an account
+                    </h1>
+                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                        Enter your details below to create your account
+                    </p>
+                </div>
+
+                <div className="mt-8">
                     <InputLabel htmlFor="name" value="Name" />
 
                     <TextInput
                         id="name"
                         name="name"
                         value={data.name}
-                        className="mt-1 block w-full"
+                        className="mt-1"
                         autoComplete="name"
                         isFocused={true}
                         onChange={(e) => setData('name', e.target.value)}
@@ -45,14 +54,14 @@ export default function Register() {
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="Email address" />
 
                     <TextInput
                         id="email"
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
+                        className="mt-1"
                         autoComplete="username"
                         onChange={(e) => setData('email', e.target.value)}
                         required
@@ -69,7 +78,7 @@ export default function Register() {
                         type="password"
                         name="password"
                         value={data.password}
-                        className="mt-1 block w-full"
+                        className="mt-1"
                         autoComplete="new-password"
                         onChange={(e) => setData('password', e.target.value)}
                         required
@@ -89,7 +98,7 @@ export default function Register() {
                         type="password"
                         name="password_confirmation"
                         value={data.password_confirmation}
-                        className="mt-1 block w-full"
+                        className="mt-1"
                         autoComplete="new-password"
                         onChange={(e) =>
                             setData('password_confirmation', e.target.value)
@@ -103,18 +112,21 @@ export default function Register() {
                     />
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Already registered?
-                    </Link>
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
+                <div className="mt-6">
+                    <PrimaryButton className="w-full" disabled={processing}>
+                        Create account
                     </PrimaryButton>
                 </div>
+
+                <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                    Already have an account?{' '}
+                    <Link
+                        href={route('login')}
+                        className="font-semibold text-slate-900 underline decoration-slate-300 underline-offset-4 transition hover:text-red-600 dark:text-white dark:decoration-slate-500 dark:hover:text-red-400"
+                    >
+                        Log in
+                    </Link>
+                </p>
             </form>
         </GuestLayout>
     );
