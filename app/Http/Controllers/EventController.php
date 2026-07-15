@@ -46,12 +46,20 @@ class EventController extends Controller
             'end_time' => 'required|date|after_or_equal:start_time',
         ]);
 
+        $rawDiv = $request->input('division_id');
+        $divisionId = ($rawDiv === 'company' || $rawDiv === '' || $rawDiv === 'null' || $rawDiv === null)
+            ? null
+            : (int) $rawDiv;
+        if ($divisionId === 0 && $rawDiv !== '0') {
+            $divisionId = $user->division_id ?: null;
+        }
+
         Event::create([
             'title' => $validated['title'],
             'description' => $validated['description'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'division_id' => $user->division_id,
+            'start_time' => \Carbon\Carbon::parse($validated['start_time'])->format('Y-m-d H:i:s'),
+            'end_time' => \Carbon\Carbon::parse($validated['end_time'])->format('Y-m-d H:i:s'),
+            'division_id' => $divisionId,
             'created_by' => $user->id,
         ]);
 
@@ -62,10 +70,6 @@ class EventController extends Controller
     {
         $user = $request->user();
 
-        if ($event->division_id !== $user->division_id) {
-            abort(403, 'Unauthorized division event modification.');
-        }
-
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -73,12 +77,20 @@ class EventController extends Controller
             'end_time' => 'required|date|after_or_equal:start_time',
         ]);
 
+        $rawDiv = $request->input('division_id');
+        $divisionId = ($rawDiv === 'company' || $rawDiv === '' || $rawDiv === 'null' || $rawDiv === null)
+            ? null
+            : (int) $rawDiv;
+        if ($divisionId === 0 && $rawDiv !== '0') {
+            $divisionId = $event->division_id;
+        }
+
         $event->update([
             'title' => $validated['title'],
             'description' => $validated['description'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'division_id' => $user->division_id,
+            'start_time' => \Carbon\Carbon::parse($validated['start_time'])->format('Y-m-d H:i:s'),
+            'end_time' => \Carbon\Carbon::parse($validated['end_time'])->format('Y-m-d H:i:s'),
+            'division_id' => $divisionId,
         ]);
 
         return redirect()->route('events.index')->with('success', 'Event berhasil diperbarui.');
@@ -86,12 +98,6 @@ class EventController extends Controller
 
     public function destroy(Event $event): RedirectResponse
     {
-        $user = Auth::user();
-
-        if ($event->division_id !== $user->division_id) {
-            abort(403, 'Unauthorized division event modification.');
-        }
-
         $event->delete();
 
         return redirect()->route('events.index')->with('success', 'Event berhasil dihapus.');

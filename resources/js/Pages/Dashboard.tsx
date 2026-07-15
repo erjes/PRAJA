@@ -62,10 +62,10 @@ export default function Dashboard({
     return (
         <>
             <Head title="Dashboard" />
-            <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+            <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#f9f9f9] min-h-screen">
                 {/* Greeting */}
                 <div>
-                    <h1 className="text-2xl font-bold">
+                    <h1 className="text-2xl font-bold text-gray-900">
                         {greeting}, {user?.name}! 👋
                     </h1>
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -75,34 +75,34 @@ export default function Dashboard({
 
                 {/* Stat Summary Cards */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <Card>
+                    <Card className="bg-white border-gray-200/80 shadow-sm">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
                                 Tugas Belum Selesai
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-3xl font-bold">{uncompletedTasks.length}</p>
+                            <p className="text-3xl font-bold text-gray-900">{uncompletedTasks.length}</p>
                         </CardContent>
                     </Card>
-                    <Card>
+                    <Card className="bg-white border-gray-200/80 shadow-sm">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
                                 Event Bulan Ini
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-3xl font-bold">{upcomingEvents.length}</p>
+                            <p className="text-3xl font-bold text-gray-900">{upcomingEvents.length}</p>
                         </CardContent>
                     </Card>
-                    <Card>
+                    <Card className="bg-white border-gray-200/80 shadow-sm">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
                                 Kebijakan Terbaru
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-3xl font-bold">{latestPolicies.length}</p>
+                            <p className="text-3xl font-bold text-gray-900">{latestPolicies.length}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -110,10 +110,10 @@ export default function Dashboard({
                 {/* Detail grids */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     {/* Uncompleted Tasks */}
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between border-b pb-3">
-                            <CardTitle className="text-base font-semibold">Tugas Belum Selesai</CardTitle>
-                            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                    <Card className="bg-white border-gray-200/80 shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between border-b border-gray-200/80 pb-3">
+                            <CardTitle className="text-base font-semibold text-gray-900">Tugas Belum Selesai</CardTitle>
+                            <span className="rounded-full bg-[#901418]/10 px-2.5 py-0.5 text-xs font-semibold text-[#901418]">
                                 {uncompletedTasks.length}
                             </span>
                         </CardHeader>
@@ -123,12 +123,12 @@ export default function Dashboard({
                                     Semua tugas selesai! ✅
                                 </p>
                             ) : (
-                                <div className="divide-y">
+                                <div className="divide-y divide-gray-100">
                                     {uncompletedTasks.slice(0, 6).map((task) => (
-                                        <div key={task.id} className="flex items-start gap-3 px-5 py-3 hover:bg-muted/40 transition-colors">
-                                            <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-red-500" />
+                                        <div key={task.id} className="flex items-start gap-3 px-5 py-3 hover:bg-gray-50 transition-colors">
+                                            <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-[#901418]" />
                                             <div className="min-w-0 flex-1">
-                                                <p className="truncate text-sm font-medium">{task.title}</p>
+                                                <p className="truncate text-sm font-medium text-gray-800">{task.title}</p>
                                                 {task.project && (
                                                     <p className="text-xs text-muted-foreground">{task.project.title}</p>
                                                 )}
@@ -144,10 +144,10 @@ export default function Dashboard({
                     </Card>
 
                     {/* Upcoming Events */}
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between border-b pb-3">
-                            <CardTitle className="text-base font-semibold">Event Bulan Ini</CardTitle>
-                            <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                    <Card className="bg-white border-gray-200/80 shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between border-b border-gray-200/80 pb-3">
+                            <CardTitle className="text-base font-semibold text-gray-900">Event Bulan Ini</CardTitle>
+                            <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs font-semibold text-blue-600">
                                 {upcomingEvents.length}
                             </span>
                         </CardHeader>
@@ -157,23 +157,23 @@ export default function Dashboard({
                                     Tidak ada event bulan ini.
                                 </p>
                             ) : (
-                                <div className="divide-y">
+                                <div className="divide-y divide-gray-100">
                                     {upcomingEvents.slice(0, 6).map((event) => (
-                                        <div key={event.id} className="flex items-center gap-3 px-5 py-3 hover:bg-muted/40 transition-colors">
-                                            <div className="flex h-10 w-10 flex-shrink-0 flex-col items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                                        <div key={event.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors">
+                                            <div className="flex h-10 w-10 flex-shrink-0 flex-col items-center justify-center rounded-xl bg-blue-500/10 text-blue-600">
                                                 <span className="text-base font-bold leading-tight">
                                                     {new Date(event.start_time).getDate()}
                                                 </span>
-                                                <span className="text-[9px] uppercase">
+                                                <span className="text-[9px] uppercase font-semibold">
                                                     {new Date(event.start_time).toLocaleString('id-ID', { month: 'short' })}
                                                 </span>
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <p className="truncate text-sm font-medium">{event.title}</p>
+                                                <p className="truncate text-sm font-medium text-gray-800">{event.title}</p>
                                                 <p className="text-xs text-muted-foreground">{formatDate(event.start_time)}</p>
                                             </div>
                                             {!event.division_id && (
-                                                <span className="flex-shrink-0 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-medium text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
+                                                <span className="flex-shrink-0 rounded-full bg-[#901418]/10 px-2 py-0.5 text-[10px] font-semibold text-[#901418]">
                                                     Company
                                                 </span>
                                             )}

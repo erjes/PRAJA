@@ -30,11 +30,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
 
+    // Universal authenticated routes (Events)
+    Route::resource('events', \App\Http\Controllers\EventController::class);
+
     // Staff-only routes
     Route::middleware('role:staff')->group(function () {
-        // Events
-        Route::resource('events', \App\Http\Controllers\EventController::class);
-
         // Projects & Tasks
         Route::resource('projects', \App\Http\Controllers\ProjectController::class);
         Route::resource('tasks', \App\Http\Controllers\TaskController::class);
