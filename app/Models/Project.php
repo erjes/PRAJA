@@ -20,7 +20,7 @@ class Project extends Model
     {
         return [
             'start_date' => 'date',
-            'end_date' => 'date',
+            'end_date'   => 'date',
         ];
     }
 
@@ -37,5 +37,13 @@ class Project extends Model
     public function tasks()
     {
         return $this->hasMany(Task::class);
+    }
+
+    /**
+     * Project collaborators (from Planner-BPA's project_members).
+     */
+    public function members()
+    {
+        return $this->belongsToMany(User::class, 'project_members')->withTimestamps();
     }
 }

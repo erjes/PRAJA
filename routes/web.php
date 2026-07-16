@@ -17,10 +17,10 @@ Route::get('/', function () {
         ->get();
 
     return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'canLogin'        => Route::has('login'),
+        'canRegister'     => Route::has('register'),
+        'laravelVersion'  => Application::VERSION,
+        'phpVersion'      => PHP_VERSION,
         'publicDocuments' => $publicDocuments,
     ]);
 });
@@ -50,9 +50,17 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:staff')->group(function () {
         // Projects & Tasks
         Route::resource('projects', \App\Http\Controllers\ProjectController::class);
+        Route::get('/projects/search-users', [\App\Http\Controllers\ProjectController::class, 'searchUsers'])->name('projects.searchUsers');
+
         Route::resource('tasks', \App\Http\Controllers\TaskController::class);
         Route::post('/tasks/{task}/status', [\App\Http\Controllers\TaskController::class, 'changeStatus'])->name('tasks.status');
         Route::post('/subtasks/{subTask}/toggle', [\App\Http\Controllers\TaskController::class, 'toggleSubTask'])->name('subtasks.toggle');
+
+        // Task review workflow (Planner-BPA)
+        Route::post('/tasks/{task}/submit', [\App\Http\Controllers\TaskController::class, 'submit'])->name('tasks.submit');
+        Route::post('/tasks/{task}/approve', [\App\Http\Controllers\TaskController::class, 'approve'])->name('tasks.approve');
+        Route::post('/tasks/{task}/revision', [\App\Http\Controllers\TaskController::class, 'revision'])->name('tasks.revision');
+        Route::post('/projects/{project}/submit-reviews', [\App\Http\Controllers\TaskController::class, 'submitBatch'])->name('projects.submit_reviews');
 
         // Documents CRUD
         Route::resource('documents', DocumentController::class);
