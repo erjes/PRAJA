@@ -324,7 +324,7 @@ export default function Show({ project, assignableUsers }: ShowProps) {
     return (
         <>
             <Head title={`Proyek: ${project.title}`} />
-            <div className="flex flex-1 flex-col gap-5 p-4 md:p-6">
+            <div className="flex flex-col gap-4 p-4 md:p-6">
 
                 {/* ── Back + Header ── */}
                 <div className="flex flex-col gap-4">
@@ -378,18 +378,19 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                 </div>
 
                 {/* ── Kanban Board ── */}
-                <div className="flex-1">
+                <div className="flex flex-col">
                     <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1.5">
                         <GripVertical className="h-3.5 w-3.5" />
                         Seret kartu tugas ke kolom lain untuk mengubah statusnya.
                     </p>
 
                     <DragDropContext onDragEnd={onDragEnd}>
-                        <div className="flex gap-4 overflow-x-auto pb-4">
+                        {/* Fixed height board: fills viewport minus header + project info area */}
+                        <div className="flex gap-4 overflow-x-auto pb-2" style={{ height: 'calc(100vh - 280px)' }}>
                             {COLUMNS.map(col => {
                                 const colTasks = tasksByColumn(col.key);
                                 return (
-                                    <div key={col.key} className={`${col.color} rounded-2xl p-4 flex flex-col gap-3 min-w-[270px] w-[270px] shrink-0 border border-border/50`}>
+                                    <div key={col.key} className={`${col.color} rounded-2xl p-4 flex flex-col gap-3 min-w-[270px] w-[270px] shrink-0 border border-border/50 h-full`}>
                                         {/* Column header */}
                                         <div className="flex items-center gap-2">
                                             <span className={`w-2.5 h-2.5 rounded-full ${col.dot}`} />
@@ -399,13 +400,13 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                                             </span>
                                         </div>
 
-                                        {/* Droppable area */}
+                                        {/* Droppable area — scrolls internally */}
                                         <Droppable droppableId={col.key}>
                                             {(provided, snapshot) => (
                                                 <div
                                                     ref={provided.innerRef}
                                                     {...provided.droppableProps}
-                                                    className={`flex flex-col gap-3 min-h-[80px] rounded-xl transition-colors ${snapshot.isDraggingOver ? 'bg-primary/5 ring-2 ring-primary/20' : ''}`}
+                                                    className={`flex flex-col gap-3 min-h-[80px] flex-1 overflow-y-auto rounded-xl transition-colors pr-0.5 ${snapshot.isDraggingOver ? 'bg-primary/5 ring-2 ring-primary/20' : ''}`}
                                                 >
                                                     {colTasks.map((task, index) => (
                                                         <Draggable key={task.id} draggableId={String(task.id)} index={index}>
