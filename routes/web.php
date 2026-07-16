@@ -37,6 +37,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Toggle role for admins
+    Route::post('/users/toggle-role', function (\Illuminate\Http\Request $request) {
+        $user = $request->user();
+        if ($user->role !== 'admin') {
+            abort(403);
+        }
+        $currentSimulated = session('simulated_role', $user->role);
+        $newRole = $currentSimulated === 'staff' ? $user->role : 'staff';
+        session(['simulated_role' => $newRole]);
+        return redirect()->route('dashboard');
+    })->name('users.toggleRole');
 
     // Notifications
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
@@ -46,8 +58,8 @@ Route::middleware('auth')->group(function () {
     // Universal authenticated routes (Events)
     Route::resource('events', \App\Http\Controllers\EventController::class);
 
-    // Staff-only routes
-    Route::middleware('role:staff')->group(function () {
+    // Staff and Admin routes
+    Route::middleware('role:staff,admin')->group(function () {
         // Projects & Tasks
         Route::resource('projects', \App\Http\Controllers\ProjectController::class);
         Route::get('/projects/search-users', [\App\Http\Controllers\ProjectController::class, 'searchUsers'])->name('projects.searchUsers');
@@ -70,6 +82,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', \App\Http\Controllers\UserController::class);
         Route::get('/activity-logs', [\App\Http\Controllers\DocumentActivityLogController::class, 'index'])->name('activity-logs.index');
+        Route::get('/review-tasks', [\App\Http\Controllers\TaskController::class, 'reviewList'])->name('review-tasks.index');
     });
 });
 

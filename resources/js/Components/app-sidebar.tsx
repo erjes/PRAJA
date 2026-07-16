@@ -27,7 +27,7 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 const ALL_NAV_ITEMS: (NavItem & { roles: string[] })[] = [
     { title: 'Dashboard',  href: '/dashboard',  icon: LayoutGrid,    roles: ['staff'] },
     { title: 'Events',     href: '/events',     icon: CalendarDays,  roles: ['staff'] },
-    { title: 'Projects',   href: '/projects',   icon: FolderKanban,  roles: ['staff'] },
+    { title: 'Projects',   href: '/projects',   icon: FolderKanban,  roles: ['staff', 'admin'] },
     { title: 'My Tasks',   href: '/tasks',      icon: CheckSquare,   roles: ['staff'] },
     { title: 'Documents',  href: '/documents',  icon: BookOpen,      roles: ['staff'] },
     { title: 'Users',      href: '/users',      icon: Users,         roles: ['admin'] },

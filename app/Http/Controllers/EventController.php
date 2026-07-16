@@ -19,7 +19,7 @@ class EventController extends Controller
         // Fetch events based on division/role
         $eventsQuery = Event::with(['division', 'creator']);
         
-        if ($user->role !== 'super_admin') {
+        if ($user->role !== 'admin') {
             $eventsQuery->where(function ($query) use ($user) {
                 $query->whereNull('division_id')
                       ->orWhere('division_id', $user->division_id);

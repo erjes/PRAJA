@@ -1,5 +1,55 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
+ * @see routes/web.php:42
+ * @route '/users/toggle-role'
+ */
+export const toggleRole = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: toggleRole.url(options),
+    method: 'post',
+})
+
+toggleRole.definition = {
+    methods: ["post"],
+    url: '/users/toggle-role',
+} satisfies RouteDefinition<["post"]>
+
+/**
+ * @see routes/web.php:42
+ * @route '/users/toggle-role'
+ */
+toggleRole.url = (options?: RouteQueryOptions) => {
+    return toggleRole.definition.url + queryParams(options)
+}
+
+/**
+ * @see routes/web.php:42
+ * @route '/users/toggle-role'
+ */
+toggleRole.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: toggleRole.url(options),
+    method: 'post',
+})
+
+    /**
+ * @see routes/web.php:42
+ * @route '/users/toggle-role'
+ */
+    const toggleRoleForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: toggleRole.url(options),
+        method: 'post',
+    })
+
+            /**
+ * @see routes/web.php:42
+ * @route '/users/toggle-role'
+ */
+        toggleRoleForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: toggleRole.url(options),
+            method: 'post',
+        })
+    
+    toggleRole.form = toggleRoleForm
+/**
 * @see \App\Http\Controllers\UserController::index
  * @see app/Http/Controllers/UserController.php:16
  * @route '/users'
@@ -606,7 +656,8 @@ destroy.delete = (args: { user: number | { id: number } } | [user: number | { id
     
     destroy.form = destroyForm
 const users = {
-    index: Object.assign(index, index),
+    toggleRole: Object.assign(toggleRole, toggleRole),
+index: Object.assign(index, index),
 create: Object.assign(create, create),
 store: Object.assign(store, store),
 show: Object.assign(show, show),

@@ -47,12 +47,9 @@ class TaskController extends Controller
             'sub_tasks.*'      => 'required|string|max:255',
         ]);
 
-        $project = Project::findOrFail($validated['project_id']);
+        $activeRole = session('simulated_role', $user->role);
 
-        $isMember = $project->members()->where('user_id', $user->id)->exists();
-        if ($project->division_id !== $user->division_id && !$isMember) {
-            abort(403, 'Unauthorized project access.');
-        }
+        $project = Project::findOrFail($validated['project_id']);
 
         $task = Task::create([
             'project_id'  => $validated['project_id'],
@@ -93,11 +90,9 @@ class TaskController extends Controller
     {
         $user = $request->user();
 
+        $activeRole = session('simulated_role', $user->role);
+
         $project  = Project::findOrFail($task->project_id);
-        $isMember = $project->members()->where('user_id', $user->id)->exists();
-        if ($project->division_id !== $user->division_id && !$isMember) {
-            abort(403, 'Unauthorized project access.');
-        }
 
         $validated = $request->validate([
             'title'            => 'required|string|max:255',
@@ -156,13 +151,10 @@ class TaskController extends Controller
 
     public function destroy(Task $task): RedirectResponse
     {
-        $user    = Auth::user();
-        $project = Project::findOrFail($task->project_id);
+        $user = Auth::user();
+        $activeRole = session('simulated_role', $user->role);
 
-        $isMember = $project->members()->where('user_id', $user->id)->exists();
-        if ($project->division_id !== $user->division_id && !$isMember) {
-            abort(403, 'Unauthorized project access.');
-        }
+        $project = Project::findOrFail($task->project_id);
 
         $projectId = $task->project_id;
         $task->delete();
@@ -178,7 +170,7 @@ class TaskController extends Controller
         $user = $request->user();
 
         if ($task->assigned_to !== $user->id) {
-            abort(403, 'Hanya penerima tugas yang dapat mengajukan review.');
+            return redirect()->back()->with('error', 'Hanya penerima tugas yang dapat mengajukan review.');
         }
 
         $validated = $request->validate([
@@ -215,6 +207,11 @@ class TaskController extends Controller
     public function approve(Task $task): RedirectResponse
     {
         $user = Auth::user();
+        $activeRole = session('simulated_role', $user->role);
+
+        if ($activeRole !== 'admin') {
+            return redirect()->back()->with('error', 'Hanya admin yang dapat menyetujui tugas.');
+        }
 
         $task->update([
             'status'        => 'completed',
@@ -239,6 +236,13 @@ class TaskController extends Controller
      */
     public function revision(Request $request, Task $task): RedirectResponse
     {
+        $user = Auth::user();
+        $activeRole = session('simulated_role', $user->role);
+
+        if ($activeRole !== 'admin') {
+            return redirect()->back()->with('error', 'Hanya admin yang dapat meminta revisi.');
+        }
+
         $validated = $request->validate([
             'revision_notes' => 'required|string|max:1000',
         ]);
@@ -267,6 +271,12 @@ class TaskController extends Controller
      */
     public function submitBatch(Request $request, Project $project): RedirectResponse
     {
+        $user = Auth::user();
+        $activeRole = session('simulated_role', $user->role);
+
+        if ($activeRole !== 'admin') {
+            return redirect()->back()->with('error', 'Hanya admin yang dapat menyetujui tugas.');
+        }
         $validated = $request->validate([
             'submission_notes' => 'nullable|string|max:1000',
             'manager_email'    => 'nullable|email',
@@ -298,16 +308,15 @@ class TaskController extends Controller
         $project  = Project::findOrFail($task->project_id);
         $oldStatus = $task->status;
 
-        $isMember = $project->members()->where('user_id', $user->id)->exists();
-        if ($project->division_id !== $user->division_id && !$isMember) {
-            abort(403, 'Unauthorized project access.');
-        }
+        $activeRole = session('simulated_role', $user->role);
 
-        // Staff (non-creator) can only move to in_progress or review
-        if ($project->created_by !== $user->id && !in_array($validated['status'], ['in_progress', 'review'])) {
-            // Also allow if task is assigned to them
+        // Allow if admin. If staff, must be assigned to task and can't complete it directly.
+        if ($activeRole !== 'admin') {
             if ($task->assigned_to !== $user->id) {
-                abort(403, 'Unauthorized status change.');
+                return redirect()->back()->with('error', 'Hanya admin atau penerima tugas yang dapat mengubah status.');
+            }
+            if ($validated['status'] === 'completed') {
+                return redirect()->back()->with('error', 'Tugas harus direview oleh admin sebelum selesai.');
             }
         }
 
@@ -351,12 +360,33 @@ class TaskController extends Controller
         $user = $request->user();
         $task = Task::findOrFail($subTask->task_id);
 
-        if ($user->role === 'staff' && $task->assigned_to !== $user->id) {
-            abort(403, 'Unauthorized.');
+        $activeRole = session('simulated_role', $user->role);
+
+        if ($activeRole !== 'admin' && $task->assigned_to !== $user->id) {
+            return redirect()->back()->with('error', 'Hanya admin atau penerima tugas yang dapat memperbarui subtugas.');
         }
 
         $subTask->update(['is_completed' => !$subTask->is_completed]);
 
         return redirect()->back()->with('success', 'Subtugas diperbarui.');
+    }
+
+    public function reviewList(Request $request): Response
+    {
+        $user = $request->user();
+        $activeRole = session('simulated_role', $user->role);
+        
+        if ($activeRole !== 'admin') {
+            return redirect()->route('dashboard')->with('error', 'Hanya admin yang dapat melihat daftar review.');
+        }
+
+        $tasks = Task::with(['project', 'assignee'])
+            ->where('status', 'review')
+            ->latest()
+            ->get();
+
+        return Inertia::render('Tasks/ReviewList', [
+            'tasks' => $tasks,
+        ]);
     }
 }

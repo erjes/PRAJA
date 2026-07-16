@@ -138,10 +138,25 @@
         @apply border-border;
     }
 
+    html {
+        font-size: 110%;
+    }
+
     body {
         @apply bg-background text-foreground antialiased;
         background-color: #f9f9f9 !important;
         color: #1e1e1e !important;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        opacity: 0.6;
+        cursor: pointer;
+    }
+
+    .dark input[type="date"]::-webkit-calendar-picker-indicator,
+    .dark input[type="time"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
     }
 }
 
