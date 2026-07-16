@@ -16,12 +16,32 @@ Route::get('/', function () {
         ->latest()
         ->get();
 
+    $recentProjects = \App\Models\Project::with('division')
+        ->latest()
+        ->take(6)
+        ->get();
+
+    $upcomingEvents = \App\Models\Event::with('division')
+        ->where('start_time', '>=', now())
+        ->orderBy('start_time')
+        ->take(6)
+        ->get();
+
+    if ($upcomingEvents->isEmpty()) {
+        $upcomingEvents = \App\Models\Event::with('division')
+            ->latest('start_time')
+            ->take(3)
+            ->get();
+    }
+
     return Inertia::render('Welcome', [
         'canLogin'        => Route::has('login'),
         'canRegister'     => Route::has('register'),
         'laravelVersion'  => Application::VERSION,
         'phpVersion'      => PHP_VERSION,
         'publicDocuments' => $publicDocuments,
+        'recentProjects'  => $recentProjects,
+        'upcomingEvents'  => $upcomingEvents,
     ]);
 });
 
