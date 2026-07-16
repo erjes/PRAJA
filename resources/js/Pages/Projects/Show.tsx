@@ -9,6 +9,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { ConfirmDialog } from '@/Components/ConfirmDialog';
 import {
     Plus, ArrowLeft, Calendar, User, CheckSquare, Trash2, Edit,
     Check, X, AlertCircle, ExternalLink, GripVertical, Users, Link2,
@@ -120,6 +121,9 @@ export default function Show({ project, assignableUsers }: ShowProps) {
     const [isRevisionOpen, setIsRevisionOpen]       = useState(false);
     const [isMembersOpen, setIsMembersOpen]         = useState(false);
     const [selectedTask, setSelectedTask]           = useState<Task | null>(null);
+    const [confirmState, setConfirmState]           = useState<{isOpen: boolean, title: string, description: string, onConfirm: () => void}>({
+        isOpen: false, title: '', description: '', onConfirm: () => {}
+    });
 
     // Subtask temp list for create form
     const [tempSubTasks, setTempSubTasks]     = useState<string[]>([]);
@@ -178,8 +182,12 @@ export default function Show({ project, assignableUsers }: ShowProps) {
     };
 
     const handleProjectDelete = () => {
-        if (!confirm(`Hapus proyek "${project.title}"? Semua tugas juga akan dihapus.`)) return;
-        router.delete(route('projects.destroy', project.id));
+        setConfirmState({
+            isOpen: true,
+            title: 'Hapus Proyek',
+            description: `Apakah Anda yakin ingin menghapus proyek "${project.title}"? Semua tugas di dalamnya juga akan dihapus secara permanen.`,
+            onConfirm: () => router.delete(route('projects.destroy', project.id))
+        });
     };
 
     const handleCreateTask = (e: React.FormEvent) => {
@@ -220,8 +228,12 @@ export default function Show({ project, assignableUsers }: ShowProps) {
     };
 
     const handleDeleteTask = (task: Task) => {
-        if (!confirm(`Hapus tugas "${task.title}"?`)) return;
-        router.delete(route('tasks.destroy', task.id), { preserveScroll: true });
+        setConfirmState({
+            isOpen: true,
+            title: 'Hapus Tugas',
+            description: `Apakah Anda yakin ingin menghapus tugas "${task.title}" secara permanen?`,
+            onConfirm: () => router.delete(route('tasks.destroy', task.id), { preserveScroll: true })
+        });
     };
 
     const openDetail = (task: Task) => {
@@ -965,6 +977,14 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <ConfirmDialog 
+                isOpen={confirmState.isOpen}
+                onOpenChange={(open) => setConfirmState(prev => ({ ...prev, isOpen: open }))}
+                title={confirmState.title}
+                description={confirmState.description}
+                onConfirm={confirmState.onConfirm}
+            />
         </>
     );
 }

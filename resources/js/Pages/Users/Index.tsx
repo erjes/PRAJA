@@ -4,6 +4,7 @@ import AppSidebarLayout from '@/Layouts/app/app-sidebar-layout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/Components/ui/dialog';
+import { ConfirmDialog } from '@/Components/ConfirmDialog';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
@@ -36,6 +37,9 @@ export default function Index({ users, divisions }: IndexProps) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [confirmState, setConfirmState] = useState<{isOpen: boolean, title: string, description: string, onConfirm: () => void}>({
+        isOpen: false, title: '', description: '', onConfirm: () => {}
+    });
 
     const createForm = useForm({
         name: '',
@@ -76,9 +80,12 @@ export default function Index({ users, divisions }: IndexProps) {
     };
 
     const handleDelete = (id: number) => {
-        if (confirm('Apakah Anda yakin ingin menghapus user ini secara permanen?')) {
-            createForm.delete(route('users.destroy', id));
-        }
+        setConfirmState({
+            isOpen: true,
+            title: 'Hapus Pengguna',
+            description: 'Apakah Anda yakin ingin menghapus pengguna ini secara permanen?',
+            onConfirm: () => createForm.delete(route('users.destroy', id))
+        });
     };
 
     const openEdit = (user: User) => {
@@ -339,6 +346,14 @@ export default function Index({ users, divisions }: IndexProps) {
                     )}
                 </DialogContent>
             </Dialog>
+
+            <ConfirmDialog 
+                isOpen={confirmState.isOpen}
+                onOpenChange={(open) => setConfirmState(prev => ({ ...prev, isOpen: open }))}
+                title={confirmState.title}
+                description={confirmState.description}
+                onConfirm={confirmState.onConfirm}
+            />
         </>
     );
 }

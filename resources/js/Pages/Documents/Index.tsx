@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import AppSidebarLayout from '@/Layouts/app/app-sidebar-layout';
 import { Button } from '@/Components/ui/button';
+import { ConfirmDialog } from '@/Components/ConfirmDialog';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
@@ -50,6 +51,9 @@ export default function Index({ documents }: IndexProps) {
     const [filterCategory, setFilterCategory] = useState<string>('all');
     const [filterStatus, setFilterStatus] = useState<string>('all');
     const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+    const [confirmState, setConfirmState] = useState<{isOpen: boolean, title: string, description: string, onConfirm: () => void}>({
+        isOpen: false, title: '', description: '', onConfirm: () => {}
+    });
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isNewVersionOpen, setIsNewVersionOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -133,9 +137,12 @@ export default function Index({ documents }: IndexProps) {
     };
 
     const handleDelete = (id: number) => {
-        if (confirm('Apakah Anda yakin ingin menghapus dokumen ini beserta seluruh versinya?')) {
-            deleteForm.delete(route('documents.destroy', id));
-        }
+        setConfirmState({
+            isOpen: true,
+            title: 'Hapus Dokumen',
+            description: 'Apakah Anda yakin ingin menghapus dokumen ini beserta seluruh versinya secara permanen?',
+            onConfirm: () => deleteForm.delete(route('documents.destroy', id))
+        });
     };
 
     const openHistory = (doc: Document) => {
@@ -694,6 +701,14 @@ export default function Index({ documents }: IndexProps) {
                     )}
                 </DialogContent>
             </Dialog>
+
+            <ConfirmDialog 
+                isOpen={confirmState.isOpen}
+                onOpenChange={(open) => setConfirmState(prev => ({ ...prev, isOpen: open }))}
+                title={confirmState.title}
+                description={confirmState.description}
+                onConfirm={confirmState.onConfirm}
+            />
         </>
     );
 }
