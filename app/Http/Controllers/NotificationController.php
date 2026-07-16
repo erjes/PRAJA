@@ -3,9 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class NotificationController extends Controller
 {
+    public function history(Request $request)
+    {
+        $user = $request->user();
+        
+        // Mark all as read when visiting history page
+        $user->unreadNotifications->markAsRead();
+        
+        $notifications = $user->notifications()->paginate(15);
+        
+        return Inertia::render('Notifications/History', [
+            'notifications' => $notifications
+        ]);
+    }
+
     public function index(Request $request)
     {
         return response()->json($request->user()->unreadNotifications);

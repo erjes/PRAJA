@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\TaskController::toggle
- * @see app/Http/Controllers/TaskController.php:349
+ * @see app/Http/Controllers/TaskController.php:358
  * @route '/subtasks/{subTask}/toggle'
  */
 export const toggle = (args: { subTask: number | { id: number } } | [subTask: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ toggle.definition = {
 
 /**
 * @see \App\Http\Controllers\TaskController::toggle
- * @see app/Http/Controllers/TaskController.php:349
+ * @see app/Http/Controllers/TaskController.php:358
  * @route '/subtasks/{subTask}/toggle'
  */
 toggle.url = (args: { subTask: number | { id: number } } | [subTask: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -49,7 +49,7 @@ toggle.url = (args: { subTask: number | { id: number } } | [subTask: number | { 
 
 /**
 * @see \App\Http\Controllers\TaskController::toggle
- * @see app/Http/Controllers/TaskController.php:349
+ * @see app/Http/Controllers/TaskController.php:358
  * @route '/subtasks/{subTask}/toggle'
  */
 toggle.post = (args: { subTask: number | { id: number } } | [subTask: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -59,7 +59,7 @@ toggle.post = (args: { subTask: number | { id: number } } | [subTask: number | {
 
     /**
 * @see \App\Http\Controllers\TaskController::toggle
- * @see app/Http/Controllers/TaskController.php:349
+ * @see app/Http/Controllers/TaskController.php:358
  * @route '/subtasks/{subTask}/toggle'
  */
     const toggleForm = (args: { subTask: number | { id: number } } | [subTask: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -69,7 +69,7 @@ toggle.post = (args: { subTask: number | { id: number } } | [subTask: number | {
 
             /**
 * @see \App\Http\Controllers\TaskController::toggle
- * @see app/Http/Controllers/TaskController.php:349
+ * @see app/Http/Controllers/TaskController.php:358
  * @route '/subtasks/{subTask}/toggle'
  */
         toggleForm.post = (args: { subTask: number | { id: number } } | [subTask: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

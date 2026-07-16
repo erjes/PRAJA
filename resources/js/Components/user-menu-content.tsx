@@ -13,6 +13,7 @@ interface User {
     name: string;
     email: string;
     role?: string;
+    real_role?: string;
     avatar?: string;
 }
 
@@ -44,6 +45,20 @@ export function UserMenuContent({ user }: Props) {
                         Settings
                     </Link>
                 </DropdownMenuItem>
+                
+                {user.real_role === 'admin' && (
+                    <DropdownMenuItem asChild>
+                        <Link
+                            className="block w-full cursor-pointer"
+                            href={route('users.toggleRole')}
+                            method="post"
+                            as="button"
+                        >
+                            <Settings className="mr-2 h-4 w-4" />
+                            {user.role === 'staff' ? 'Switch to Admin' : 'Simulate Staff'}
+                        </Link>
+                    </DropdownMenuItem>
+                )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>

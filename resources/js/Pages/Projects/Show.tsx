@@ -9,9 +9,11 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { ConfirmDialog } from '@/Components/ConfirmDialog';
 import {
     Plus, ArrowLeft, Calendar, User, CheckSquare, Trash2, Edit,
-    Check, X, AlertCircle, ExternalLink, GripVertical, Users, Link2
+    Check, X, AlertCircle, ExternalLink, GripVertical, Users, Link2,
+    ChevronLeft, ChevronRight
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 
@@ -105,7 +107,10 @@ const urgencyBadge: Record<string, string> = {
 export default function Show({ project, assignableUsers }: ShowProps) {
     const { auth } = usePage().props as any;
     const user = auth.user;
+    const isAdmin = user.role === 'admin';
     const isCreator = project.created_by === user.id;
+    const canManageProject = isAdmin || isCreator;
+    const canManageTask = true; // All members can add/edit tasks
 
     // Dialog state
     const [isEditProjectOpen, setIsEditProjectOpen] = useState(false);
@@ -116,6 +121,9 @@ export default function Show({ project, assignableUsers }: ShowProps) {
     const [isRevisionOpen, setIsRevisionOpen]       = useState(false);
     const [isMembersOpen, setIsMembersOpen]         = useState(false);
     const [selectedTask, setSelectedTask]           = useState<Task | null>(null);
+    const [confirmState, setConfirmState]           = useState<{isOpen: boolean, title: string, description: string, onConfirm: () => void}>({
+        isOpen: false, title: '', description: '', onConfirm: () => {}
+    });
 
     // Subtask temp list for create form
     const [tempSubTasks, setTempSubTasks]     = useState<string[]>([]);
@@ -174,8 +182,12 @@ export default function Show({ project, assignableUsers }: ShowProps) {
     };
 
     const handleProjectDelete = () => {
-        if (!confirm(`Hapus proyek "${project.title}"? Semua tugas juga akan dihapus.`)) return;
-        router.delete(route('projects.destroy', project.id));
+        setConfirmState({
+            isOpen: true,
+            title: 'Hapus Proyek',
+            description: `Apakah Anda yakin ingin menghapus proyek "${project.title}"? Semua tugas di dalamnya juga akan dihapus secara permanen.`,
+            onConfirm: () => router.delete(route('projects.destroy', project.id))
+        });
     };
 
     const handleCreateTask = (e: React.FormEvent) => {
@@ -216,8 +228,12 @@ export default function Show({ project, assignableUsers }: ShowProps) {
     };
 
     const handleDeleteTask = (task: Task) => {
-        if (!confirm(`Hapus tugas "${task.title}"?`)) return;
-        router.delete(route('tasks.destroy', task.id), { preserveScroll: true });
+        setConfirmState({
+            isOpen: true,
+            title: 'Hapus Tugas',
+            description: `Apakah Anda yakin ingin menghapus tugas "${task.title}" secara permanen?`,
+            onConfirm: () => router.delete(route('tasks.destroy', task.id), { preserveScroll: true })
+        });
     };
 
     const openDetail = (task: Task) => {
@@ -277,19 +293,30 @@ export default function Show({ project, assignableUsers }: ShowProps) {
         router.post(route('tasks.status', taskId), { status: newStatus }, { preserveScroll: true });
     };
 
+    const moveTask = (task: Task, direction: 'left' | 'right') => {
+        const statuses: Task['status'][] = ['pending', 'in_progress', 'review', 'completed'];
+        const currentIndex = statuses.indexOf(task.status);
+        if (currentIndex === -1) return;
+        
+        const newIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
+        if (newIndex < 0 || newIndex >= statuses.length) return;
+        
+        const newStatus = statuses[newIndex];
+        router.post(route('tasks.status', task.id), { status: newStatus }, { preserveScroll: true });
+    };
+
     // ── Member search ─────────────────────────────────────────────────────────
 
-    const searchMembers = async (q: string) => {
+    const searchMembers = (q: string) => {
         setMemberSearch(q);
         if (!q.trim()) { setMemberResults([]); return; }
-        setMemberLoading(true);
-        try {
-            const res  = await fetch(route('projects.searchUsers') + `?search=${encodeURIComponent(q)}`);
-            const data = await res.json();
-            setMemberResults(data);
-        } finally {
-            setMemberLoading(false);
-        }
+        
+        const term = q.toLowerCase();
+        const filtered = assignableUsers.filter(u => 
+            u.name.toLowerCase().includes(term)
+        ).slice(0, 10);
+        
+        setMemberResults(filtered);
     };
 
     const addMember = (memberId: number) => {
@@ -324,7 +351,7 @@ export default function Show({ project, assignableUsers }: ShowProps) {
     return (
         <>
             <Head title={`Proyek: ${project.title}`} />
-            <div className="flex flex-1 flex-col gap-5 p-4 md:p-6">
+            <div className="flex flex-col gap-4 p-4 md:p-6">
 
                 {/* ── Back + Header ── */}
                 <div className="flex flex-col gap-4">
@@ -344,8 +371,8 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                                     </span>
                                 )}
                             </div>
-                            <h1 className="text-2xl font-bold truncate">{project.title}</h1>
-                            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{project.description}</p>
+                            <h1 className="text-3xl font-bold truncate">{project.title}</h1>
+                            <p className="text-base text-muted-foreground mt-1 line-clamp-2">{project.description}</p>
                             <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
                                 <span className="flex items-center gap-1">
                                     <Calendar className="h-3.5 w-3.5" />
@@ -354,13 +381,13 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                                 </span>
                                 <button onClick={() => setIsMembersOpen(true)} className="flex items-center gap-1 hover:text-foreground transition-colors">
                                     <Users className="h-3.5 w-3.5" />
-                                    {project.members.length} kolaborator
+                                    {project.members.length} anggota proyek
                                 </button>
                             </div>
                         </div>
 
                         <div className="flex gap-2 flex-wrap">
-                            {isCreator && (
+                            {canManageProject && (
                                 <>
                                     <Button size="sm" variant="outline" onClick={() => setIsEditProjectOpen(true)}>
                                         <Edit className="h-4 w-4 mr-1" /> Edit
@@ -368,28 +395,38 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                                     <Button size="sm" variant="destructive" onClick={handleProjectDelete}>
                                         <Trash2 className="h-4 w-4 mr-1" /> Hapus
                                     </Button>
+                                    <Button size="sm" onClick={() => setIsCreateTaskOpen(true)}>
+                                        <Plus className="h-4 w-4 mr-1" /> Tambah Tugas
+                                    </Button>
                                 </>
                             )}
-                            <Button size="sm" onClick={() => setIsCreateTaskOpen(true)}>
-                                <Plus className="h-4 w-4 mr-1" /> Tambah Tugas
-                            </Button>
+                            {canManageTask && !canManageProject && (
+                                <Button size="sm" onClick={() => setIsCreateTaskOpen(true)}>
+                                    <Plus className="h-4 w-4 mr-1" /> Tambah Tugas
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* ── Kanban Board ── */}
-                <div className="flex-1">
-                    <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1.5">
-                        <GripVertical className="h-3.5 w-3.5" />
-                        Seret kartu tugas ke kolom lain untuk mengubah statusnya.
-                    </p>
+                <div className="flex flex-col mt-4">
+                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 mb-4 flex items-start sm:items-center gap-3 w-fit shadow-sm">
+                        <div className="bg-primary/10 p-2 rounded-lg text-primary">
+                            <GripVertical className="h-4 w-4" />
+                        </div>
+                        <p className="text-sm font-medium text-foreground">
+                            <span className="font-bold text-primary">Pintasan:</span> Seret dan lepas kartu tugas antar kolom untuk mengubah status pekerjaannya dengan cepat.
+                        </p>
+                    </div>
 
                     <DragDropContext onDragEnd={onDragEnd}>
-                        <div className="flex gap-4 overflow-x-auto pb-4">
+                        {/* Fixed height board: fills viewport minus header + project info area */}
+                        <div className="flex gap-4 overflow-x-auto pb-2" style={{ height: 'calc(100vh - 280px)' }}>
                             {COLUMNS.map(col => {
                                 const colTasks = tasksByColumn(col.key);
                                 return (
-                                    <div key={col.key} className={`${col.color} rounded-2xl p-4 flex flex-col gap-3 min-w-[270px] w-[270px] shrink-0 border border-border/50`}>
+                                    <div key={col.key} className={`${col.color} rounded-2xl p-4 flex flex-col gap-3 min-w-[280px] w-[280px] shrink-0 border border-border shadow-sm h-full`}>
                                         {/* Column header */}
                                         <div className="flex items-center gap-2">
                                             <span className={`w-2.5 h-2.5 rounded-full ${col.dot}`} />
@@ -399,13 +436,13 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                                             </span>
                                         </div>
 
-                                        {/* Droppable area */}
+                                        {/* Droppable area — scrolls internally */}
                                         <Droppable droppableId={col.key}>
                                             {(provided, snapshot) => (
                                                 <div
                                                     ref={provided.innerRef}
                                                     {...provided.droppableProps}
-                                                    className={`flex flex-col gap-3 min-h-[80px] rounded-xl transition-colors ${snapshot.isDraggingOver ? 'bg-primary/5 ring-2 ring-primary/20' : ''}`}
+                                                    className={`flex flex-col gap-3 min-h-[80px] flex-1 overflow-y-auto rounded-xl transition-colors pr-0.5 ${snapshot.isDraggingOver ? 'bg-primary/5 ring-2 ring-primary/20' : ''}`}
                                                 >
                                                     {colTasks.map((task, index) => (
                                                         <Draggable key={task.id} draggableId={String(task.id)} index={index}>
@@ -413,7 +450,7 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                                                                 <div
                                                                     ref={prov.innerRef}
                                                                     {...prov.draggableProps}
-                                                                    className={`bg-card rounded-xl p-3.5 shadow-sm border hover:shadow-md transition-shadow ${snap.isDragging ? 'rotate-1 shadow-lg' : ''}`}
+                                                                    className={`bg-card rounded-xl p-4 shadow-sm border border-border/60 hover:shadow-md transition-all hover:border-primary/40 ${snap.isDragging ? 'rotate-2 shadow-xl ring-2 ring-primary/20' : ''}`}
                                                                 >
                                                                     {/* Drag handle + actions row */}
                                                                     <div className="flex items-center gap-1 mb-2">
@@ -426,10 +463,23 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                                                                                 {task.urgency_label}
                                                                             </span>
                                                                         )}
+                                                                        
+                                                                        {/* Arrows */}
+                                                                        {col.key !== 'pending' && (
+                                                                            <button onClick={() => moveTask(task, 'left')} className="p-0.5 text-muted-foreground hover:text-foreground">
+                                                                                <ChevronLeft className="h-3.5 w-3.5" />
+                                                                            </button>
+                                                                        )}
+                                                                        {col.key !== 'completed' && (
+                                                                            <button onClick={() => moveTask(task, 'right')} className="p-0.5 text-muted-foreground hover:text-foreground">
+                                                                                <ChevronRight className="h-3.5 w-3.5" />
+                                                                            </button>
+                                                                        )}
+
                                                                         <button onClick={() => openDetail(task)} className="p-0.5 text-muted-foreground hover:text-foreground">
                                                                             <AlertCircle className="h-3.5 w-3.5" />
                                                                         </button>
-                                                                        {isCreator && (
+                                                                        {canManageTask && (
                                                                             <>
                                                                                 <button onClick={() => openEditTask(task)} className="p-0.5 text-muted-foreground hover:text-foreground">
                                                                                     <Edit className="h-3.5 w-3.5" />
@@ -494,8 +544,8 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                                                                         </Button>
                                                                     )}
 
-                                                                    {/* Approve / Revision buttons for creator */}
-                                                                    {isCreator && task.status === 'review' && (
+                                                                    {/* Approve / Revision buttons for admin */}
+                                                                    {isAdmin && task.status === 'review' && (
                                                                         <div className="flex gap-1.5 mt-2">
                                                                             <Button size="sm" className="flex-1 h-7 text-[11px] bg-emerald-600 hover:bg-emerald-700"
                                                                                 onClick={e => { e.stopPropagation(); handleApprove(task); }}>
@@ -524,7 +574,7 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                                         </Droppable>
 
                                         {/* Add task button in first column */}
-                                        {col.key === 'pending' && (
+                                        {col.key === 'pending' && canManageTask && (
                                             <button onClick={() => setIsCreateTaskOpen(true)}
                                                 className="border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 text-muted-foreground hover:text-primary text-xs font-semibold rounded-xl py-3 flex items-center justify-center gap-1 transition-colors hover:bg-primary/5">
                                                 <Plus className="h-3.5 w-3.5" /> TAMBAH TUGAS
@@ -576,7 +626,7 @@ export default function Show({ project, assignableUsers }: ShowProps) {
 
                         {/* Member management */}
                         <div className="space-y-2">
-                            <Label>Kolaborator</Label>
+                            <Label>Anggota Proyek</Label>
                             <div className="flex flex-wrap gap-2">
                                 {(projectForm.data.members as number[]).map(mid => {
                                     const m = [...assignableUsers, ...project.members].find(u => u.id === mid);
@@ -919,7 +969,7 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsMembersOpen(false)}>Tutup</Button>
-                        {isCreator && (
+                        {canManageProject && (
                             <Button onClick={() => { setIsMembersOpen(false); setIsEditProjectOpen(true); }}>
                                 <Users className="h-4 w-4 mr-1" /> Kelola
                             </Button>
@@ -927,6 +977,14 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <ConfirmDialog 
+                isOpen={confirmState.isOpen}
+                onOpenChange={(open) => setConfirmState(prev => ({ ...prev, isOpen: open }))}
+                title={confirmState.title}
+                description={confirmState.description}
+                onConfirm={confirmState.onConfirm}
+            />
         </>
     );
 }

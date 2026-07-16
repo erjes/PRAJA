@@ -75,18 +75,21 @@ export default function Index({ projects, divisions, assignableUsers }: IndexPro
         status:      'planned',
         start_date:  new Date().toISOString().slice(0, 10),
         end_date:    '',
-        division_id: user.role === 'super_admin' ? '' : String(user.division_id || ''),
+        division_id: String(user.division_id || ''),
         members:     [] as number[],
     });
 
-    const searchMembers = async (q: string) => {
+    const searchMembers = (q: string) => {
         setMemberSearch(q);
         if (!q.trim()) { setMemberResults([]); return; }
-        try {
-            const res  = await fetch(route('projects.searchUsers') + `?search=${encodeURIComponent(q)}`);
-            const data = await res.json();
-            setMemberResults(data);
-        } catch { /* silent */ }
+        
+        const term = q.toLowerCase();
+        const filtered = assignableUsers.filter(u => 
+            u.name.toLowerCase().includes(term) || 
+            (u.email && u.email.toLowerCase().includes(term))
+        ).slice(0, 10);
+        
+        setMemberResults(filtered);
     };
 
     const addMember = (m: AssignableUser) => {
@@ -241,7 +244,7 @@ export default function Index({ projects, divisions, assignableUsers }: IndexPro
                             </Select>
                         </div>
 
-                        {user.role === 'super_admin' && (
+                        {user.role === 'admin' && (
                             <div className="space-y-1">
                                 <Label htmlFor="division">Divisi Penanggung Jawab</Label>
                                 <Select value={createForm.data.division_id}
@@ -258,7 +261,7 @@ export default function Index({ projects, divisions, assignableUsers }: IndexPro
 
                         {/* Member picker */}
                         <div className="space-y-2">
-                            <Label>Kolaborator (Opsional)</Label>
+                            <Label>Anggota Proyek (Opsional)</Label>
                             {selectedMembers.length > 0 && (
                                 <div className="flex flex-wrap gap-2">
                                     {selectedMembers.map(m => (

@@ -7,6 +7,7 @@ import {
     LayoutGrid,
     Users,
     History,
+    Bell,
 } from 'lucide-react';
 import {
     Sidebar,
@@ -27,11 +28,12 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 const ALL_NAV_ITEMS: (NavItem & { roles: string[] })[] = [
     { title: 'Dashboard',  href: '/dashboard',  icon: LayoutGrid,    roles: ['staff'] },
     { title: 'Events',     href: '/events',     icon: CalendarDays,  roles: ['staff'] },
-    { title: 'Projects',   href: '/projects',   icon: FolderKanban,  roles: ['staff'] },
+    { title: 'Projects',   href: '/projects',   icon: FolderKanban,  roles: ['staff', 'admin'] },
     { title: 'My Tasks',   href: '/tasks',      icon: CheckSquare,   roles: ['staff'] },
     { title: 'Documents',  href: '/documents',  icon: BookOpen,      roles: ['staff'] },
     { title: 'Users',      href: '/users',      icon: Users,         roles: ['admin'] },
     { title: 'Activity Log', href: '/activity-logs', icon: History,    roles: ['admin'] },
+    { title: 'Notifikasi',   href: '/notifications/history', icon: Bell, roles: ['staff', 'admin'] },
 ];
 
 export function AppSidebar() {

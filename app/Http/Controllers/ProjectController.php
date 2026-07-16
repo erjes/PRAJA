@@ -17,20 +17,21 @@ class ProjectController extends Controller
     public function index(Request $request): Response
     {
         $user = $request->user();
+        $activeRole = session('simulated_role', $user->role);
 
-        $projects = Project::with(['division', 'creator', 'members'])
-            ->where(function ($q) use ($user) {
-                $q->where('division_id', $user->division_id)
+        $query = Project::with(['division', 'creator', 'members']);
+
+        // Admins see all. Staff only see projects they created or are assigned to.
+        if ($activeRole !== 'admin') {
+            $query->where(function ($q) use ($user) {
+                $q->where('created_by', $user->id)
                   ->orWhereHas('members', fn ($q2) => $q2->where('user_id', $user->id));
-            })
-            ->latest()
-            ->get();
+            });
+        }
 
+        $projects = $query->latest()->get();
         $divisions = Division::all();
-
-        // Users in same division for member picker
-        $users = User::where('division_id', $user->division_id)
-            ->get(['id', 'name', 'role', 'division_id']);
+        $users = User::all(['id', 'name', 'role', 'division_id']);
 
         return Inertia::render('Projects/Index', [
             'projects'       => $projects,
@@ -42,6 +43,7 @@ class ProjectController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $user = $request->user();
+        $activeRole = session('simulated_role', $user->role);
 
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
@@ -79,19 +81,17 @@ class ProjectController extends Controller
     public function show(Project $project): Response
     {
         $user = Auth::user();
+        $activeRole = session('simulated_role', $user->role);
 
-        // Allow access if same division OR is a member
+        // Allow access if admin, creator, or assigned member
         $isMember = $project->members()->where('user_id', $user->id)->exists();
-        if ($project->division_id !== $user->division_id && !$isMember) {
+        if ($activeRole !== 'admin' && $project->created_by !== $user->id && !$isMember) {
             abort(403, 'Unauthorized project access.');
         }
 
         $project->load(['division', 'creator', 'members', 'tasks.assignedUser', 'tasks.subTasks']);
 
-        // All users that can be assigned: same division + existing collaborators
-        $divisionUsers   = User::where('division_id', $project->division_id)->get(['id', 'name', 'role', 'division_id']);
-        $collaborators   = $project->members;
-        $assignableUsers = $divisionUsers->merge($collaborators)->unique('id')->values();
+        $assignableUsers = User::all(['id', 'name', 'role', 'division_id']);
 
         return Inertia::render('Projects/Show', [
             'project'         => $project,
@@ -102,11 +102,7 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project): RedirectResponse
     {
         $user = $request->user();
-
-        $isMember = $project->members()->where('user_id', $user->id)->exists();
-        if ($project->division_id !== $user->division_id && !$isMember) {
-            abort(403, 'Unauthorized project access.');
-        }
+        $activeRole = session('simulated_role', $user->role);
 
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
@@ -138,9 +134,10 @@ class ProjectController extends Controller
     public function destroy(Project $project): RedirectResponse
     {
         $user = Auth::user();
-
-        if ($project->division_id !== $user->division_id) {
-            abort(403, 'Unauthorized project access.');
+        $activeRole = session('simulated_role', $user->role);
+        
+        if ($activeRole !== 'admin') {
+            abort(403, 'Hanya admin yang dapat menghapus proyek.');
         }
 
         $project->load('members');
@@ -151,31 +148,19 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')->with('success', 'Proyek berhasil dihapus.');
     }
 
-    /**
-     * Live user search for member picker (returns JSON).
-     */
-    public function searchUsers(Request $request)
-    {
-        $search = $request->get('search', '');
-
-        $users = User::where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('email', 'LIKE', "%{$search}%");
-            })
-            ->limit(10)
-            ->get(['id', 'name', 'email', 'role']);
-
-        return response()->json($users);
-    }
-
     // ─── Private Helpers ─────────────────────────────────────────────────────
 
     private function notifyProjectUsers(Project $project, string $action): void
     {
-        $divisionUsers = User::where('division_id', $project->division_id)->get();
-        $members       = $project->members;
-
-        $usersToNotify = $divisionUsers->merge($members)->unique('id');
+        $members = $project->members;
+        $creator = User::find($project->created_by);
+        
+        $usersToNotify = $members;
+        if ($creator) {
+            $usersToNotify->push($creator);
+        }
+        
+        $usersToNotify = $usersToNotify->unique('id');
 
         foreach ($usersToNotify as $u) {
             $u->notify(new ProjectNotification($project, $action));

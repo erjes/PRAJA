@@ -21,11 +21,13 @@ class CheckRole
             abort(403, 'Unauthorized action.');
         }
 
-        if ($user->role === 'super_admin') {
+        $activeRole = session('simulated_role', $user->role);
+
+        if ($activeRole === 'admin') {
             return $next($request);
         }
 
-        if (! in_array($user->role, $roles)) {
+        if (! in_array($activeRole, $roles)) {
             abort(403, 'Unauthorized action.');
         }
 
