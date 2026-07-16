@@ -1,5 +1,209 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
+* @see \App\Http\Controllers\DocumentController::preview
+ * @see app/Http/Controllers/DocumentController.php:186
+ * @route '/documents/preview/{version}'
+ */
+export const preview = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: preview.url(args, options),
+    method: 'get',
+})
+
+preview.definition = {
+    methods: ["get","head"],
+    url: '/documents/preview/{version}',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\DocumentController::preview
+ * @see app/Http/Controllers/DocumentController.php:186
+ * @route '/documents/preview/{version}'
+ */
+preview.url = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { version: args }
+    }
+
+            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+            args = { version: args.id }
+        }
+    
+    if (Array.isArray(args)) {
+        args = {
+                    version: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        version: typeof args.version === 'object'
+                ? args.version.id
+                : args.version,
+                }
+
+    return preview.definition.url
+            .replace('{version}', parsedArgs.version.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\DocumentController::preview
+ * @see app/Http/Controllers/DocumentController.php:186
+ * @route '/documents/preview/{version}'
+ */
+preview.get = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: preview.url(args, options),
+    method: 'get',
+})
+/**
+* @see \App\Http\Controllers\DocumentController::preview
+ * @see app/Http/Controllers/DocumentController.php:186
+ * @route '/documents/preview/{version}'
+ */
+preview.head = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: preview.url(args, options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Http\Controllers\DocumentController::preview
+ * @see app/Http/Controllers/DocumentController.php:186
+ * @route '/documents/preview/{version}'
+ */
+    const previewForm = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: preview.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\DocumentController::preview
+ * @see app/Http/Controllers/DocumentController.php:186
+ * @route '/documents/preview/{version}'
+ */
+        previewForm.get = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: preview.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\DocumentController::preview
+ * @see app/Http/Controllers/DocumentController.php:186
+ * @route '/documents/preview/{version}'
+ */
+        previewForm.head = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: preview.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    preview.form = previewForm
+/**
+* @see \App\Http\Controllers\DocumentController::download
+ * @see app/Http/Controllers/DocumentController.php:161
+ * @route '/documents/download/{version}'
+ */
+export const download = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: download.url(args, options),
+    method: 'get',
+})
+
+download.definition = {
+    methods: ["get","head"],
+    url: '/documents/download/{version}',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\DocumentController::download
+ * @see app/Http/Controllers/DocumentController.php:161
+ * @route '/documents/download/{version}'
+ */
+download.url = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { version: args }
+    }
+
+            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+            args = { version: args.id }
+        }
+    
+    if (Array.isArray(args)) {
+        args = {
+                    version: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        version: typeof args.version === 'object'
+                ? args.version.id
+                : args.version,
+                }
+
+    return download.definition.url
+            .replace('{version}', parsedArgs.version.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\DocumentController::download
+ * @see app/Http/Controllers/DocumentController.php:161
+ * @route '/documents/download/{version}'
+ */
+download.get = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: download.url(args, options),
+    method: 'get',
+})
+/**
+* @see \App\Http\Controllers\DocumentController::download
+ * @see app/Http/Controllers/DocumentController.php:161
+ * @route '/documents/download/{version}'
+ */
+download.head = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: download.url(args, options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Http\Controllers\DocumentController::download
+ * @see app/Http/Controllers/DocumentController.php:161
+ * @route '/documents/download/{version}'
+ */
+    const downloadForm = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: download.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\DocumentController::download
+ * @see app/Http/Controllers/DocumentController.php:161
+ * @route '/documents/download/{version}'
+ */
+        downloadForm.get = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: download.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\DocumentController::download
+ * @see app/Http/Controllers/DocumentController.php:161
+ * @route '/documents/download/{version}'
+ */
+        downloadForm.head = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: download.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    download.form = downloadForm
+/**
 * @see \App\Http\Controllers\DocumentController::index
  * @see app/Http/Controllers/DocumentController.php:18
  * @route '/documents'
@@ -406,7 +610,7 @@ edit.head = (args: { document: string | number } | [document: string | number ] 
     edit.form = editForm
 /**
 * @see \App\Http\Controllers\DocumentController::update
- * @see app/Http/Controllers/DocumentController.php:74
+ * @see app/Http/Controllers/DocumentController.php:88
  * @route '/documents/{document}'
  */
 export const update = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -421,7 +625,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\DocumentController::update
- * @see app/Http/Controllers/DocumentController.php:74
+ * @see app/Http/Controllers/DocumentController.php:88
  * @route '/documents/{document}'
  */
 update.url = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -454,7 +658,7 @@ update.url = (args: { document: number | { id: number } } | [document: number | 
 
 /**
 * @see \App\Http\Controllers\DocumentController::update
- * @see app/Http/Controllers/DocumentController.php:74
+ * @see app/Http/Controllers/DocumentController.php:88
  * @route '/documents/{document}'
  */
 update.put = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -463,7 +667,7 @@ update.put = (args: { document: number | { id: number } } | [document: number | 
 })
 /**
 * @see \App\Http\Controllers\DocumentController::update
- * @see app/Http/Controllers/DocumentController.php:74
+ * @see app/Http/Controllers/DocumentController.php:88
  * @route '/documents/{document}'
  */
 update.patch = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -473,7 +677,7 @@ update.patch = (args: { document: number | { id: number } } | [document: number 
 
     /**
 * @see \App\Http\Controllers\DocumentController::update
- * @see app/Http/Controllers/DocumentController.php:74
+ * @see app/Http/Controllers/DocumentController.php:88
  * @route '/documents/{document}'
  */
     const updateForm = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -488,7 +692,7 @@ update.patch = (args: { document: number | { id: number } } | [document: number 
 
             /**
 * @see \App\Http\Controllers\DocumentController::update
- * @see app/Http/Controllers/DocumentController.php:74
+ * @see app/Http/Controllers/DocumentController.php:88
  * @route '/documents/{document}'
  */
         updateForm.put = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -502,7 +706,7 @@ update.patch = (args: { document: number | { id: number } } | [document: number 
         })
             /**
 * @see \App\Http\Controllers\DocumentController::update
- * @see app/Http/Controllers/DocumentController.php:74
+ * @see app/Http/Controllers/DocumentController.php:88
  * @route '/documents/{document}'
  */
         updateForm.patch = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -518,7 +722,7 @@ update.patch = (args: { document: number | { id: number } } | [document: number 
     update.form = updateForm
 /**
 * @see \App\Http\Controllers\DocumentController::destroy
- * @see app/Http/Controllers/DocumentController.php:111
+ * @see app/Http/Controllers/DocumentController.php:147
  * @route '/documents/{document}'
  */
 export const destroy = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -533,7 +737,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\DocumentController::destroy
- * @see app/Http/Controllers/DocumentController.php:111
+ * @see app/Http/Controllers/DocumentController.php:147
  * @route '/documents/{document}'
  */
 destroy.url = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -566,7 +770,7 @@ destroy.url = (args: { document: number | { id: number } } | [document: number |
 
 /**
 * @see \App\Http\Controllers\DocumentController::destroy
- * @see app/Http/Controllers/DocumentController.php:111
+ * @see app/Http/Controllers/DocumentController.php:147
  * @route '/documents/{document}'
  */
 destroy.delete = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -576,7 +780,7 @@ destroy.delete = (args: { document: number | { id: number } } | [document: numbe
 
     /**
 * @see \App\Http\Controllers\DocumentController::destroy
- * @see app/Http/Controllers/DocumentController.php:111
+ * @see app/Http/Controllers/DocumentController.php:147
  * @route '/documents/{document}'
  */
     const destroyForm = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -591,7 +795,7 @@ destroy.delete = (args: { document: number | { id: number } } | [document: numbe
 
             /**
 * @see \App\Http\Controllers\DocumentController::destroy
- * @see app/Http/Controllers/DocumentController.php:111
+ * @see app/Http/Controllers/DocumentController.php:147
  * @route '/documents/{document}'
  */
         destroyForm.delete = (args: { document: number | { id: number } } | [document: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -605,108 +809,6 @@ destroy.delete = (args: { document: number | { id: number } } | [document: numbe
         })
     
     destroy.form = destroyForm
-/**
-* @see \App\Http\Controllers\DocumentController::download
- * @see app/Http/Controllers/DocumentController.php:125
- * @route '/documents/download/{version}'
- */
-export const download = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: download.url(args, options),
-    method: 'get',
-})
-
-download.definition = {
-    methods: ["get","head"],
-    url: '/documents/download/{version}',
-} satisfies RouteDefinition<["get","head"]>
-
-/**
-* @see \App\Http\Controllers\DocumentController::download
- * @see app/Http/Controllers/DocumentController.php:125
- * @route '/documents/download/{version}'
- */
-download.url = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
-    if (typeof args === 'string' || typeof args === 'number') {
-        args = { version: args }
-    }
-
-            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
-            args = { version: args.id }
-        }
-    
-    if (Array.isArray(args)) {
-        args = {
-                    version: args[0],
-                }
-    }
-
-    args = applyUrlDefaults(args)
-
-    const parsedArgs = {
-                        version: typeof args.version === 'object'
-                ? args.version.id
-                : args.version,
-                }
-
-    return download.definition.url
-            .replace('{version}', parsedArgs.version.toString())
-            .replace(/\/+$/, '') + queryParams(options)
-}
-
-/**
-* @see \App\Http\Controllers\DocumentController::download
- * @see app/Http/Controllers/DocumentController.php:125
- * @route '/documents/download/{version}'
- */
-download.get = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: download.url(args, options),
-    method: 'get',
-})
-/**
-* @see \App\Http\Controllers\DocumentController::download
- * @see app/Http/Controllers/DocumentController.php:125
- * @route '/documents/download/{version}'
- */
-download.head = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
-    url: download.url(args, options),
-    method: 'head',
-})
-
-    /**
-* @see \App\Http\Controllers\DocumentController::download
- * @see app/Http/Controllers/DocumentController.php:125
- * @route '/documents/download/{version}'
- */
-    const downloadForm = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: download.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\DocumentController::download
- * @see app/Http/Controllers/DocumentController.php:125
- * @route '/documents/download/{version}'
- */
-        downloadForm.get = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: download.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\DocumentController::download
- * @see app/Http/Controllers/DocumentController.php:125
- * @route '/documents/download/{version}'
- */
-        downloadForm.head = (args: { version: number | { id: number } } | [version: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: download.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    download.form = downloadForm
-const DocumentController = { index, create, store, show, edit, update, destroy, download }
+const DocumentController = { preview, download, index, create, store, show, edit, update, destroy }
 
 export default DocumentController

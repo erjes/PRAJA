@@ -28,9 +28,12 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
             <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                 <Link
                     href={dashboard().url}
-                    className="text-sm font-semibold tracking-wide"
+                    className="flex items-center gap-2.5 text-sm font-bold tracking-wide text-gray-900 hover:opacity-90 transition-opacity"
                 >
-                    BPA Ticketing
+                    <div className="flex size-8 items-center justify-center rounded-lg bg-white p-1 border border-gray-200/80 shadow-xs">
+                        <img src="/logo.png" alt="PRAJA Logo" className="size-full object-contain" />
+                    </div>
+                    <span>PRAJA – BPA Tel-U</span>
                 </Link>
 
                 <div className="ml-6 hidden md:flex">

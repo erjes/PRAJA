@@ -5,16 +5,29 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use App\Models\Document;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentController;
+
 Route::get('/', function () {
+    $publicDocuments = Document::with(['versions.creator', 'uploader'])
+        ->where('visibility', 'public')
+        ->where('status', 'aktif')
+        ->latest()
+        ->get();
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        'publicDocuments' => $publicDocuments,
     ]);
 });
 
-use App\Http\Controllers\DashboardController;
+// Preview & Download untuk dokumen (Publik/Privat diperiksa di Controller)
+Route::get('/documents/preview/{version}', [DocumentController::class, 'preview'])->name('documents.preview');
+Route::get('/documents/download/{version}', [DocumentController::class, 'download'])->name('documents.download');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -30,20 +43,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
 
+    // Universal authenticated routes (Events)
+    Route::resource('events', \App\Http\Controllers\EventController::class);
+
     // Staff-only routes
     Route::middleware('role:staff')->group(function () {
-        // Events
-        Route::resource('events', \App\Http\Controllers\EventController::class);
-
         // Projects & Tasks
         Route::resource('projects', \App\Http\Controllers\ProjectController::class);
         Route::resource('tasks', \App\Http\Controllers\TaskController::class);
         Route::post('/tasks/{task}/status', [\App\Http\Controllers\TaskController::class, 'changeStatus'])->name('tasks.status');
         Route::post('/subtasks/{subTask}/toggle', [\App\Http\Controllers\TaskController::class, 'toggleSubTask'])->name('subtasks.toggle');
 
-        // Documents
-        Route::resource('documents', \App\Http\Controllers\DocumentController::class);
-        Route::get('/documents/download/{version}', [\App\Http\Controllers\DocumentController::class, 'download'])->name('documents.download');
+        // Documents CRUD
+        Route::resource('documents', DocumentController::class);
     });
 
     // Admin-only User management & Activity Logs

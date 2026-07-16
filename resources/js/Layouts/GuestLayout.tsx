@@ -17,7 +17,7 @@ export default function Guest({ children }: PropsWithChildren) {
                         href="/"
                         className="rounded-full border border-slate-200 bg-white/80 p-4 shadow-[0_12px_40px_rgba(15,23,42,0.08)] backdrop-blur dark:border-white/10 dark:bg-white/5 dark:shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
                     >
-                        <ApplicationLogo className="h-9 w-9 fill-current text-red-600 dark:text-red-400" />
+                        <ApplicationLogo className="h-12 w-12 object-contain" />
                     </Link>
                 </div>
 

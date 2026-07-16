@@ -50,14 +50,14 @@ export function AppSidebar() {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        <SidebarMenuButton size="lg" asChild className="hover:bg-gray-100 transition-colors py-2">
                             <Link href={logoHref} prefetch>
-                                <span className="inline-flex size-8 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-                                    PJ
-                                </span>
-                                <span className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">PRAJA</span>
-                                    <span className="truncate text-xs text-muted-foreground">
+                                <div className="flex size-9 items-center justify-center rounded-lg bg-white p-1 border border-gray-200/80 shadow-xs flex-shrink-0">
+                                    <img src="/logo.png" alt="PRAJA Logo" className="size-full object-contain" />
+                                </div>
+                                <span className="grid flex-1 text-left text-sm leading-tight ml-2">
+                                    <span className="truncate font-bold text-gray-900">PRAJA</span>
+                                    <span className="truncate text-xs text-muted-foreground font-medium">
                                         BPA Integrated Portal
                                     </span>
                                 </span>
