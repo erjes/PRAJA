@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\Division;
 use App\Models\User;
 use App\Notifications\ProjectNotification;
@@ -69,6 +69,17 @@ class ProjectController extends Controller
         if (!empty($validated['members'])) {
             $project->members()->attach($validated['members']);
         }
+
+        // Auto-create initial To Do task
+        $project->tasks()->create([
+            'title'       => $validated['title'],
+            'description' => $validated['description'],
+            'status'      => 'pending',
+            'start_date'  => $validated['start_date'],
+            'due_date'    => $validated['end_date'] ?? $validated['start_date'],
+            'assigned_to' => $user->id,
+            'created_by'  => $user->id,
+        ]);
 
         $project->load('members');
 

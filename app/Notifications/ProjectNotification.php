@@ -30,12 +30,14 @@ class ProjectNotification extends Notification
             'added'   => 'Proyek Baru Dibuat',
             'updated' => 'Proyek Diperbarui',
             'removed' => 'Proyek Dihapus',
+            'deadline_reminder' => 'Peringatan Deadline Proyek',
         ];
 
         $messageMap = [
             'added'   => "Proyek baru '{$this->project->title}' telah dibuat di divisi Anda.",
             'updated' => "Proyek '{$this->project->title}' telah diperbarui.",
             'removed' => "Proyek '{$this->project->title}' telah dihapus.",
+            'deadline_reminder' => "Deadline untuk proyek '{$this->project->title}' semakin dekat.",
         ];
 
         return [

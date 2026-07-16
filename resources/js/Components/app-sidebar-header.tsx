@@ -118,12 +118,14 @@ export function AppSidebarHeader({
                             <Button variant="ghost" size="icon" className="relative">
                                 <Bell className="h-5 w-5" />
                                 {notifications.length > 0 && (
-                                    <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-600 ring-2 ring-background animate-pulse" />
+                                    <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-red-600 text-[9px] font-bold text-white flex items-center justify-center animate-pulse border border-background">
+                                        {notifications.length > 9 ? '9+' : notifications.length}
+                                    </span>
                                 )}
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-80 max-h-[400px] overflow-y-auto">
-                            <div className="flex items-center justify-between px-2 py-1.5">
+                        <DropdownMenuContent align="end" className="w-96 max-h-[500px] overflow-y-auto">
+                            <div className="flex items-center justify-between px-3 py-2">
                                 <DropdownMenuLabel className="p-0">Notifikasi</DropdownMenuLabel>
                                 {notifications.length > 0 && (
                                     <button
@@ -146,16 +148,16 @@ export function AppSidebarHeader({
                                         className="p-3 flex flex-col items-start gap-1 cursor-pointer"
                                     >
                                         <div className="flex justify-between w-full items-start gap-2">
-                                            <span className="font-semibold text-sm">{notification.data.title}</span>
+                                            <span className="font-semibold text-sm line-clamp-1">{notification.data.title}</span>
                                             <button
                                                 onClick={(e) => handleRead(notification.id, e)}
-                                                className="text-muted-foreground hover:text-green-600"
+                                                className="text-muted-foreground hover:text-green-600 shrink-0"
                                                 title="Tandai sudah dibaca"
                                             >
                                                 <CheckCircle2 className="h-4 w-4" />
                                             </button>
                                         </div>
-                                        <span className="text-xs text-muted-foreground line-clamp-2">
+                                        <span className="text-xs text-muted-foreground line-clamp-3 mt-0.5">
                                             {notification.data.message}
                                         </span>
                                     </DropdownMenuItem>

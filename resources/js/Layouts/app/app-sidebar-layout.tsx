@@ -19,8 +19,10 @@ export default function AppSidebarLayout({
     useEffect(() => {
         if (flash?.error) {
             setAlertData({ type: 'error', message: flash.error });
+            flash.error = null;
         } else if (flash?.success) {
             setAlertData({ type: 'success', message: flash.success });
+            flash.success = null;
         }
     }, [flash]);
 
