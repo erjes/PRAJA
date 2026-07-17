@@ -8,18 +8,21 @@ class Event extends Model
 {
     protected $fillable = [
         'division_id',
+        'category',
         'title',
         'description',
         'start_time',
         'end_time',
+        'evidence_link',
+        'poster_path',
         'created_by',
     ];
 
     protected function casts(): array
     {
         return [
-            'start_time' => 'datetime',
-            'end_time' => 'datetime',
+            'start_time' => 'datetime:Y-m-d H:i:s',
+            'end_time' => 'datetime:Y-m-d H:i:s',
         ];
     }
 

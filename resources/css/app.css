@@ -158,6 +158,27 @@
     .dark input[type="time"]::-webkit-calendar-picker-indicator {
         filter: invert(1);
     }
+
+    /* Custom White Scrollbar for Modals and Page */
+    * {
+        scrollbar-color: #d1d5db #ffffff;
+        scrollbar-width: thin;
+    }
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #ffffff !important;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #d1d5db !important;
+        border-radius: 9999px;
+        border: 2px solid #ffffff;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af !important;
+    }
 }
 
 @theme inline {

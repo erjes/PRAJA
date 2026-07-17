@@ -22,6 +22,7 @@ Route::get('/', function () {
         ->get();
 
     $upcomingEvents = \App\Models\Event::with('division')
+        ->where('category', 'public')
         ->where('start_time', '>=', now())
         ->orderBy('start_time')
         ->take(6)
@@ -29,6 +30,7 @@ Route::get('/', function () {
 
     if ($upcomingEvents->isEmpty()) {
         $upcomingEvents = \App\Models\Event::with('division')
+            ->where('category', 'public')
             ->latest('start_time')
             ->take(3)
             ->get();

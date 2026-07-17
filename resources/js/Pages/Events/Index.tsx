@@ -9,7 +9,7 @@ import InputError from '@/Components/InputError';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Trash2, Edit, CheckSquare, LayoutList, Kanban, Clock, MessageSquare, Folder, Paperclip, MoreHorizontal, ChevronDown, AlertTriangle } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Trash2, Edit, CheckSquare, LayoutList, Kanban, Clock, MessageSquare, Folder, Paperclip, MoreHorizontal, ChevronDown, AlertTriangle, Link as LinkIcon, ExternalLink } from 'lucide-react';
 
 interface Event {
     id: number;
@@ -18,6 +18,9 @@ interface Event {
     start_time: string;
     end_time: string;
     division_id: number | null;
+    evidence_link?: string | null;
+    poster_path?: string | null;
+    category?: 'internal' | 'public' | null;
     division?: { id: number; name: string } | null;
     creator?: { id: number; name: string } | null;
 }
@@ -38,6 +41,41 @@ export default function Index({ events, divisions }: EventsProps) {
     const user = auth.user;
     const isStaff = user.role === 'staff';
 
+    const parseLocal = (dateStr?: string | null) => {
+        if (!dateStr) return new Date();
+        return new Date(dateStr.replace(' ', 'T'));
+    };
+
+    const formatDisplayDateTime = (dateStr?: string | null) => {
+        if (!dateStr) return '-';
+        const cleanStr = dateStr.replace(' ', 'T');
+        const [datePart, timePartRaw] = cleanStr.split('T');
+        const timePart = timePartRaw ? timePartRaw.slice(0, 5) : '';
+        
+        if (!datePart) return dateStr;
+        const [y, m, d] = datePart.split('-');
+        const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+        const monthIndex = parseInt(m) - 1;
+        const monthName = months[monthIndex] || m;
+        
+        return `${parseInt(d)} ${monthName} ${y}${timePart ? `, ${timePart}` : ''}`;
+    };
+
+    const formatTimeOnly = (dateStr?: string | null) => {
+        if (!dateStr) return '';
+        const clean = dateStr.replace(' ', 'T');
+        const parts = clean.split('T');
+        return parts[1] ? parts[1].slice(0, 5) : '';
+    };
+
+    const formatLocalPart = (dateStr?: string | null, defaultTime = '08:00') => {
+        if (!dateStr) return { date: new Date().toISOString().slice(0, 10), time: defaultTime };
+        const clean = dateStr.replace(' ', 'T');
+        const [datePart, timeRaw] = clean.split('T');
+        const timePart = timeRaw ? timeRaw.slice(0, 5) : defaultTime;
+        return { date: datePart || new Date().toISOString().slice(0, 10), time: timePart };
+    };
+
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -57,10 +95,14 @@ export default function Index({ events, divisions }: EventsProps) {
         start_time: '',
         end_time: '',
         division_id: user.division_id ? String(user.division_id) : 'company',
+        evidence_link: '',
+        category: 'internal' as 'internal' | 'public',
+        poster_file: null as File | null,
     });
 
     // Form for editing event
     const editForm = useForm({
+        _method: 'put',
         title: '',
         description: '',
         start_date: '',
@@ -70,6 +112,9 @@ export default function Index({ events, divisions }: EventsProps) {
         start_time: '',
         end_time: '',
         division_id: 'company',
+        evidence_link: '',
+        category: 'internal' as 'internal' | 'public',
+        poster_file: null as File | null,
     });
 
     const handlePrevMonth = () => {
@@ -108,7 +153,7 @@ export default function Index({ events, divisions }: EventsProps) {
 
     const getEventsForDate = (date: Date) => {
         return events.filter(event => {
-            const eventStart = new Date(event.start_time);
+            const eventStart = parseLocal(event.start_time);
             return (
                 eventStart.getDate() === date.getDate() &&
                 eventStart.getMonth() === date.getMonth() &&
@@ -118,12 +163,12 @@ export default function Index({ events, divisions }: EventsProps) {
     };
 
     const currentMonthEvents = events.filter(event => {
-        const eventStart = new Date(event.start_time);
+        const eventStart = parseLocal(event.start_time);
         return eventStart.getMonth() === currentDate.getMonth() && eventStart.getFullYear() === currentDate.getFullYear();
-    }).sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+    }).sort((a, b) => parseLocal(a.start_time).getTime() - parseLocal(b.start_time).getTime());
 
     const groupedEvents = currentMonthEvents.reduce((acc, event) => {
-        const dateKey = new Date(event.start_time).toDateString();
+        const dateKey = parseLocal(event.start_time).toDateString();
         if (!acc[dateKey]) {
             acc[dateKey] = [];
         }
@@ -139,6 +184,7 @@ export default function Index({ events, divisions }: EventsProps) {
             end_time: `${data.end_date} ${data.end_time_only || '17:00'}:00`,
         }));
         createForm.post(route('events.store'), {
+            forceFormData: true,
             onSuccess: () => {
                 setIsCreateOpen(false);
                 createForm.reset();
@@ -154,10 +200,12 @@ export default function Index({ events, divisions }: EventsProps) {
         if (!selectedEvent) return;
         editForm.transform((data) => ({
             ...data,
+            _method: 'put',
             start_time: `${data.start_date} ${data.start_time_only || '08:00'}:00`,
             end_time: `${data.end_date} ${data.end_time_only || '17:00'}:00`,
         }));
-        editForm.put(route('events.update', selectedEvent.id), {
+        editForm.post(route('events.update', selectedEvent.id), {
+            forceFormData: true,
             onSuccess: () => {
                 setIsEditOpen(false);
                 setSelectedEvent(null);
@@ -198,29 +246,32 @@ export default function Index({ events, divisions }: EventsProps) {
             start_time: '',
             end_time: '',
             division_id: user.division_id ? String(user.division_id) : 'company',
+            evidence_link: '',
+            category: 'internal',
+            poster_file: null,
         });
         setIsCreateOpen(true);
     };
 
     const openEdit = (event: Event) => {
         setSelectedEvent(event);
-        const startObj = new Date(event.start_time);
-        const endObj = new Date(event.end_time);
-        const startDateStr = startObj.toISOString().slice(0, 10);
-        const startTimeStr = startObj.toTimeString().slice(0, 5);
-        const endDateStr = endObj.toISOString().slice(0, 10);
-        const endTimeStr = endObj.toTimeString().slice(0, 5);
+        const startParts = formatLocalPart(event.start_time, '08:00');
+        const endParts = formatLocalPart(event.end_time, '17:00');
 
         editForm.setData({
+            _method: 'put',
             title: event.title,
             description: event.description,
-            start_date: startDateStr,
-            start_time_only: startTimeStr,
-            end_date: endDateStr,
-            end_time_only: endTimeStr,
+            start_date: startParts.date,
+            start_time_only: startParts.time,
+            end_date: endParts.date,
+            end_time_only: endParts.time,
             start_time: '',
             end_time: '',
             division_id: event.division_id ? String(event.division_id) : 'company',
+            evidence_link: event.evidence_link || '',
+            category: event.category || 'internal',
+            poster_file: null,
         });
         setIsDetailOpen(false);
         setIsEditOpen(true);
@@ -254,15 +305,6 @@ export default function Index({ events, divisions }: EventsProps) {
                                 </p>
                             </div>
                         </div>
-
-                        <Button
-                            type="button"
-                            onClick={openCreate}
-                            className="bg-[#901418] hover:bg-[#781014] text-white shadow-md font-bold px-5 py-2.5 h-auto rounded-xl transition-all flex items-center gap-2 self-start sm:self-center shrink-0"
-                        >
-                            <Plus className="h-4 w-4 stroke-[2.5]" />
-                            <span>Buat Event</span>
-                        </Button>
                     </div>
 
                     {/* Mondays style Tabs Bar */}
@@ -299,38 +341,100 @@ export default function Index({ events, divisions }: EventsProps) {
                 </div>
 
                 {/* Mondays style Calendar Container */}
-                <div className="bg-white border border-gray-200/80 rounded-xl shadow-sm overflow-hidden flex flex-col">
+                <div className="bg-white border border-gray-200/80 rounded-xl shadow-sm overflow-hidden flex flex-col ">
                     {/* Sub-toolbar (`+ Add Task` / `< Today >` controls) */}
-                    <div className="flex justify-end flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b border-gray-200/80 bg-gray-50/50">
-                        <div className="flex items-center gap-3 flex-wrap">
-                            <span className="text-lg font-bold text-gray-900 sm:ml-2">
+                    {/* Sub-toolbar (`+ Add Task` / `< Bulan >` controls & Year/Month Filters) */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b border-gray-200/80 bg-gray-50/50">
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-xl font-extrabold text-gray-900 tracking-tight sm:ml-1">
                                 {monthName}
-                            </span>
-                            <div className="flex items-center bg-white border border-gray-200/80 rounded-lg shadow-sm overflow-hidden">
-                                <button
-                                    type="button"
-                                    onClick={handlePrevMonth}
-                                    className="px-2.5 py-2 hover:bg-gray-100 text-gray-600 border-r border-gray-200/80 transition-colors"
-                                    title="Bulan Sebelumnya"
-                                >
-                                    <ChevronLeft className="h-4 w-4" />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setCurrentDate(new Date())}
-                                    className="px-3.5 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors tracking-wider uppercase"
-                                >
-                                    Hari Ini
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleNextMonth}
-                                    className="px-2.5 py-2 hover:bg-gray-100 text-gray-600 border-l border-gray-200/80 transition-colors"
-                                    title="Bulan Selanjutnya"
-                                >
-                                    <ChevronRight className="h-4 w-4" />
-                                </button>
-                            </div>
+                            </h2>
+                        </div>
+
+                        {/* Filter Bulan & Tahun di Kanan */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <Select
+                                value={String(currentDate.getMonth())}
+                                onValueChange={(val) => {
+                                    setCurrentDate(
+                                        new Date(
+                                            currentDate.getFullYear(),
+                                            parseInt(val),
+                                            1,
+                                        ),
+                                    );
+                                }}
+                            >
+                                <SelectTrigger className="bg-white border border-gray-200/80 rounded-xl h-9 px-3 font-semibold text-xs text-gray-700 shadow-xs focus:ring-[#901418] w-[120px]">
+                                    <SelectValue placeholder="Bulan" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[
+                                        "Januari",
+                                        "Februari",
+                                        "Maret",
+                                        "April",
+                                        "Mei",
+                                        "Juni",
+                                        "Juli",
+                                        "Agustus",
+                                        "September",
+                                        "Oktober",
+                                        "November",
+                                        "Desember",
+                                    ].map((m, idx) => (
+                                        <SelectItem
+                                            key={idx}
+                                            value={String(idx)}
+                                        >
+                                            {m}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            <Select
+                                value={String(currentDate.getFullYear())}
+                                onValueChange={(val) => {
+                                    setCurrentDate(
+                                        new Date(
+                                            parseInt(val),
+                                            currentDate.getMonth(),
+                                            1,
+                                        ),
+                                    );
+                                }}
+                            >
+                                <SelectTrigger className="bg-white border border-gray-200/80 rounded-xl h-9 px-3 font-bold text-xs text-gray-800 shadow-xs focus:ring-[#901418] w-[95px]">
+                                    <SelectValue placeholder="Tahun" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[
+                                        currentDate.getFullYear() - 3,
+                                        currentDate.getFullYear() - 2,
+                                        currentDate.getFullYear() - 1,
+                                        currentDate.getFullYear(),
+                                        currentDate.getFullYear() + 1,
+                                        currentDate.getFullYear() + 2,
+                                        currentDate.getFullYear() + 3,
+                                        currentDate.getFullYear() + 4,
+                                        currentDate.getFullYear() + 5,
+                                    ].map((y) => (
+                                        <SelectItem key={y} value={String(y)}>
+                                            {y}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            <Button
+                                type="button"
+                                onClick={openCreate}
+                                className="bg-[#901418] hover:bg-[#781014] text-white shadow-md font-bold px-5 py-2.5 h-auto rounded-xl transition-all flex items-center gap-2 self-start sm:self-center shrink-0"
+                            >
+                                <Plus className="h-4 w-4 stroke-[2.5]" />
+                                <span>Buat Event</span>
+                            </Button>
                         </div>
                     </div>
 
@@ -344,28 +448,28 @@ export default function Index({ events, divisions }: EventsProps) {
                                     </div>
                                     <div>
                                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                            Total Agenda
+                                            Total Agenda bulan ini
                                         </p>
                                         <p className="text-2xl font-extrabold text-gray-900">
                                             {currentMonthEvents.length}{" "}
                                             <span className="text-xs font-normal text-gray-500">
-                                                Event Bulan Ini
+                                                Event
                                             </span>
                                         </p>
                                     </div>
                                 </div>
                                 <div className="bg-gray-50/80 rounded-xl p-4 border border-gray-200/80 shadow-xs flex items-center gap-4">
-                                    <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#901418]/10 text-[#901418]">
+                                    <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
                                         <Clock className="size-5" />
                                     </div>
                                     <div>
                                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                            BPA
+                                            Agenda Internal
                                         </p>
-                                        <p className="text-2xl font-extrabold text-[#901418]">
+                                        <p className="text-2xl font-extrabold text-amber-600">
                                             {
                                                 currentMonthEvents.filter(
-                                                    (e) => !e.division_id,
+                                                    (e) => !e.category || e.category === "internal"
                                                 ).length
                                             }{" "}
                                             <span className="text-xs font-normal text-gray-500">
@@ -380,12 +484,12 @@ export default function Index({ events, divisions }: EventsProps) {
                                     </div>
                                     <div>
                                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                            Agenda Divisi
+                                            Agenda Umum
                                         </p>
                                         <p className="text-2xl font-extrabold text-blue-600">
                                             {
                                                 currentMonthEvents.filter(
-                                                    (e) => e.division_id,
+                                                    (e) => e.category === "public"
                                                 ).length
                                             }{" "}
                                             <span className="text-xs font-normal text-gray-500">
@@ -512,27 +616,7 @@ export default function Index({ events, divisions }: EventsProps) {
                                                                                 <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
                                                                                     <span className="flex items-center gap-1 text-xs font-semibold text-gray-500">
                                                                                         <Clock className="size-3.5 text-gray-400" />
-                                                                                        {new Date(
-                                                                                            event.start_time,
-                                                                                        ).toLocaleTimeString(
-                                                                                            "id-ID",
-                                                                                            {
-                                                                                                hour: "2-digit",
-                                                                                                minute: "2-digit",
-                                                                                            },
-                                                                                        )}
-                                                                                        {
-                                                                                            " - "
-                                                                                        }
-                                                                                        {new Date(
-                                                                                            event.end_time,
-                                                                                        ).toLocaleTimeString(
-                                                                                            "id-ID",
-                                                                                            {
-                                                                                                hour: "2-digit",
-                                                                                                minute: "2-digit",
-                                                                                            },
-                                                                                        )}
+                                                                                        {formatTimeOnly(event.start_time)} - {formatTimeOnly(event.end_time)}
                                                                                     </span>
                                                                                 </div>
 
@@ -709,15 +793,7 @@ export default function Index({ events, divisions }: EventsProps) {
                                                                                 className={`h-1.5 w-7 rounded-full ${accentBarClass}`}
                                                                             />
                                                                             <span className="text-[9px] font-bold uppercase tracking-wider text-gray-400">
-                                                                                {new Date(
-                                                                                    event.start_time,
-                                                                                ).toLocaleTimeString(
-                                                                                    "id-ID",
-                                                                                    {
-                                                                                        hour: "2-digit",
-                                                                                        minute: "2-digit",
-                                                                                    },
-                                                                                )}
+                                                                                {formatTimeOnly(event.start_time)}
                                                                             </span>
                                                                         </div>
 
@@ -729,17 +805,7 @@ export default function Index({ events, divisions }: EventsProps) {
                                                                         </p>
 
                                                                         {/* Footer (icons and avatars matching Mondays) */}
-                                                                        <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-gray-100 text-[10px] text-gray-400">
-                                                                            <div className="flex items-center gap-2">
-                                                                                <span className="flex items-center gap-0.5 font-medium">
-                                                                                    <MessageSquare className="size-3" />{" "}
-                                                                                    2
-                                                                                </span>
-                                                                                <span className="flex items-center gap-0.5 font-medium">
-                                                                                    <Paperclip className="size-3" />{" "}
-                                                                                    1
-                                                                                </span>
-                                                                            </div>
+                                                                        <div className="flex items-center justify-end gap-1 mt-1 pt-1.5 border-t border-gray-100 text-[10px] text-gray-400">
                                                                             <div className="flex items-center gap-1">
                                                                                 <button
                                                                                     type="button"
@@ -809,7 +875,7 @@ export default function Index({ events, divisions }: EventsProps) {
 
             {/* Create Event Dialog */}
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogContent className="sm:max-w-lg rounded-2xl p-6 bg-white border border-gray-200/80 shadow-2xl">
+                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl p-6 bg-white border border-white-200/80 shadow-2xl">
                     <DialogHeader>
                         <div className="flex items-center gap-3 mb-1">
                             <div className="flex size-10 items-center justify-center rounded-xl bg-[#901418]/10 text-[#901418]">
@@ -847,8 +913,62 @@ export default function Index({ events, divisions }: EventsProps) {
                                 required
                                 className="rounded-xl border-gray-200 focus:border-[#901418] focus:ring-[#901418]"
                             />
-                            <InputError message={createForm.errors.title} className="mt-1" />
+                            <InputError
+                                message={createForm.errors.title}
+                                className="mt-1"
+                            />
                         </div>
+                        <div className="space-y-1.5">
+                            <Label
+                                htmlFor="create-category"
+                                className="text-xs font-bold text-gray-700 uppercase tracking-wider"
+                            >
+                                Kategori Agenda
+                            </Label>
+                            <select
+                                id="create-category"
+                                value={createForm.data.category || "internal"}
+                                onChange={(e) =>
+                                    createForm.setData("category", e.target.value as any)
+                                }
+                                className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-medium text-gray-800 focus:border-[#901418] focus:outline-none focus:ring-1 focus:ring-[#901418]"
+                            >
+                                <option value="internal">Internal</option>
+                                <option value="public">Publik</option>
+                            </select>
+                            <p className="text-[11px] text-gray-400 mt-1">
+                                Pilih <strong className="text-gray-600">Publik</strong> untuk event umum seperti Market Day yang akan dipublish di halaman awal.
+                            </p>
+                        </div>
+                        {createForm.data.category === "public" && (
+                            <div className="p-3.5 bg-red-50/60 border border-red-100 rounded-2xl space-y-2 animate-in fade-in duration-300">
+                                <Label
+                                    htmlFor="create-poster"
+                                    className="text-xs font-bold text-[#901418] uppercase tracking-wider block"
+                                >
+                                    File Poster (Opsional)
+                                </Label>
+                                <Input
+                                    id="create-poster"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) =>
+                                        createForm.setData(
+                                            "poster_file",
+                                            e.target.files && e.target.files[0] ? e.target.files[0] : null
+                                        )
+                                    }
+                                    className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium text-xs py-1.5 cursor-pointer"
+                                />
+                                <p className="text-[11px] text-gray-600 leading-snug">
+                                    Unggah file poster kegiatan untuk ditampilkan di Landing Page. Jika tidak dicantumkan, sistem akan menampilkan nama kegiatan dalam kotak abu-abu.
+                                </p>
+                                <InputError
+                                    message={createForm.errors.poster_file}
+                                    className="mt-1"
+                                />
+                            </div>
+                        )}
                         <div className="space-y-1.5">
                             <Label
                                 htmlFor="create-desc"
@@ -869,10 +989,12 @@ export default function Index({ events, divisions }: EventsProps) {
                                 required
                                 className="rounded-xl border-gray-200 focus:border-[#901418] focus:ring-[#901418] min-h-[90px]"
                             />
-                            <InputError message={createForm.errors.description} className="mt-1" />
+                            <InputError
+                                message={createForm.errors.description}
+                                className="mt-1"
+                            />
                         </div>
                         <div className="space-y-3 pt-1">
-                            
                             <div className="p-3.5 bg-gray-50/70 border border-gray-200/80 rounded-2xl space-y-2.5">
                                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-800 uppercase tracking-wider">
                                     <Clock className="size-3.5 text-[#901418]" />
@@ -891,7 +1013,10 @@ export default function Index({ events, divisions }: EventsProps) {
                                             type="date"
                                             value={createForm.data.start_date}
                                             onChange={(e) =>
-                                                createForm.setData("start_date", e.target.value)
+                                                createForm.setData(
+                                                    "start_date",
+                                                    e.target.value,
+                                                )
                                             }
                                             required
                                             className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium"
@@ -907,16 +1032,28 @@ export default function Index({ events, divisions }: EventsProps) {
                                         <Input
                                             id="create-start-time"
                                             type="time"
-                                            value={createForm.data.start_time_only}
+                                            value={
+                                                createForm.data.start_time_only
+                                            }
                                             onChange={(e) =>
-                                                createForm.setData("start_time_only", e.target.value)
+                                                createForm.setData(
+                                                    "start_time_only",
+                                                    e.target.value,
+                                                )
                                             }
                                             required
                                             className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium text-center"
                                         />
                                     </div>
                                 </div>
-                                <InputError message={createForm.errors.start_time || createForm.errors.start_date || createForm.errors.start_time_only} className="mt-1" />
+                                <InputError
+                                    message={
+                                        createForm.errors.start_time ||
+                                        createForm.errors.start_date ||
+                                        createForm.errors.start_time_only
+                                    }
+                                    className="mt-1"
+                                />
                             </div>
 
                             {/* Waktu Selesai */}
@@ -938,7 +1075,10 @@ export default function Index({ events, divisions }: EventsProps) {
                                             type="date"
                                             value={createForm.data.end_date}
                                             onChange={(e) =>
-                                                createForm.setData("end_date", e.target.value)
+                                                createForm.setData(
+                                                    "end_date",
+                                                    e.target.value,
+                                                )
                                             }
                                             required
                                             className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium"
@@ -954,17 +1094,60 @@ export default function Index({ events, divisions }: EventsProps) {
                                         <Input
                                             id="create-end-time"
                                             type="time"
-                                            value={createForm.data.end_time_only}
+                                            value={
+                                                createForm.data.end_time_only
+                                            }
                                             onChange={(e) =>
-                                                createForm.setData("end_time_only", e.target.value)
+                                                createForm.setData(
+                                                    "end_time_only",
+                                                    e.target.value,
+                                                )
                                             }
                                             required
                                             className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium text-center"
                                         />
                                     </div>
                                 </div>
-                                <InputError message={createForm.errors.end_time || createForm.errors.end_date || createForm.errors.end_time_only} className="mt-1" />
+                                <InputError
+                                    message={
+                                        createForm.errors.end_time ||
+                                        createForm.errors.end_date ||
+                                        createForm.errors.end_time_only
+                                    }
+                                    className="mt-1"
+                                />
                             </div>
+                        </div>
+
+                        {/* Link Evidence (Optional) */}
+                        <div className="pt-1">
+                            <Label
+                                htmlFor="create-evidence-link"
+                                className="text-xs font-bold text-gray-700 uppercase tracking-wider"
+                            >
+                                Evidence (Optional)
+                            </Label>
+                            <Input
+                                id="create-evidence-link"
+                                type="url"
+                                placeholder="https://example.com/folder-evidence atau tautan drive..."
+                                value={createForm.data.evidence_link || ""}
+                                onChange={(e) =>
+                                    createForm.setData(
+                                        "evidence_link",
+                                        e.target.value,
+                                    )
+                                }
+                                className="mt-1 rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium"
+                            />
+                            <p className="text-[11px] text-gray-400 mt-1">
+                                Masukkan URL tautan Google Drive, DropBox, atau
+                                dokumentasi lainnya jika ada.
+                            </p>
+                            <InputError
+                                message={createForm.errors.evidence_link}
+                                className="mt-1"
+                            />
                         </div>
 
                         <DialogFooter className="pt-4 border-t border-gray-100 flex items-center justify-end gap-2.5">
@@ -990,56 +1173,103 @@ export default function Index({ events, divisions }: EventsProps) {
 
             {/* Event Detail Dialog */}
             <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl p-6 bg-white border border-gray-200/80 shadow-2xl">
                     {selectedEvent && (
                         <>
                             <DialogHeader>
-                                <DialogTitle className="text-xl mt-1">
-                                    {selectedEvent.title}
-                                </DialogTitle>
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-1">
+                                    <DialogTitle className="text-xl leading-snug">
+                                        {selectedEvent.title}
+                                    </DialogTitle>
+                                    <span
+                                        className={`w-fit px-3 py-1 rounded-full text-xs font-bold shrink-0 ${
+                                            selectedEvent.category === "public"
+                                                ? "bg-blue-100 text-blue-700 border border-blue-200"
+                                                : "bg-amber-100 text-amber-700 border border-amber-200"
+                                        }`}
+                                    >
+                                        {selectedEvent.category === "public"
+                                            ? "Publik "
+                                            : "Internal "}
+                                    </span>
+                                </div>
                             </DialogHeader>
                             <div className="space-y-4 py-2">
                                 <div>
                                     <Label className="text-xs text-muted-foreground">
                                         Deskripsi Kegiatan
                                     </Label>
-                                    <p className="text-sm whitespace-pre-wrap mt-1">
-                                        {selectedEvent.description}
+                                    <p className="text-sm whitespace-pre-wrap mt-1 text-gray-800">
+                                        {selectedEvent.description || "Tidak ada deskripsi."}
                                     </p>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4 border-t pt-3">
-                                    <div>
-                                        <Label className="text-xs text-muted-foreground">
-                                            Mulai
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-3">
+                                    <div className="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
+                                        <Label className="text-xs text-muted-foreground flex items-center gap-1.5 font-bold">
+                                            <Clock className="size-3.5 text-[#901418]" />
+                                            Waktu Mulai
                                         </Label>
-                                        <p className="text-sm mt-0.5 font-medium">
-                                            {new Date(
-                                                selectedEvent.start_time,
-                                            ).toLocaleString("id-ID", {
-                                                dateStyle: "medium",
-                                                timeStyle: "short",
-                                            })}
+                                        <p className="text-sm mt-1 font-bold text-gray-900">
+                                            {formatDisplayDateTime(selectedEvent.start_time)}
                                         </p>
                                     </div>
-                                    <div>
-                                        <Label className="text-xs text-muted-foreground">
-                                            Selesai
+                                    <div className="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
+                                        <Label className="text-xs text-muted-foreground flex items-center gap-1.5 font-bold">
+                                            <Clock className="size-3.5 text-gray-600" />
+                                            Waktu Selesai
                                         </Label>
-                                        <p className="text-sm mt-0.5 font-medium">
-                                            {new Date(
-                                                selectedEvent.end_time,
-                                            ).toLocaleString("id-ID", {
-                                                dateStyle: "medium",
-                                                timeStyle: "short",
-                                            })}
+                                        <p className="text-sm mt-1 font-bold text-gray-900">
+                                            {formatDisplayDateTime(selectedEvent.end_time)}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="text-xs text-muted-foreground border-t pt-3 flex justify-between">
+                                {selectedEvent.poster_path && (
+                                    <div className="border-t pt-3">
+                                        <Label className="text-xs text-muted-foreground flex items-center gap-1.5 mb-2 font-bold">
+                                            <span>Poster Kegiatan</span>
+                                        </Label>
+                                        <div className="rounded-xl overflow-hidden border border-gray-200 max-h-56 bg-gray-50 flex items-center justify-center p-1">
+                                            <img
+                                                src={selectedEvent.poster_path}
+                                                alt="Poster Event"
+                                                className="w-full h-auto max-h-52 object-contain rounded-lg"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                                {selectedEvent.evidence_link ? (
+                                    <div className="border-t pt-3">
+                                        <Label className="text-xs text-muted-foreground flex items-center gap-1.5 mb-1.5 font-bold">
+                                            <LinkIcon className="size-3.5 text-[#901418]" />
+                                            Link Evidence / Bukti Kegiatan
+                                        </Label>
+                                        <a
+                                            href={selectedEvent.evidence_link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="mt-1 inline-flex items-center gap-2 p-3 rounded-xl bg-red-50/70 border border-red-100 text-sm font-semibold text-[#901418] hover:bg-red-50 transition-colors w-full break-all shadow-2xs"
+                                        >
+                                            <ExternalLink className="size-4 shrink-0 text-[#901418]" />
+                                            <span className="line-clamp-2">{selectedEvent.evidence_link}</span>
+                                        </a>
+                                    </div>
+                                ) : (
+                                    <div className="border-t pt-3">
+                                        <Label className="text-xs text-muted-foreground flex items-center gap-1.5 mb-1 font-bold">
+                                            <LinkIcon className="size-3.5 text-gray-400" />
+                                            Link Evidence / Bukti Kegiatan
+                                        </Label>
+                                        <p className="text-xs text-gray-400 italic bg-gray-50/50 p-2.5 rounded-xl border border-gray-100">
+                                            Belum ada tautan evidence yang dilampirkan pada agenda ini.
+                                        </p>
+                                    </div>
+                                )}
+                                <div className="text-xs text-muted-foreground border-t pt-3 flex items-center justify-between">
                                     <span>
                                         Dibuat oleh:{" "}
-                                        {selectedEvent.creator?.name ||
-                                            "Sistem"}
+                                        <strong className="text-gray-700">
+                                            {selectedEvent.creator?.name || "Sistem"}
+                                        </strong>
                                     </span>
                                 </div>
                             </div>
@@ -1073,7 +1303,7 @@ export default function Index({ events, divisions }: EventsProps) {
 
             {/* Edit Event Dialog */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl p-6 bg-white border border-gray-200/80 shadow-2xl">
                     <DialogHeader>
                         <DialogTitle>Edit Event</DialogTitle>
                     </DialogHeader>
@@ -1088,8 +1318,57 @@ export default function Index({ events, divisions }: EventsProps) {
                                 }
                                 required
                             />
-                            <InputError message={editForm.errors.title} className="mt-1" />
+                            <InputError
+                                message={editForm.errors.title}
+                                className="mt-1"
+                            />
                         </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="edit-category">Kategori Agenda</Label>
+                            <select
+                                id="edit-category"
+                                value={editForm.data.category || "internal"}
+                                onChange={(e) =>
+                                    editForm.setData("category", e.target.value as any)
+                                }
+                                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-800 focus:border-[#901418] focus:outline-none focus:ring-1 focus:ring-[#901418]"
+                            >
+                                <option value="internal">Internal </option>
+                                <option value="public">Publik </option>
+                            </select>
+                        </div>
+                        {editForm.data.category === "public" && (
+                            <div className="p-3.5 bg-red-50/60 border border-red-100 rounded-2xl space-y-2 animate-in fade-in duration-300">
+                                <Label
+                                    htmlFor="edit-poster"
+                                    className="text-xs font-bold text-[#901418] uppercase tracking-wider flex items-center justify-between"
+                                >
+                                    <span>File Poster (Opsional)</span>
+                                    {selectedEvent?.poster_path && (
+                                        <span className="text-[10px] text-gray-500 font-normal">Sudah ada poster tersimpan</span>
+                                    )}
+                                </Label>
+                                <Input
+                                    id="edit-poster"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) =>
+                                        editForm.setData(
+                                            "poster_file",
+                                            e.target.files && e.target.files[0] ? e.target.files[0] : null
+                                        )
+                                    }
+                                    className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium text-xs py-1.5 cursor-pointer"
+                                />
+                                <p className="text-[11px] text-gray-600 leading-snug">
+                                    Unggah file poster baru jika ingin menggantikan poster lama. Jika tidak ada/kosong, akan menampilkan poster lama atau kotak abu-abu.
+                                </p>
+                                <InputError
+                                    message={editForm.errors.poster_file}
+                                    className="mt-1"
+                                />
+                            </div>
+                        )}
                         <div className="space-y-1">
                             <Label htmlFor="edit-desc">Deskripsi</Label>
                             <Textarea
@@ -1103,7 +1382,10 @@ export default function Index({ events, divisions }: EventsProps) {
                                 }
                                 required
                             />
-                            <InputError message={editForm.errors.description} className="mt-1" />
+                            <InputError
+                                message={editForm.errors.description}
+                                className="mt-1"
+                            />
                         </div>
                         <div className="space-y-3 pt-1">
                             {/* Waktu Mulai */}
@@ -1125,7 +1407,10 @@ export default function Index({ events, divisions }: EventsProps) {
                                             type="date"
                                             value={editForm.data.start_date}
                                             onChange={(e) =>
-                                                editForm.setData("start_date", e.target.value)
+                                                editForm.setData(
+                                                    "start_date",
+                                                    e.target.value,
+                                                )
                                             }
                                             required
                                             className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium"
@@ -1141,16 +1426,28 @@ export default function Index({ events, divisions }: EventsProps) {
                                         <Input
                                             id="edit-start-time"
                                             type="time"
-                                            value={editForm.data.start_time_only}
+                                            value={
+                                                editForm.data.start_time_only
+                                            }
                                             onChange={(e) =>
-                                                editForm.setData("start_time_only", e.target.value)
+                                                editForm.setData(
+                                                    "start_time_only",
+                                                    e.target.value,
+                                                )
                                             }
                                             required
                                             className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium text-center"
                                         />
                                     </div>
                                 </div>
-                                <InputError message={editForm.errors.start_time || editForm.errors.start_date || editForm.errors.start_time_only} className="mt-1" />
+                                <InputError
+                                    message={
+                                        editForm.errors.start_time ||
+                                        editForm.errors.start_date ||
+                                        editForm.errors.start_time_only
+                                    }
+                                    className="mt-1"
+                                />
                             </div>
 
                             {/* Waktu Selesai */}
@@ -1165,14 +1462,17 @@ export default function Index({ events, divisions }: EventsProps) {
                                             htmlFor="edit-end-date"
                                             className="text-[11px] font-semibold text-gray-600"
                                         >
-                                            Tanggal 
+                                            Tanggal
                                         </Label>
                                         <Input
                                             id="edit-end-date"
                                             type="date"
                                             value={editForm.data.end_date}
                                             onChange={(e) =>
-                                                editForm.setData("end_date", e.target.value)
+                                                editForm.setData(
+                                                    "end_date",
+                                                    e.target.value,
+                                                )
                                             }
                                             required
                                             className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium"
@@ -1183,49 +1483,66 @@ export default function Index({ events, divisions }: EventsProps) {
                                             htmlFor="edit-end-time"
                                             className="text-[11px] font-semibold text-gray-600"
                                         >
-                                            Jam 
+                                            Jam
                                         </Label>
                                         <Input
                                             id="edit-end-time"
                                             type="time"
                                             value={editForm.data.end_time_only}
                                             onChange={(e) =>
-                                                editForm.setData("end_time_only", e.target.value)
+                                                editForm.setData(
+                                                    "end_time_only",
+                                                    e.target.value,
+                                                )
                                             }
                                             required
                                             className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium text-center"
                                         />
                                     </div>
                                 </div>
-                                <InputError message={editForm.errors.end_time || editForm.errors.end_date || editForm.errors.end_time_only} className="mt-1" />
+                                <InputError
+                                    message={
+                                        editForm.errors.end_time ||
+                                        editForm.errors.end_date ||
+                                        editForm.errors.end_time_only
+                                    }
+                                    className="mt-1"
+                                />
                             </div>
                         </div>
 
-                        <div className="space-y-1">
-                            <Label htmlFor="edit-div">Kategori Event</Label>
-                            <Select
-                                value={editForm.data.division_id}
-                                onValueChange={(val) =>
-                                    editForm.setData("division_id", val)
-                                }
+                        {/* Link Evidence (Optional) */}
+                        <div className="pt-1">
+                            <Label
+                                htmlFor="edit-evidence-link"
+                                className="text-xs font-semibold text-gray-700 flex items-center gap-1.5"
                             >
-                                <SelectTrigger id="edit-div">
-                                    <SelectValue placeholder="Pilih Kategori" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="company">
-                                        Perusahaan (Company-wide)
-                                    </SelectItem>
-                                    {divisions.map((div) => (
-                                        <SelectItem
-                                            key={div.id}
-                                            value={String(div.id)}
-                                        >
-                                            Divisi: {div.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                <LinkIcon className="size-3.5 text-[#901418]" />
+                                <span>
+                                    Link Evidence / Bukti Kegiatan (Opsional)
+                                </span>
+                            </Label>
+                            <Input
+                                id="edit-evidence-link"
+                                type="url"
+                                placeholder="https://example.com/folder-evidence atau tautan drive..."
+                                value={editForm.data.evidence_link || ""}
+                                onChange={(e) =>
+                                    editForm.setData(
+                                        "evidence_link",
+                                        e.target.value,
+                                    )
+                                }
+                                className="mt-1 rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium"
+                            />
+                            <p className="text-[11px] text-gray-400 mt-1">
+                                Masukkan URL tautan Google Drive, DropBox, atau
+                                dokumentasi lainnya jika ada.
+                            </p>
+                            <InputError
+                                message={editForm.errors.evidence_link}
+                                className="mt-1"
+                            />
                         </div>
 
                         <DialogFooter>
@@ -1248,7 +1565,10 @@ export default function Index({ events, divisions }: EventsProps) {
             </Dialog>
 
             {/* Delete Event Confirmation Dialog */}
-            <Dialog open={!!eventToDelete} onOpenChange={(open) => !open && setEventToDelete(null)}>
+            <Dialog
+                open={!!eventToDelete}
+                onOpenChange={(open) => !open && setEventToDelete(null)}
+            >
                 <DialogContent className="max-w-md rounded-2xl p-6 overflow-hidden">
                     <DialogHeader className="flex flex-col items-center text-center gap-3 pt-2">
                         <div className="size-14 rounded-full bg-red-100 flex items-center justify-center shrink-0 shadow-inner">
@@ -1259,7 +1579,8 @@ export default function Index({ events, divisions }: EventsProps) {
                                 Konfirmasi Hapus Agenda
                             </DialogTitle>
                             <DialogDescription className="text-sm text-gray-500">
-                                Apakah Anda yakin ingin menghapus agenda atau kegiatan ini?
+                                Apakah Anda yakin ingin menghapus agenda atau
+                                kegiatan ini?
                             </DialogDescription>
                         </div>
                     </DialogHeader>
@@ -1290,7 +1611,12 @@ export default function Index({ events, divisions }: EventsProps) {
                                         Waktu Mulai
                                     </span>
                                     <p className="text-xs font-medium text-gray-800">
-                                        {new Date(eventToDelete.start_time).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                                        {new Date(
+                                            eventToDelete.start_time,
+                                        ).toLocaleString("id-ID", {
+                                            dateStyle: "medium",
+                                            timeStyle: "short",
+                                        })}
                                     </p>
                                 </div>
                                 <div>
@@ -1298,7 +1624,12 @@ export default function Index({ events, divisions }: EventsProps) {
                                         Waktu Selesai
                                     </span>
                                     <p className="text-xs font-medium text-gray-800">
-                                        {new Date(eventToDelete.end_time).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                                        {new Date(
+                                            eventToDelete.end_time,
+                                        ).toLocaleString("id-ID", {
+                                            dateStyle: "medium",
+                                            timeStyle: "short",
+                                        })}
                                     </p>
                                 </div>
                             </div>
@@ -1308,7 +1639,8 @@ export default function Index({ events, divisions }: EventsProps) {
                     <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-3 text-xs text-amber-800 flex items-start gap-2.5">
                         <Trash2 className="size-4 text-amber-600 shrink-0 mt-0.5" />
                         <span>
-                            Tindakan ini bersifat permanen. Data agenda yang dihapus tidak dapat dipulihkan kembali.
+                            Tindakan ini bersifat permanen. Data agenda yang
+                            dihapus tidak dapat dipulihkan kembali.
                         </span>
                     </div>
 

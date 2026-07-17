@@ -44,6 +44,9 @@ class EventController extends Controller
             'description' => 'required|string',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
+            'evidence_link' => 'nullable|string|max:2048',
+            'category' => 'nullable|string|in:internal,public',
+            'poster_file' => 'nullable|file|mimes:jpeg,jpg,png,webp|max:5120',
         ]);
 
         $rawDiv = $request->input('division_id');
@@ -54,14 +57,29 @@ class EventController extends Controller
             $divisionId = $user->division_id ?: null;
         }
 
-        Event::create([
+        $posterPath = null;
+        if ($request->hasFile('poster_file')) {
+            $file = $request->file('poster_file');
+            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $file->getClientOriginalName());
+            $file->move(public_path('uploads/posters'), $filename);
+            $posterPath = '/uploads/posters/' . $filename;
+        }
+
+        $event = Event::create([
             'title' => $validated['title'],
             'description' => $validated['description'],
             'start_time' => \Carbon\Carbon::parse($validated['start_time'])->format('Y-m-d H:i:s'),
             'end_time' => \Carbon\Carbon::parse($validated['end_time'])->format('Y-m-d H:i:s'),
+            'evidence_link' => $request->input('evidence_link') ?: null,
+            'poster_path' => $posterPath,
             'division_id' => $divisionId,
+            'category' => $request->input('category', 'internal'),
             'created_by' => $user->id,
         ]);
+
+        // Kirim notifikasi ke semua user
+        $users = \App\Models\User::all();
+        \Illuminate\Support\Facades\Notification::send($users, new \App\Notifications\EventNotification($event, 'created'));
 
         return redirect()->route('events.index')->with('success', 'Event berhasil dibuat.');
     }
@@ -75,6 +93,9 @@ class EventController extends Controller
             'description' => 'required|string',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
+            'evidence_link' => 'nullable|string|max:2048',
+            'category' => 'nullable|string|in:internal,public',
+            'poster_file' => 'nullable|file|mimes:jpeg,jpg,png,webp|max:5120',
         ]);
 
         $rawDiv = $request->input('division_id');
@@ -85,13 +106,24 @@ class EventController extends Controller
             $divisionId = $event->division_id;
         }
 
-        $event->update([
+        $updateData = [
             'title' => $validated['title'],
             'description' => $validated['description'],
             'start_time' => \Carbon\Carbon::parse($validated['start_time'])->format('Y-m-d H:i:s'),
             'end_time' => \Carbon\Carbon::parse($validated['end_time'])->format('Y-m-d H:i:s'),
+            'evidence_link' => $request->input('evidence_link') ?: null,
             'division_id' => $divisionId,
-        ]);
+            'category' => $request->input('category', 'internal'),
+        ];
+
+        if ($request->hasFile('poster_file')) {
+            $file = $request->file('poster_file');
+            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $file->getClientOriginalName());
+            $file->move(public_path('uploads/posters'), $filename);
+            $updateData['poster_path'] = '/uploads/posters/' . $filename;
+        }
+
+        $event->update($updateData);
 
         return redirect()->route('events.index')->with('success', 'Event berhasil diperbarui.');
     }

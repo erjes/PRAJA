@@ -136,7 +136,7 @@ export default function Welcome() {
     ];
 
     const eventsList = upcomingEvents.length > 0
-        ? upcomingEvents.slice(0, 3).map((e, idx) => {
+        ? upcomingEvents.slice(0, 3).map((e: any, idx) => {
             const dateObj = e.start_time ? new Date(e.start_time) : new Date();
             const day = dateObj.toLocaleDateString('id-ID', { day: '2-digit' });
             const month = dateObj.toLocaleDateString('id-ID', { month: 'short' });
@@ -146,7 +146,7 @@ export default function Welcome() {
                 day,
                 month,
                 location: e.division?.name ? `${e.division.name}, Telkom University` : 'Gedung Tokong Nanas, Telkom University',
-                image: defaultEvents[idx % defaultEvents.length].image
+                image: e.poster_path ? e.poster_path : null
             };
         })
         : defaultEvents;
@@ -218,8 +218,8 @@ export default function Welcome() {
             <Head title="Selamat Datang - PRAJA" />
 
             {/* Top Header Navigation */}
-            <header className="sticky top-0 z-50 w-full bg-[#F9F9F9]/95 backdrop-blur-md transition-colors border-b border-gray-100 shadow-xs">
-                <div className="w-full px-4 sm:px-8 lg:px-12 h-18 sm:h-20 flex items-center justify-between">
+            <header className="sticky top-0 z-50 w-full bg-[#F9F9F9]/95 backdrop-blur-md transition-colors border-b border-gray-200/60 shadow-xs">
+                <div className="w-full px-4 sm:px-6 md:px-8 h-18 sm:h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
                         <img 
                             src="/logo.png" 
@@ -252,7 +252,7 @@ export default function Welcome() {
             </header>
 
             {/* Hero Section */}
-            <section className="pt-10 sm:pt-14 pb-8 px-4 sm:px-8 lg:px-12 w-full text-center relative">
+            <section className="pt-10 sm:pt-14 pb-8 px-3 sm:px-6 md:px-8 w-full text-center relative">
                 <div className="max-w-3xl mx-auto">
                     <h1 className="text-3xl sm:text-4xl md:text-[44px] font-bold text-slate-900 tracking-tight leading-tight">
                         Bangun Kolaborasi yang Lebih Terstruktur
@@ -262,12 +262,12 @@ export default function Welcome() {
                     </p>
                 </div>
 
-                {/* Overlapping 3D Carousel Slider exactly matching screenshot */}
-                <div className="mt-10 relative max-w-4xl mx-auto flex items-center justify-center min-h-[250px] sm:min-h-[310px]">
-                    {/* Left Navigation Button placed on left card border */}
+                {/* Full-width responsive 3D Carousel Slider with reduced side padding */}
+                <div className="mt-10 relative w-full max-w-6xl mx-auto flex items-center justify-center min-h-[260px] sm:min-h-[340px]">
+                    {/* Left Navigation Button */}
                     <button
                         onClick={prevSlide}
-                        className="absolute left-4 sm:left-14 md:left-24 z-30 bg-[#901418] hover:bg-[#7a1014] text-white w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-xl transition-all transform hover:scale-110 active:scale-95 border border-white"
+                        className="absolute left-2 sm:left-6 md:left-12 z-30 bg-[#901418] hover:bg-[#7a1014] text-white w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shadow-xl transition-all transform hover:scale-110 active:scale-95 border border-white"
                         aria-label="Previous Slide"
                     >
                         <ChevronLeft className="w-5 h-5 stroke-[3]" />
@@ -276,7 +276,7 @@ export default function Welcome() {
                     {/* Left Slide (preview) */}
                     <div 
                         onClick={prevSlide}
-                        className="absolute left-0 sm:left-6 md:left-12 w-[220px] sm:w-[320px] md:w-[360px] h-[190px] sm:h-[240px] rounded-2xl overflow-hidden opacity-75 scale-90 z-10 shadow-md cursor-pointer transition-all duration-500"
+                        className="absolute left-0 sm:left-4 md:left-8 w-[240px] sm:w-[360px] md:w-[420px] h-[200px] sm:h-[260px] rounded-2xl overflow-hidden opacity-75 scale-90 z-10 shadow-md cursor-pointer transition-all duration-500"
                     >
                         <img
                             src={activitiesList[(activeSlide - 1 + activitiesList.length) % activitiesList.length].image}
@@ -287,7 +287,7 @@ export default function Welcome() {
 
                     {/* Active Center Slide */}
                     <div 
-                        className="relative w-[280px] sm:w-[380px] md:w-[440px] h-[220px] sm:h-[280px] rounded-2xl overflow-hidden z-20 shadow-2xl border-2 border-white transition-all duration-500 cursor-pointer"
+                        className="relative w-[300px] sm:w-[440px] md:w-[520px] h-[230px] sm:h-[310px] rounded-2xl overflow-hidden z-20 shadow-2xl border-2 border-white transition-all duration-500 cursor-pointer"
                     >
                         <img
                             src={activitiesList[activeSlide].image}
@@ -304,7 +304,7 @@ export default function Welcome() {
                     {/* Right Slide (preview) */}
                     <div 
                         onClick={nextSlide}
-                        className="absolute right-0 sm:right-6 md:right-12 w-[220px] sm:w-[320px] md:w-[360px] h-[190px] sm:h-[240px] rounded-2xl overflow-hidden opacity-75 scale-90 z-10 shadow-md cursor-pointer transition-all duration-500"
+                        className="absolute right-0 sm:right-4 md:right-8 w-[240px] sm:w-[360px] md:w-[420px] h-[200px] sm:h-[260px] rounded-2xl overflow-hidden opacity-75 scale-90 z-10 shadow-md cursor-pointer transition-all duration-500"
                     >
                         <img
                             src={activitiesList[(activeSlide + 1) % activitiesList.length].image}
@@ -313,10 +313,10 @@ export default function Welcome() {
                         />
                     </div>
 
-                    {/* Right Navigation Button placed on right card border */}
+                    {/* Right Navigation Button */}
                     <button
                         onClick={nextSlide}
-                        className="absolute right-4 sm:right-14 md:right-24 z-30 bg-[#901418] hover:bg-[#7a1014] text-white w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-xl transition-all transform hover:scale-110 active:scale-95 border border-white"
+                        className="absolute right-2 sm:right-6 md:right-12 z-30 bg-[#901418] hover:bg-[#7a1014] text-white w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shadow-xl transition-all transform hover:scale-110 active:scale-95 border border-white"
                         aria-label="Next Slide"
                     >
                         <ChevronRight className="w-5 h-5 stroke-[3]" />
@@ -334,7 +334,7 @@ export default function Welcome() {
             </div>
 
             {/* Event Mendatang Section */}
-            <section className="pt-6 sm:pt-8 pb-16 px-4 sm:px-8 lg:px-12 w-full">
+            <section className="pt-6 sm:pt-8 pb-16 px-3 sm:px-6 md:px-8 w-full">
                 <div className="text-center max-w-2xl mx-auto mb-10">
                     <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
                         Event Mendatang
@@ -344,18 +344,25 @@ export default function Welcome() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 w-full">
                     {eventsList.map((ev, idx) => (
                         <div
                             key={ev.id || idx}
-                            className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group"
+                            className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-md hover:border-[#901418]/50 transition-all duration-300 flex flex-col group w-full"
                         >
-                            <div className="h-44 sm:h-48 w-full overflow-hidden relative">
-                                <img
-                                    src={ev.image}
-                                    alt={ev.title}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                />
+                            <div className="h-44 sm:h-48 w-full overflow-hidden relative bg-gray-100 flex items-center justify-center">
+                                {ev.image ? (
+                                    <img
+                                        src={ev.image}
+                                        alt={ev.title}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="p-6 text-center w-full flex flex-col items-center justify-center bg-gray-100/90 h-full">
+                                        <span className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Agenda Kegiatan</span>
+                                        <span className="text-gray-600 font-bold text-base sm:text-lg line-clamp-3 leading-snug">{ev.title}</span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="p-4 sm:p-5 flex items-center gap-4 flex-1 bg-white">
@@ -370,11 +377,11 @@ export default function Welcome() {
                                 </div>
 
                                 {/* Divider vertical */}
-                                <div className="w-[1px] h-8 bg-slate-200 shrink-0" />
+                                <div className="w-[1px] h-8 bg-gray-200 shrink-0" />
 
                                 {/* Event Details */}
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-snug line-clamp-1">
+                                    <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-snug line-clamp-1 group-hover:text-[#901418] transition-colors">
                                         {ev.title}
                                     </h3>
                                     <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 line-clamp-1">
@@ -387,8 +394,8 @@ export default function Welcome() {
                 </div>
             </section>
 
-            {/* Document Kebijakan Section with D9D9D9 base card colors */}
-            <section className="py-12 sm:py-16 px-4 sm:px-8 lg:px-12 w-full">
+            {/* Document Kebijakan Section with clean white theme & #901418 accent */}
+            <section className="py-12 sm:py-16 px-3 sm:px-6 md:px-8 w-full">
                 <div className="text-center max-w-2xl mx-auto mb-10">
                     <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
                         Document Kebijakan
@@ -398,8 +405,8 @@ export default function Welcome() {
                     </p>
                 </div>
 
-                {/* Grid of 4 Documents side by side exact match to screenshot */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-center">
+                {/* Grid of 4 Documents full-width across screen */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 items-stretch w-full">
                     {displayDocs.slice(0, 4).map((doc, idx) => {
                         const isFeatured = idx === 1 || (idx === 0 && displayDocs.length === 1);
                         const latestVer = doc.versions && doc.versions.length > 0 ? doc.versions[0] : null;
@@ -409,35 +416,35 @@ export default function Welcome() {
                                 <div
                                     key={doc.id || idx}
                                     onClick={() => openDocReview(doc)}
-                                    className="bg-[#101828] text-white rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col justify-between relative overflow-hidden border border-slate-700 hover:scale-[1.02] transition-all cursor-pointer min-h-[320px] sm:min-h-[340px] z-10"
+                                    className="bg-white text-slate-900 rounded-2xl p-6 shadow-md border-2 border-[#901418]/30 hover:border-[#901418] hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden min-h-[320px] sm:min-h-[340px] z-10 w-full group"
                                 >
-                                    <div className="text-center mt-3">
-                                        <div className="inline-block px-2 py-0.5 rounded text-[9px] uppercase font-bold tracking-widest bg-[#901418] text-white mb-2.5">
+                                    <div className="text-center mt-2">
+                                        <div className="inline-block px-2.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-widest bg-[#901418] text-white mb-2.5 shadow-2xs">
                                             {doc.current_version || '2025'}
                                         </div>
-                                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
-                                            Laporan
+                                        <p className="text-[10px] uppercase tracking-wider text-[#901418] font-extrabold">
+                                            Laporan / Pedoman
                                         </p>
-                                        <h3 className="text-lg sm:text-xl font-black tracking-tight leading-tight mt-1 text-red-100">
+                                        <h3 className="text-lg sm:text-xl font-black tracking-tight leading-tight mt-1 text-slate-900 group-hover:text-[#901418] transition-colors">
                                             {doc.title.includes('Tracer') ? 'TRACER STUDY' : doc.title}
                                         </h3>
-                                        <p className="text-xs text-slate-300 font-bold mt-1">
+                                        <p className="text-xs text-slate-500 font-semibold mt-1">
                                             {doc.title.includes('Tracer') ? '2025' : ''}
                                         </p>
-                                        <div className="inline-block mt-2.5 px-3 py-1 rounded-full bg-white/10 text-white text-[10px] font-semibold">
+                                        <div className="inline-block mt-2.5 px-3 py-1 rounded-full bg-red-50 border border-red-100 text-[#901418] text-[10px] font-bold">
                                             Kampus Bandung
                                         </div>
                                     </div>
 
-                                    <div className="mt-6 text-center border-t border-white/15 pt-3.5">
-                                        <p className="text-[10px] text-slate-400 leading-relaxed line-clamp-2">
+                                    <div className="mt-6 text-center border-t border-gray-100 pt-3.5">
+                                        <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">
                                             {doc.description || 'Bridging Education and Workforce Evolution - Direktorat Penjaminan Mutu & Audit'}
                                         </p>
                                         {latestVer && (
                                             <a
                                                 href={route('documents.download', latestVer.id)}
                                                 onClick={(e) => e.stopPropagation()}
-                                                className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-bold px-3.5 py-1.5 rounded-lg bg-[#901418] hover:bg-[#7a1014] text-white transition shadow"
+                                                className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-[#901418] hover:bg-[#7a1014] text-white transition shadow-sm"
                                             >
                                                 <Download className="w-3.5 h-3.5" />
                                                 Unduh PDF
@@ -448,16 +455,22 @@ export default function Welcome() {
                             );
                         }
 
-                        // Surrounding minimalist grey cards using #D9D9D9
+                        // Surrounding clean white cards with #901418 accent
                         return (
                             <div
                                 key={doc.id || idx}
                                 onClick={() => openDocReview(doc)}
-                                className="bg-[#D9D9D9] rounded-2xl p-6 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all flex flex-col items-center justify-center cursor-pointer min-h-[280px] sm:min-h-[300px] border border-slate-300/60"
+                                className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-[#901418]/60 transition-all flex flex-col items-center justify-center cursor-pointer min-h-[280px] sm:min-h-[300px] border border-gray-200/80 w-full group"
                             >
-                                <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-[#B8B8B8] flex items-center justify-center text-slate-800 font-bold text-sm tracking-tight shadow-inner">
+                                <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-red-50/80 border border-red-100 group-hover:bg-[#901418] transition-colors flex items-center justify-center text-[#901418] group-hover:text-white font-extrabold text-sm tracking-tight shadow-2xs">
                                     PDF
                                 </div>
+                                <h4 className="font-bold text-slate-800 text-sm mt-4 text-center line-clamp-2 group-hover:text-[#901418] transition-colors">
+                                    {doc.title}
+                                </h4>
+                                <span className="text-[11px] text-slate-400 font-semibold mt-1">
+                                    {doc.current_version || 'v1.0'}
+                                </span>
                             </div>
                         );
                     })}
@@ -467,7 +480,7 @@ export default function Welcome() {
                 <div className="mt-10 text-center">
                     <button
                         onClick={() => setIsAllDocsOpen(true)}
-                        className="bg-[#901418] hover:bg-[#7a1014] text-white font-medium px-8 py-2.5 rounded-full shadow hover:shadow-md transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm tracking-wide"
+                        className="bg-[#901418] hover:bg-[#7a1014] text-white font-semibold px-8 py-2.5 rounded-full shadow hover:shadow-md transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm tracking-wide"
                     >
                         Lihat Selengkapnya
                     </button>

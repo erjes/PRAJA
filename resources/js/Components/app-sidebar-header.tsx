@@ -27,6 +27,7 @@ interface NotificationData {
     data: {
         title: string;
         message: string;
+        url?: string;
     };
     read_at: string | null;
     created_at: string;
@@ -145,10 +146,16 @@ export function AppSidebarHeader({
                                 notifications.map((notification) => (
                                     <DropdownMenuItem
                                         key={notification.id}
-                                        className="p-3 flex flex-col items-start gap-1 cursor-pointer"
+                                        onClick={async (e) => {
+                                            await handleRead(notification.id, e);
+                                            if (notification.data.url) {
+                                                window.location.href = notification.data.url;
+                                            }
+                                        }}
+                                        className="p-3 flex flex-col items-start gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
                                     >
                                         <div className="flex justify-between w-full items-start gap-2">
-                                            <span className="font-semibold text-sm line-clamp-1">{notification.data.title}</span>
+                                            <span className="font-semibold text-sm line-clamp-1 text-gray-900">{notification.data.title}</span>
                                             <button
                                                 onClick={(e) => handleRead(notification.id, e)}
                                                 className="text-muted-foreground hover:text-green-600 shrink-0"
