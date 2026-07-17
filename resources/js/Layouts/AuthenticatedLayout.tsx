@@ -66,7 +66,7 @@ const navItems: NavItem[] = [
         ),
     },
     {
-        label: 'Divisions',
+        label: 'Divisi',
         href: '/divisions',
         routeName: 'divisions.index',
         roles: ['admin'],

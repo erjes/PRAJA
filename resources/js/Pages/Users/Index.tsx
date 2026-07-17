@@ -103,51 +103,51 @@ export default function Index({ users, divisions }: IndexProps) {
     return (
         <>
             <Head title="Manajemen Pengguna BPA" />
-            <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+            <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#F9F9F9] text-[#1e1e1e] min-h-screen">
                 
                 {/* Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold">Manajemen Pengguna</h1>
-                        <p className="text-sm text-muted-foreground">
+                        <h1 className="text-2xl font-bold text-[#1e1e1e]">Manajemen Pengguna</h1>
+                        <p className="text-sm text-gray-600">
                             Kelola akun pegawai, peran (role), dan penugasan divisi.
                         </p>
                     </div>
-                    <Button onClick={() => setIsCreateOpen(true)} className="w-full sm:w-auto">
+                    <Button onClick={() => setIsCreateOpen(true)} className="w-full sm:w-auto bg-[#901418] hover:bg-[#7a1114] text-white shadow-sm">
                         <Plus className="mr-2 h-4 w-4" />
                         Tambah Pengguna
                     </Button>
                 </div>
 
                 {/* Users Table */}
-                <Card>
+                <Card className="border border-gray-200/80 shadow-sm rounded-xl overflow-hidden bg-white text-[#1e1e1e]">
                     <CardContent className="p-0 overflow-x-auto">
                         {users.length === 0 ? (
-                            <div className="py-12 flex flex-col items-center justify-center text-muted-foreground">
+                            <div className="py-12 flex flex-col items-center justify-center text-gray-500">
                                 <Users className="h-12 w-12 opacity-30 mb-3" />
                                 <p className="font-medium">Belum ada pengguna terdaftar</p>
                             </div>
                         ) : (
                             <table className="w-full text-left text-sm border-collapse">
                                 <thead>
-                                    <tr className="border-b bg-slate-50 dark:bg-slate-900/50">
-                                        <th className="px-6 py-3.5 font-semibold text-slate-700 dark:text-slate-300">Nama Lengkap</th>
-                                        <th className="px-6 py-3.5 font-semibold text-slate-700 dark:text-slate-300">Alamat Email</th>
-                                        <th className="px-6 py-3.5 font-semibold text-slate-700 dark:text-slate-300">Role</th>
-                                        <th className="px-6 py-3.5 font-semibold text-slate-700 dark:text-slate-300">Divisi</th>
-                                        <th className="text-right px-6 py-3.5 font-semibold text-slate-700 dark:text-slate-300">Aksi</th>
+                                    <tr className="border-b bg-[#64748B] text-white">
+                                        <th className="px-6 py-3.5 font-semibold text-white">Nama Lengkap</th>
+                                        <th className="px-6 py-3.5 font-semibold text-white">Alamat Email</th>
+                                        <th className="px-6 py-3.5 font-semibold text-white">Role</th>
+                                        <th className="px-6 py-3.5 font-semibold text-white">Divisi</th>
+                                        <th className="text-right px-6 py-3.5 font-semibold text-white">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y">
+                                <tbody className="divide-y divide-gray-100">
                                     {users.map((u) => (
-                                        <tr key={u.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors">
-                                            <td className="px-6 py-4 font-medium text-foreground">{u.name}</td>
-                                            <td className="px-6 py-4 text-muted-foreground">{u.email}</td>
+                                        <tr key={u.id} className="hover:bg-slate-50 transition-colors">
+                                            <td className="px-6 py-4 font-medium text-[#1e1e1e]">{u.name}</td>
+                                            <td className="px-6 py-4 text-gray-600">{u.email}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold capitalize ${
                                                     u.role === 'admin' 
-                                                        ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' 
-                                                        : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                                                        ? 'bg-red-100 text-[#901418]' 
+                                                        : 'bg-slate-100 text-slate-700'
                                                 }`}>
                                                     {u.role}
                                                 </span>

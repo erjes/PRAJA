@@ -6,6 +6,7 @@ import EventController from './EventController'
 import ProjectController from './ProjectController'
 import TaskController from './TaskController'
 import UserController from './UserController'
+import DivisionController from './DivisionController'
 import DocumentActivityLogController from './DocumentActivityLogController'
 import Auth from './Auth'
 const Controllers = {
@@ -17,6 +18,7 @@ EventController: Object.assign(EventController, EventController),
 ProjectController: Object.assign(ProjectController, ProjectController),
 TaskController: Object.assign(TaskController, TaskController),
 UserController: Object.assign(UserController, UserController),
+DivisionController: Object.assign(DivisionController, DivisionController),
 DocumentActivityLogController: Object.assign(DocumentActivityLogController, DocumentActivityLogController),
 Auth: Object.assign(Auth, Auth),
 }

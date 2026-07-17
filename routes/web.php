@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use App\Models\Document;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\DivisionController;
 
 Route::get('/', function () {
     $publicDocuments = Document::with(['versions.creator', 'uploader'])
@@ -104,6 +105,7 @@ Route::middleware('auth')->group(function () {
     // Admin-only User management & Activity Logs
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', \App\Http\Controllers\UserController::class);
+        Route::resource('divisions', DivisionController::class);
         Route::get('/activity-logs', [\App\Http\Controllers\DocumentActivityLogController::class, 'index'])->name('activity-logs.index');
         Route::get('/review-tasks', [\App\Http\Controllers\TaskController::class, 'reviewList'])->name('review-tasks.index');
     });

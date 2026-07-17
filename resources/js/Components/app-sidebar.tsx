@@ -8,6 +8,7 @@ import {
     Users,
     History,
     Bell,
+    Building2,
 } from 'lucide-react';
 import {
     Sidebar,
@@ -32,6 +33,7 @@ const ALL_NAV_ITEMS: (NavItem & { roles: string[] })[] = [
     { title: 'My Tasks',   href: '/tasks',      icon: CheckSquare,   roles: ['staff'] },
     { title: 'Documents',  href: '/documents',  icon: BookOpen,      roles: ['staff'] },
     { title: 'Users',      href: '/users',      icon: Users,         roles: ['admin'] },
+    { title: 'Divisi',     href: '/divisions',  icon: Building2,     roles: ['admin'] },
     { title: 'Activity Log', href: '/activity-logs', icon: History,    roles: ['admin'] },
     { title: 'Notifikasi',   href: '/notifications/history', icon: Bell, roles: ['staff', 'admin'] },
 ];

@@ -1,4 +1,4 @@
-import AuthSimpleLayout from '@/layouts/auth/auth-simple-layout';
+import AuthSimpleLayout from '@/Layouts/auth/auth-simple-layout';
 
 export default function AuthLayout({
     title = '',
