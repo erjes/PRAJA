@@ -45,6 +45,7 @@ class EventController extends Controller
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
             'evidence_link' => 'nullable|string|max:2048',
+            'location' => 'nullable|string|max:255',
             'category' => 'nullable|string|in:internal,public',
             'poster_file' => 'nullable|file|mimes:jpeg,jpg,png,webp|max:5120',
         ]);
@@ -68,6 +69,7 @@ class EventController extends Controller
         $event = Event::create([
             'title' => $validated['title'],
             'description' => $validated['description'],
+            'location' => $request->input('location') ?: null,
             'start_time' => \Carbon\Carbon::parse($validated['start_time'])->format('Y-m-d H:i:s'),
             'end_time' => \Carbon\Carbon::parse($validated['end_time'])->format('Y-m-d H:i:s'),
             'evidence_link' => $request->input('evidence_link') ?: null,
@@ -94,6 +96,7 @@ class EventController extends Controller
             'start_time' => 'required|date',
             'end_time' => 'required|date|after_or_equal:start_time',
             'evidence_link' => 'nullable|string|max:2048',
+            'location' => 'nullable|string|max:255',
             'category' => 'nullable|string|in:internal,public',
             'poster_file' => 'nullable|file|mimes:jpeg,jpg,png,webp|max:5120',
         ]);
@@ -109,6 +112,7 @@ class EventController extends Controller
         $updateData = [
             'title' => $validated['title'],
             'description' => $validated['description'],
+            'location' => $request->input('location') ?: null,
             'start_time' => \Carbon\Carbon::parse($validated['start_time'])->format('Y-m-d H:i:s'),
             'end_time' => \Carbon\Carbon::parse($validated['end_time'])->format('Y-m-d H:i:s'),
             'evidence_link' => $request->input('evidence_link') ?: null,

@@ -19,6 +19,7 @@ interface Event {
     end_time: string;
     division_id: number | null;
     evidence_link?: string | null;
+    location?: string | null;
     poster_path?: string | null;
     category?: 'internal' | 'public' | null;
     division?: { id: number; name: string } | null;
@@ -82,6 +83,7 @@ export default function Index({ events, divisions }: EventsProps) {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'overview' | 'calendar'>('overview');
+    const [activeCategory, setActiveCategory] = useState<'all' | 'internal' | 'public'>('all');
     const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
 
     // Form for creating event
@@ -96,6 +98,7 @@ export default function Index({ events, divisions }: EventsProps) {
         end_time: '',
         division_id: user.division_id ? String(user.division_id) : 'company',
         evidence_link: '',
+        location: '',
         category: 'internal' as 'internal' | 'public',
         poster_file: null as File | null,
     });
@@ -113,6 +116,7 @@ export default function Index({ events, divisions }: EventsProps) {
         end_time: '',
         division_id: 'company',
         evidence_link: '',
+        location: '',
         category: 'internal' as 'internal' | 'public',
         poster_file: null as File | null,
     });
@@ -162,12 +166,19 @@ export default function Index({ events, divisions }: EventsProps) {
         });
     };
 
-    const currentMonthEvents = events.filter(event => {
+    const currentMonthEventsBase = events.filter(event => {
         const eventStart = parseLocal(event.start_time);
         return eventStart.getMonth() === currentDate.getMonth() && eventStart.getFullYear() === currentDate.getFullYear();
     }).sort((a, b) => parseLocal(a.start_time).getTime() - parseLocal(b.start_time).getTime());
 
-    const groupedEvents = currentMonthEvents.reduce((acc, event) => {
+    const currentMonthEventsFiltered = currentMonthEventsBase.filter(event => {
+        if (activeCategory === 'all') return true;
+        if (activeCategory === 'internal') return !event.category || event.category === 'internal';
+        if (activeCategory === 'public') return event.category === 'public';
+        return true;
+    });
+
+    const groupedEvents = currentMonthEventsFiltered.reduce((acc, event) => {
         const dateKey = parseLocal(event.start_time).toDateString();
         if (!acc[dateKey]) {
             acc[dateKey] = [];
@@ -247,6 +258,7 @@ export default function Index({ events, divisions }: EventsProps) {
             end_time: '',
             division_id: user.division_id ? String(user.division_id) : 'company',
             evidence_link: '',
+            location: '',
             category: 'internal',
             poster_file: null,
         });
@@ -270,6 +282,7 @@ export default function Index({ events, divisions }: EventsProps) {
             end_time: '',
             division_id: event.division_id ? String(event.division_id) : 'company',
             evidence_link: event.evidence_link || '',
+            location: event.location || '',
             category: event.category || 'internal',
             poster_file: null,
         });
@@ -442,7 +455,10 @@ export default function Index({ events, divisions }: EventsProps) {
                         <div className="flex flex-col bg-[#f9f9f9]/50 min-h-[500px]">
                             {/* Stat Banner */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-5 bg-white border-b border-gray-200/80">
-                                <div className="bg-gray-50/80 rounded-xl p-4 border border-gray-200/80 shadow-xs flex items-center gap-4">
+                                <div 
+                                    onClick={() => setActiveCategory('all')}
+                                    className={`rounded-xl p-4 border shadow-xs flex items-center gap-4 cursor-pointer transition-all ${activeCategory === 'all' ? 'bg-gray-100 border-gray-300 ring-2 ring-gray-200' : 'bg-gray-50/80 border-gray-200/80 hover:bg-gray-100'}`}
+                                >
                                     <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#901418]/10 text-[#901418]">
                                         <CalendarIcon className="size-5" />
                                     </div>
@@ -451,14 +467,17 @@ export default function Index({ events, divisions }: EventsProps) {
                                             Total Agenda bulan ini
                                         </p>
                                         <p className="text-2xl font-extrabold text-gray-900">
-                                            {currentMonthEvents.length}{" "}
+                                            {currentMonthEventsBase.length}{" "}
                                             <span className="text-xs font-normal text-gray-500">
                                                 Event
                                             </span>
                                         </p>
                                     </div>
                                 </div>
-                                <div className="bg-gray-50/80 rounded-xl p-4 border border-gray-200/80 shadow-xs flex items-center gap-4">
+                                <div 
+                                    onClick={() => setActiveCategory('internal')}
+                                    className={`rounded-xl p-4 border shadow-xs flex items-center gap-4 cursor-pointer transition-all ${activeCategory === 'internal' ? 'bg-orange-50 border-orange-200 ring-2 ring-orange-200' : 'bg-gray-50/80 border-gray-200/80 hover:bg-orange-50/50'}`}
+                                >
                                     <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
                                         <Clock className="size-5" />
                                     </div>
@@ -468,7 +487,7 @@ export default function Index({ events, divisions }: EventsProps) {
                                         </p>
                                         <p className="text-2xl font-extrabold text-amber-600">
                                             {
-                                                currentMonthEvents.filter(
+                                                currentMonthEventsBase.filter(
                                                     (e) => !e.category || e.category === "internal"
                                                 ).length
                                             }{" "}
@@ -478,7 +497,10 @@ export default function Index({ events, divisions }: EventsProps) {
                                         </p>
                                     </div>
                                 </div>
-                                <div className="bg-gray-50/80 rounded-xl p-4 border border-gray-200/80 shadow-xs flex items-center gap-4">
+                                <div 
+                                    onClick={() => setActiveCategory('public')}
+                                    className={`rounded-xl p-4 border shadow-xs flex items-center gap-4 cursor-pointer transition-all ${activeCategory === 'public' ? 'bg-blue-50 border-blue-200 ring-2 ring-blue-200' : 'bg-gray-50/80 border-gray-200/80 hover:bg-blue-50/50'}`}
+                                >
                                     <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600">
                                         <Kanban className="size-5" />
                                     </div>
@@ -488,7 +510,7 @@ export default function Index({ events, divisions }: EventsProps) {
                                         </p>
                                         <p className="text-2xl font-extrabold text-blue-600">
                                             {
-                                                currentMonthEvents.filter(
+                                                currentMonthEventsBase.filter(
                                                     (e) => e.category === "public"
                                                 ).length
                                             }{" "}
@@ -502,7 +524,7 @@ export default function Index({ events, divisions }: EventsProps) {
 
                             {/* Timeline Content */}
                             <div className="p-6 md:p-8 flex-1">
-                                {currentMonthEvents.length === 0 ? (
+                                {currentMonthEventsFiltered.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-16 px-4 text-center bg-white border border-gray-200/80 rounded-2xl shadow-xs max-w-xl mx-auto my-6">
                                         <div className="size-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 mb-4">
                                             <CalendarIcon className="size-8 stroke-[1.5]" />
@@ -530,174 +552,114 @@ export default function Index({ events, divisions }: EventsProps) {
                                                 groupIdx,
                                                 arr,
                                             ) => {
-                                                const dateObj = new Date(
-                                                    dateString,
-                                                );
-                                                const isToday =
-                                                    dateObj.toDateString() ===
-                                                    new Date().toDateString();
-                                                const isLastGroup =
-                                                    groupIdx === arr.length - 1;
+                                                const dateObj = new Date(dateString);
+                                                const isLastGroup = groupIdx === arr.length - 1;
+                                                const firstEvent = dateEvents[0];
+                                                const firstIsCompany = !firstEvent.division_id;
+                                                const dateColor = firstIsCompany ? "text-[#901418]" : "text-blue-600";
 
                                                 return (
-                                                    <div
-                                                        key={dateString}
-                                                        className="relative flex flex-col md:flex-row gap-4 md:gap-8 items-start"
-                                                    >
-                                                        {/* Vertical line connecting nodes */}
-                                                        {!isLastGroup && (
-                                                            <div className="absolute left-[31px] md:left-[55px] top-16 bottom-0 w-0.5 bg-gray-200/80 -mb-8 z-0" />
-                                                        )}
-
-                                                        {/* Date Badge Node */}
-                                                        <div className="relative z-10 flex shrink-0 items-center md:items-end gap-3 md:flex-col md:w-[110px] md:text-right pt-1">
-                                                            <div
-                                                                className={`flex flex-col items-center justify-center size-16 rounded-2xl border transition-all ${
-                                                                    isToday
-                                                                        ? "bg-[#901418] text-white border-[#901418] shadow-md ring-4 ring-[#901418]/15 font-extrabold"
-                                                                        : "bg-white text-gray-800 border-gray-200/80 shadow-xs"
-                                                                }`}
-                                                            >
-                                                                <span className="text-2xl font-extrabold leading-none">
-                                                                    {dateObj.getDate()}
-                                                                </span>
-                                                                <span
-                                                                    className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 ${isToday ? "text-white/90" : "text-gray-500"}`}
-                                                                >
-                                                                    {dateObj.toLocaleString(
-                                                                        "id-ID",
-                                                                        {
-                                                                            month: "short",
-                                                                        },
-                                                                    )}
-                                                                </span>
-                                                            </div>
-                                                            <div>
-                                                                <span
-                                                                    className={`text-xs font-bold uppercase tracking-wider ${isToday ? "text-[#901418]" : "text-gray-500"}`}
-                                                                >
-                                                                    {isToday
-                                                                        ? "Hari Ini"
-                                                                        : dateObj.toLocaleString(
-                                                                              "id-ID",
-                                                                              {
-                                                                                  weekday:
-                                                                                      "long",
-                                                                              },
-                                                                          )}
-                                                                </span>
-                                                            </div>
+                                                    <div key={dateString} className="relative flex flex-col md:flex-row gap-6 md:gap-10 items-start w-full group/timeline">
+                                                        {/* Date Box (Left side) */}
+                                                        <div className="flex-shrink-0 w-24 md:w-28 bg-white border border-gray-100 rounded-3xl py-5 flex flex-col items-center justify-center shadow-sm relative z-10 transition-shadow hover:shadow-md">
+                                                            <span className={`text-[32px] font-extrabold leading-none ${dateColor}`}>{dateObj.getDate()}</span>
+                                                            <span className="text-[11px] font-bold text-gray-500 uppercase mt-2.5 tracking-wider">{dateObj.toLocaleString("id-ID", { month: "short" })}</span>
+                                                            <span className="text-[10px] font-semibold text-gray-400 uppercase mt-2.5 tracking-widest">{dateObj.toLocaleString("id-ID", { weekday: "long" })}</span>
                                                         </div>
 
+                                                        {/* Timeline Vertical Line connecting dots */}
+                                                        {!isLastGroup && (
+                                                            <div className="absolute left-[48px] md:left-[140px] top-6 bottom-[-32px] w-px bg-gray-200 z-0 hidden md:block" />
+                                                        )}
+
                                                         {/* Events Cards for this date */}
-                                                        <div className="flex-1 w-full space-y-3 pt-1">
-                                                            {dateEvents.map(
-                                                                (event) => {
-                                                                    const isCompany =
-                                                                        !event.division_id;
-                                                                    return (
-                                                                        <div
-                                                                            key={
-                                                                                event.id
-                                                                            }
-                                                                            onClick={() =>
-                                                                                openDetail(
-                                                                                    event,
-                                                                                )
-                                                                            }
-                                                                            className="group relative bg-white border border-gray-200/80 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#901418]/50 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full overflow-hidden"
-                                                                        >
-                                                                            {/* Left color bar accent */}
-                                                                            <div
-                                                                                className={`absolute top-0 bottom-0 left-0 w-1.5 ${isCompany ? "bg-[#901418]" : "bg-blue-500"}`}
-                                                                            />
+                                                        <div className="flex-1 w-full space-y-6 md:pt-1 relative z-10">
+                                                            {dateEvents.map((event) => {
+                                                                const isInternal = !event.category || event.category === 'internal';
+                                                                const eventColorBg = isInternal ? "bg-[#901418]" : "bg-blue-500";
+                                                                const eventColorText = isInternal ? "text-[#901418]" : "text-blue-500";
+                                                                const eventColorLightBg = isInternal ? "bg-[#901418]/10" : "bg-blue-500/10";
+                                                                
+                                                                return (
+                                                                    <div key={event.id} className="relative flex items-start w-full">
+                                                                        {/* Dot on the timeline */}
+                                                                        <div className={`absolute -left-[45.5px] top-7 w-3 h-3 rounded-full ring-4 ring-[#f9f9f9] shadow-sm z-10 hidden md:block ${eventColorBg}`} />
 
-                                                                            <div className="flex-1 min-w-0 pl-2">
-                                                                                <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
-                                                                                    <span className="flex items-center gap-1 text-xs font-semibold text-gray-500">
-                                                                                        <Clock className="size-3.5 text-gray-400" />
-                                                                                        {formatTimeOnly(event.start_time)} - {formatTimeOnly(event.end_time)}
-                                                                                    </span>
-                                                                                </div>
-
-                                                                                <h4 className="text-base font-bold text-gray-900 group-hover:text-[#901418] transition-colors line-clamp-1">
-                                                                                    {
-                                                                                        event.title
-                                                                                    }
-                                                                                </h4>
-                                                                                <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                                                                                    {event.description ||
-                                                                                        "Tidak ada deskripsi tambahan."}
-                                                                                </p>
-                                                                            </div>
-
-                                                                            <div className="flex items-center justify-between sm:justify-end gap-4 pl-2 sm:pl-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100 shrink-0">
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <div className="size-7 rounded-full bg-[#901418] text-white flex items-center justify-center text-xs font-bold shadow-xs">
-                                                                                        {event.creator?.name
-                                                                                            ?.charAt(
-                                                                                                0,
-                                                                                            )
-                                                                                            .toUpperCase() ||
-                                                                                            "P"}
-                                                                                    </div>
-                                                                                    <div className="text-left">
-                                                                                        <p className="text-xs font-bold text-gray-800 leading-none truncate max-w-[100px]">
-                                                                                            {event
-                                                                                                .creator
-                                                                                                ?.name ||
-                                                                                                "Staff"}
-                                                                                        </p>
-                                                                                        <p className="text-[10px] text-gray-400 mt-0.5">
-                                                                                            Pembuat
+                                                                        {/* Card Content */}
+                                                                        <div onClick={() => openDetail(event)} className="group bg-white border border-gray-100 rounded-[20px] shadow-sm hover:shadow-md transition-all cursor-pointer w-full overflow-hidden flex flex-col md:flex-row items-stretch">
+                                                                            {/* Left Color Border */}
+                                                                            <div className={`w-1.5 shrink-0 ${eventColorBg}`} />
+                                                                            
+                                                                            <div className="flex-1 p-5 md:p-6 flex flex-col w-full min-w-0 gap-5 md:gap-7">
+                                                                                {/* Top Row: Info and Actions */}
+                                                                                <div className="flex flex-col md:flex-row justify-between items-start gap-4 md:gap-8 w-full">
+                                                                                    <div className="flex-1 min-w-0">
+                                                                                        <div className="flex items-center gap-2 mb-2.5 text-[13px] font-semibold text-gray-500">
+                                                                                            <Clock className="size-4 text-gray-400" />
+                                                                                            {formatTimeOnly(event.start_time)} - {formatTimeOnly(event.end_time)}
+                                                                                        </div>
+                                                                                        <h4 className="text-[17px] font-bold text-gray-900 group-hover:text-gray-700 transition-colors mb-2 truncate">
+                                                                                            {event.title}
+                                                                                        </h4>
+                                                                                        <p className="text-[13px] text-gray-500 line-clamp-2 leading-relaxed">
+                                                                                            {event.description || "Tidak ada deskripsi tambahan."}
                                                                                         </p>
                                                                                     </div>
+                                                                                    
+                                                                                    <div className="flex items-center justify-between sm:justify-end gap-6 shrink-0 w-full md:w-auto">
+                                                                                        {/* User */}
+                                                                                        <div className="flex items-center gap-3.5">
+                                                                                            <div className={`size-10 rounded-full text-white flex items-center justify-center text-sm font-bold shadow-sm ${eventColorBg}`}>
+                                                                                                {event.creator?.name?.charAt(0).toUpperCase() || "A"}
+                                                                                            </div>
+                                                                                            <div className="text-left flex flex-col">
+                                                                                                <span className="text-[13px] font-bold text-gray-900 truncate max-w-[120px]">
+                                                                                                    {event.creator?.name || "Administrator"}
+                                                                                                </span>
+                                                                                                <span className="text-[11px] font-semibold text-gray-400 mt-0.5">
+                                                                                                    Pembuat
+                                                                                                </span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        
+                                                                                        {/* Actions */}
+                                                                                        <div className="flex items-center gap-2">
+                                                                                            <button type="button" onClick={(e) => { e.stopPropagation(); openEdit(event); }} className="size-[34px] rounded-xl border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900 flex items-center justify-center transition-colors">
+                                                                                                <Edit className="size-4" />
+                                                                                            </button>
+                                                                                            <button type="button" onClick={(e) => { e.stopPropagation(); handleDelete(event); }} className="size-[34px] rounded-xl border border-red-100 bg-white text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors">
+                                                                                                <Trash2 className="size-4" />
+                                                                                            </button>
+                                                                                            <div className="size-[34px] rounded-xl border border-gray-200 bg-white text-gray-400 flex items-center justify-center group-hover:border-gray-300 transition-colors">
+                                                                                                <ChevronRight className="size-4" />
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
                                                                                 </div>
-
-                                                                                <div className="flex items-center gap-1.5">
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        onClick={(
-                                                                                            e,
-                                                                                        ) => {
-                                                                                            e.stopPropagation();
-                                                                                            openEdit(
-                                                                                                event,
-                                                                                            );
-                                                                                        }}
-                                                                                        className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
-                                                                                        title="Edit Event"
-                                                                                    >
-                                                                                        <Edit className="size-3.5" />
-                                                                                    </button>
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        onClick={(
-                                                                                            e,
-                                                                                        ) => {
-                                                                                            e.stopPropagation();
-                                                                                            handleDelete(
-                                                                                                event,
-                                                                                            );
-                                                                                        }}
-                                                                                        className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                                                                                        title="Hapus Event"
-                                                                                    >
-                                                                                        <Trash2 className="size-3.5" />
-                                                                                    </button>
-                                                                                    <div className="size-8 rounded-lg border border-gray-200/80 flex items-center justify-center text-gray-400 group-hover:border-[#901418] group-hover:text-[#901418] transition-all">
-                                                                                        <ChevronRight className="size-4" />
+                                                                                
+                                                                                {/* Bottom Row: Badges */}
+                                                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                                                                                    <div className="flex flex-wrap gap-3">
+                                                                                        {event.location && (
+                                                                                            <span className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold ${eventColorLightBg} ${eventColorText}`}>
+                                                                                                <svg className="size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                                                                                {event.location}
+                                                                                            </span>
+                                                                                        )}
+                                                                                        <span className={`inline-flex items-center px-3.5 py-1.5 rounded-lg text-xs font-bold ${eventColorLightBg} ${eventColorText}`}>
+                                                                                            {isInternal ? "Internal" : "Umum"}
+                                                                                        </span>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                    );
-                                                                },
-                                                            )}
+                                                                    </div>
+                                                                );
+                                                            })}
                                                         </div>
                                                     </div>
                                                 );
-                                            },
+                                            }
                                         )}
                                     </div>
                                 )}
@@ -937,7 +899,7 @@ export default function Index({ events, divisions }: EventsProps) {
                                 <option value="public">Publik</option>
                             </select>
                             <p className="text-[11px] text-gray-400 mt-1">
-                                Pilih <strong className="text-gray-600">Publik</strong> untuk event umum seperti Market Day yang akan dipublish di halaman awal.
+                                Pilih <strong className="text-gray-600">Publik</strong> untuk event umum.
                             </p>
                         </div>
                         {createForm.data.category === "public" && (
@@ -991,6 +953,30 @@ export default function Index({ events, divisions }: EventsProps) {
                             />
                             <InputError
                                 message={createForm.errors.description}
+                                className="mt-1"
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label
+                                htmlFor="create-location"
+                                className="text-xs font-bold text-gray-700 uppercase tracking-wider"
+                            >
+                                Tempat Diselenggarakan
+                            </Label>
+                            <Input
+                                id="create-location"
+                                placeholder="Contoh: Ruang Rapat Utama"
+                                value={createForm.data.location || ""}
+                                onChange={(e) =>
+                                    createForm.setData(
+                                        "location",
+                                        e.target.value,
+                                    )
+                                }
+                                className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium"
+                            />
+                            <InputError
+                                message={createForm.errors.location}
                                 className="mt-1"
                             />
                         </div>
@@ -1203,6 +1189,29 @@ export default function Index({ events, divisions }: EventsProps) {
                                         {selectedEvent.description || "Tidak ada deskripsi."}
                                     </p>
                                 </div>
+                                {selectedEvent.location && (
+                                    <div className="mt-4">
+                                        <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                            <svg className="size-3.5 text-[#901418]" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            Tempat Diselenggarakan
+                                        </Label>
+                                        <p className="text-sm mt-1 text-gray-800">
+                                            {/^(https?:\/\/|www\.)/i.test(selectedEvent.location) ? (
+                                                <a 
+                                                    href={selectedEvent.location.startsWith('http') ? selectedEvent.location : `https://${selectedEvent.location}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:underline hover:text-blue-800 transition-colors break-all flex items-center gap-1.5"
+                                                >
+                                                    {selectedEvent.location}
+                                                    <ExternalLink className="size-3" />
+                                                </a>
+                                            ) : (
+                                                <span className="font-semibold">{selectedEvent.location}</span>
+                                            )}
+                                        </p>
+                                    </div>
+                                )}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-3">
                                     <div className="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
                                         <Label className="text-xs text-muted-foreground flex items-center gap-1.5 font-bold">
@@ -1384,6 +1393,25 @@ export default function Index({ events, divisions }: EventsProps) {
                             />
                             <InputError
                                 message={editForm.errors.description}
+                                className="mt-1"
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="edit-location">Tempat Diselenggarakan</Label>
+                            <Input
+                                id="edit-location"
+                                placeholder="Contoh: Ruang Rapat Utama"
+                                value={editForm.data.location || ""}
+                                onChange={(e) =>
+                                    editForm.setData(
+                                        "location",
+                                        e.target.value,
+                                    )
+                                }
+                                className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-medium"
+                            />
+                            <InputError
+                                message={editForm.errors.location}
                                 className="mt-1"
                             />
                         </div>

@@ -2,7 +2,7 @@ import { Head, usePage } from '@inertiajs/react';
 import { ReactNode, useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import AppSidebarLayout from '@/Layouts/app/app-sidebar-layout';
-import { CheckSquare, CalendarDays, BookOpen, Search, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckSquare, CalendarDays, BookOpen, Search, ArrowRight, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { Input } from '@/Components/ui/input';
 
 interface Task {
@@ -65,6 +65,7 @@ export default function Dashboard({
     const today = new Date();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [isMounted, setIsMounted] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
     useEffect(() => {
         // Trigger animations after mount
@@ -103,58 +104,58 @@ export default function Dashboard({
                     </div>
                 </div>
 
-                {/* Stat Summary Cards */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both">
-                    <Card className="bg-white border-gray-200/80 shadow-sm relative overflow-hidden group">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
-                                Tugas Aktif
-                                <div className="p-2 bg-red-50 rounded-lg text-[#901418] transition-colors group-hover:bg-[#901418] group-hover:text-white">
-                                    <CheckSquare className="h-4 w-4" />
-                                </div>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-3xl font-bold text-gray-900">
-                                {uncompletedTasks.length}
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-white border-gray-200/80 shadow-sm relative overflow-hidden group">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
-                                Event Bulan Ini
-                                <div className="p-2 bg-blue-50 rounded-lg text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
-                                    <CalendarDays className="h-4 w-4" />
-                                </div>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-3xl font-bold text-gray-900">
-                                {upcomingEvents.length}
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-white border-gray-200/80 shadow-sm relative overflow-hidden group">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
-                                Kebijakan Baru
-                                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-white">
-                                    <BookOpen className="h-4 w-4" />
-                                </div>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-3xl font-bold text-gray-900">
-                                {latestPolicies.length}
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
-
                 {/* Main Content Area */}
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 fill-mode-both">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both">
+                    {/* Left Column */}
                     <div className="lg:col-span-2 space-y-6">
+                        {/* Stat Summary Cards */}
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            <Card className="bg-white border-gray-200/80 shadow-sm relative overflow-hidden group">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
+                                        Tugas Aktif
+                                        <div className="p-2 bg-red-50 rounded-lg text-[#901418] transition-colors group-hover:bg-[#901418] group-hover:text-white">
+                                            <CheckSquare className="h-4 w-4" />
+                                        </div>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-3xl font-bold text-gray-900">
+                                        {uncompletedTasks.length}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                            <Card className="bg-white border-gray-200/80 shadow-sm relative overflow-hidden group">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
+                                        Event Bulan Ini
+                                        <div className="p-2 bg-blue-50 rounded-lg text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+                                            <CalendarDays className="h-4 w-4" />
+                                        </div>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-3xl font-bold text-gray-900">
+                                        {upcomingEvents.length}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                            <Card className="bg-white border-gray-200/80 shadow-sm relative overflow-hidden group">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
+                                        Kebijakan Baru
+                                        <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-white">
+                                            <BookOpen className="h-4 w-4" />
+                                        </div>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-3xl font-bold text-gray-900">
+                                        {latestPolicies.length}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </div>
                         {/* Uncompleted Tasks Preview */}
                         <Card className="bg-white border-gray-200/80 shadow-sm">
                             <CardHeader className="border-b border-gray-200/80 pb-4">
@@ -295,7 +296,7 @@ export default function Dashboard({
                                 ) : (
                                     <div className="divide-y divide-gray-100">
                                         {upcomingEvents
-                                            .slice(0, 4)
+                                            .slice(0, 3)
                                             .map((event) => (
                                                 <div
                                                     key={event.id}
@@ -495,7 +496,14 @@ export default function Dashboard({
                                                     className="relative group/day"
                                                 >
                                                     <div
-                                                        className={`p-2 rounded-lg flex flex-col items-center justify-center aspect-square ${isToday ? "bg-[#901418] text-white shadow-md ring-2 ring-red-100" : "hover:bg-gray-100 hover:text-gray-900 cursor-pointer text-gray-600"}`}
+                                                        onClick={() => {
+                                                            if (hasEvents) {
+                                                                setSelectedDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), date));
+                                                            } else {
+                                                                setSelectedDate(null);
+                                                            }
+                                                        }}
+                                                        className={`p-2 rounded-lg flex flex-col items-center justify-center aspect-square ${isToday ? "bg-[#901418] text-white shadow-md ring-2 ring-red-100" : (hasEvents ? "cursor-pointer hover:bg-gray-100 hover:text-gray-900 text-gray-900 font-extrabold" : "text-gray-600")}`}
                                                     >
                                                         <span>{date}</span>
                                                         {hasEvents && (
@@ -533,6 +541,39 @@ export default function Dashboard({
                                 </div>
                             </CardContent>
                         </Card>
+                        {selectedDate && (
+                            <Card className="bg-white border-gray-200/80 shadow-sm mt-6 animate-in fade-in zoom-in duration-300">
+                                <CardHeader className="pb-3 border-b border-gray-100">
+                                    <CardTitle className="text-sm font-bold text-gray-900">
+                                        Agenda pada {selectedDate.getDate()} {selectedDate.toLocaleString("id-ID", { month: "short", year: "numeric" })}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-0">
+                                    <div className="divide-y divide-gray-100">
+                                        {upcomingEvents
+                                            .filter((e) => {
+                                                const eDate = new Date(e.start_time);
+                                                return eDate.getDate() === selectedDate.getDate() && eDate.getMonth() === selectedDate.getMonth() && eDate.getFullYear() === selectedDate.getFullYear();
+                                            })
+                                            .map((event) => (
+                                                <div key={event.id} className="p-4 hover:bg-gray-50 transition-colors flex flex-col gap-1.5">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0"></div>
+                                                        <p className="text-[13px] font-bold text-gray-900 truncate">{event.title}</p>
+                                                    </div>
+                                                    <div className="flex items-center gap-1 text-[11px] font-semibold text-gray-500 pl-3.5">
+                                                        <Clock className="size-3" />
+                                                        {new Date(event.start_time).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})} - {new Date(event.end_time).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}
+                                                    </div>
+                                                    <p className="text-xs text-gray-600 pl-3.5 mt-0.5 line-clamp-2 leading-relaxed">
+                                                        {event.description || "Tidak ada deskripsi."}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
                 </div>
             </div>

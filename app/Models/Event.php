@@ -11,6 +11,7 @@ class Event extends Model
         'category',
         'title',
         'description',
+        'location',
         'start_time',
         'end_time',
         'evidence_link',
