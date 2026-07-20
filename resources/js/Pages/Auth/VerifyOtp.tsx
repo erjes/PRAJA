@@ -52,7 +52,6 @@ export default function VerifyOtp({ email }: { email: string }) {
 
                 <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-300">
                     <strong>Mode Development:</strong> Cek{' '}
-                    <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/40">Dimana Hayo</code>{' '}
                     untuk kode OTP Anda.
                 </div>
 

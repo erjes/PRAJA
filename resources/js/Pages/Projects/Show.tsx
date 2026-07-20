@@ -389,14 +389,14 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                         <div className="flex gap-2 flex-wrap">
                             {canManageProject && (
                                 <>
+                                    <Button size="sm" onClick={() => setIsCreateTaskOpen(true)}>
+                                        <Plus className="h-4 w-4 mr-1" /> Tambah Tugas
+                                    </Button>
                                     <Button size="sm" variant="outline" onClick={() => setIsEditProjectOpen(true)}>
                                         <Edit className="h-4 w-4 mr-1" /> Edit
                                     </Button>
-                                    <Button size="sm" variant="destructive" onClick={handleProjectDelete}>
+                                    <Button size="sm" onClick={handleProjectDelete} className="bg-[#901418] hover:bg-[#7a1014] text-white border-0">
                                         <Trash2 className="h-4 w-4 mr-1" /> Hapus
-                                    </Button>
-                                    <Button size="sm" onClick={() => setIsCreateTaskOpen(true)}>
-                                        <Plus className="h-4 w-4 mr-1" /> Tambah Tugas
                                     </Button>
                                 </>
                             )}

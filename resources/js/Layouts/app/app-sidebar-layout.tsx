@@ -60,9 +60,11 @@ export default function AppSidebarLayout({
                 </DialogContent>
             </Dialog>
             <AppSidebar />
-            <AppContent variant="sidebar" className="overflow-x-hidden">
+            <AppContent variant="sidebar" className="overflow-x-hidden flex flex-col">
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                {children}
+                <div key={usePage().url} className="animate-in fade-in slide-in-from-bottom-4 duration-300 ease-out fill-mode-both flex-1 flex flex-col">
+                    {children}
+                </div>
             </AppContent>
         </AppShell>
     );

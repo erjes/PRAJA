@@ -218,7 +218,7 @@ export default function Welcome() {
             <Head title="Selamat Datang - PRAJA" />
 
             {/* Top Header Navigation */}
-            <header className="sticky top-0 z-50 w-full bg-[#F9F9F9]/95 backdrop-blur-md transition-colors border-b border-gray-200/60 shadow-xs">
+            <header className="sticky top-0 z-50 w-full bg-[#F9F9F9]/95 backdrop-blur-md transition-colors border-b border-gray-200/60 shadow-xs animate-in fade-in slide-in-from-top-4 duration-700">
                 <div className="w-full px-4 sm:px-6 md:px-8 h-18 sm:h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
                         <img 
@@ -252,7 +252,7 @@ export default function Welcome() {
             </header>
 
             {/* Hero Section */}
-            <section className="pt-10 sm:pt-14 pb-8 px-3 sm:px-6 md:px-8 w-full text-center relative">
+            <section className="pt-10 sm:pt-14 pb-8 px-3 sm:px-6 md:px-8 w-full text-center relative animate-in fade-in zoom-in-95 duration-700 delay-150 fill-mode-both">
                 <div className="max-w-3xl mx-auto">
                     <h1 className="text-3xl sm:text-4xl md:text-[44px] font-bold text-slate-900 tracking-tight leading-tight">
                         Bangun Kolaborasi yang Lebih Terstruktur
@@ -264,63 +264,7 @@ export default function Welcome() {
 
                 {/* Full-width responsive 3D Carousel Slider with reduced side padding */}
                 <div className="mt-10 relative w-full max-w-6xl mx-auto flex items-center justify-center min-h-[260px] sm:min-h-[340px]">
-                    {/* Left Navigation Button */}
-                    <button
-                        onClick={prevSlide}
-                        className="absolute left-2 sm:left-6 md:left-12 z-30 bg-[#901418] hover:bg-[#7a1014] text-white w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shadow-xl transition-all transform hover:scale-110 active:scale-95 border border-white"
-                        aria-label="Previous Slide"
-                    >
-                        <ChevronLeft className="w-5 h-5 stroke-[3]" />
-                    </button>
-
-                    {/* Left Slide (preview) */}
-                    <div 
-                        onClick={prevSlide}
-                        className="absolute left-0 sm:left-4 md:left-8 w-[240px] sm:w-[360px] md:w-[420px] h-[200px] sm:h-[260px] rounded-2xl overflow-hidden opacity-75 scale-90 z-10 shadow-md cursor-pointer transition-all duration-500"
-                    >
-                        <img
-                            src={activitiesList[(activeSlide - 1 + activitiesList.length) % activitiesList.length].image}
-                            alt="Previous activity"
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
-
-                    {/* Active Center Slide */}
-                    <div 
-                        className="relative w-[300px] sm:w-[440px] md:w-[520px] h-[230px] sm:h-[310px] rounded-2xl overflow-hidden z-20 shadow-2xl border-2 border-white transition-all duration-500 cursor-pointer"
-                    >
-                        <img
-                            src={activitiesList[activeSlide].image}
-                            alt={activitiesList[activeSlide].title}
-                            className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-5 sm:p-6 text-left">
-                            <h3 className="text-sm sm:text-base font-bold text-white tracking-tight">
-                                {activitiesList[activeSlide].title}
-                            </h3>
-                        </div>
-                    </div>
-
-                    {/* Right Slide (preview) */}
-                    <div 
-                        onClick={nextSlide}
-                        className="absolute right-0 sm:right-4 md:right-8 w-[240px] sm:w-[360px] md:w-[420px] h-[200px] sm:h-[260px] rounded-2xl overflow-hidden opacity-75 scale-90 z-10 shadow-md cursor-pointer transition-all duration-500"
-                    >
-                        <img
-                            src={activitiesList[(activeSlide + 1) % activitiesList.length].image}
-                            alt="Next activity"
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
-
-                    {/* Right Navigation Button */}
-                    <button
-                        onClick={nextSlide}
-                        className="absolute right-2 sm:right-6 md:right-12 z-30 bg-[#901418] hover:bg-[#7a1014] text-white w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shadow-xl transition-all transform hover:scale-110 active:scale-95 border border-white"
-                        aria-label="Next Slide"
-                    >
-                        <ChevronRight className="w-5 h-5 stroke-[3]" />
-                    </button>
+                    
                 </div>
             </section>
 
@@ -335,7 +279,7 @@ export default function Welcome() {
 
             {/* Event Mendatang Section */}
             <section className="pt-6 sm:pt-8 pb-16 px-3 sm:px-6 md:px-8 w-full">
-                <div className="text-center max-w-2xl mx-auto mb-10">
+                <div className="text-center max-w-2xl mx-auto mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
                         Event Mendatang
                     </h2>
@@ -348,7 +292,8 @@ export default function Welcome() {
                     {eventsList.map((ev, idx) => (
                         <div
                             key={ev.id || idx}
-                            className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-md hover:border-[#901418]/50 transition-all duration-300 flex flex-col group w-full"
+                            className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#901418]/50 transition-all duration-300 flex flex-col group w-full animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
+                            style={{ animationDelay: `${(idx + 1) * 150}ms`, animationDuration: '700ms' }}
                         >
                             <div className="h-44 sm:h-48 w-full overflow-hidden relative bg-gray-100 flex items-center justify-center">
                                 {ev.image ? (
@@ -396,7 +341,7 @@ export default function Welcome() {
 
             {/* Document Kebijakan Section with clean white theme & #901418 accent */}
             <section className="py-12 sm:py-16 px-3 sm:px-6 md:px-8 w-full">
-                <div className="text-center max-w-2xl mx-auto mb-10">
+                <div className="text-center max-w-2xl mx-auto mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
                         Document Kebijakan
                     </h2>
@@ -416,7 +361,8 @@ export default function Welcome() {
                                 <div
                                     key={doc.id || idx}
                                     onClick={() => openDocReview(doc)}
-                                    className="bg-white text-slate-900 rounded-2xl p-6 shadow-md border-2 border-[#901418]/30 hover:border-[#901418] hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden min-h-[320px] sm:min-h-[340px] z-10 w-full group"
+                                    className="bg-white text-slate-900 rounded-2xl p-6 shadow-md border-2 border-[#901418]/30 hover:border-[#901418] hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden min-h-[320px] sm:min-h-[340px] z-10 w-full group animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
+                                    style={{ animationDelay: `${(idx + 1) * 150}ms`, animationDuration: '700ms' }}
                                 >
                                     <div className="text-center mt-2">
                                         <div className="inline-block px-2.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-widest bg-[#901418] text-white mb-2.5 shadow-2xs">
@@ -460,7 +406,8 @@ export default function Welcome() {
                             <div
                                 key={doc.id || idx}
                                 onClick={() => openDocReview(doc)}
-                                className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-[#901418]/60 transition-all flex flex-col items-center justify-center cursor-pointer min-h-[280px] sm:min-h-[300px] border border-gray-200/80 w-full group"
+                                className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#901418]/60 transition-all flex flex-col items-center justify-center cursor-pointer min-h-[280px] sm:min-h-[300px] border border-gray-200/80 w-full group animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
+                                style={{ animationDelay: `${(idx + 1) * 150}ms`, animationDuration: '700ms' }}
                             >
                                 <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-red-50/80 border border-red-100 group-hover:bg-[#901418] transition-colors flex items-center justify-center text-[#901418] group-hover:text-white font-extrabold text-sm tracking-tight shadow-2xs">
                                     PDF
@@ -480,7 +427,7 @@ export default function Welcome() {
                 <div className="mt-10 text-center">
                     <button
                         onClick={() => setIsAllDocsOpen(true)}
-                        className="bg-[#901418] hover:bg-[#7a1014] text-white font-semibold px-8 py-2.5 rounded-full shadow hover:shadow-md transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm tracking-wide"
+                        className="bg-[#901418] hover:bg-[#7a1014] text-white font-semibold px-8 py-2.5 rounded-full shadow hover:shadow-lg hover:-translate-y-0.5 transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm tracking-wide"
                     >
                         Lihat Selengkapnya
                     </button>
@@ -651,7 +598,6 @@ export default function Welcome() {
                                         className="p-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition"
                                         title="Tutup"
                                     >
-                                        <X className="w-5 h-5" />
                                     </button>
                                 </div>
                             </div>

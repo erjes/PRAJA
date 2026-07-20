@@ -25,8 +25,8 @@ class DashboardController extends Controller
             ->whereIn('status', ['pending', 'in_progress'])
             ->get();
 
-        // 2. Upcoming Events this month
-        $upcomingEvents = Event::where('start_time', '>=', now())
+        // 2. Events this month (for calendar and preview)
+        $thisMonthEvents = Event::where('start_time', '>=', now()->startOfMonth())
             ->where('start_time', '<=', now()->endOfMonth())
             ->where(function ($query) use ($user) {
                 $query->whereNull('division_id')
@@ -43,7 +43,7 @@ class DashboardController extends Controller
 
         return Inertia::render('Dashboard', [
             'uncompletedTasks' => $uncompletedTasks,
-            'upcomingEvents' => $upcomingEvents,
+            'upcomingEvents' => $thisMonthEvents,
             'latestPolicies' => $latestPolicies,
         ]);
     }
