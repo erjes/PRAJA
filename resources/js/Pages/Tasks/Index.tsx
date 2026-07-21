@@ -130,7 +130,7 @@ export default function Index({ tasks }: IndexProps) {
                 </div>
 
                 {/* Tasks Grid */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div key={activeTab} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-in fade-in zoom-in-[0.99] slide-in-from-bottom-4 duration-500 ease-out fill-mode-both">
                     {filteredTasks.length === 0 ? (
                         <Card className="col-span-full py-12 flex flex-col items-center justify-center text-muted-foreground">
                             <ClipboardList className="h-12 w-12 opacity-30 mb-3" />

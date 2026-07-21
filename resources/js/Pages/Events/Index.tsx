@@ -451,7 +451,8 @@ export default function Index({ events, divisions }: EventsProps) {
                         </div>
                     </div>
 
-                    {activeTab === "overview" ? (
+                    <div key={activeTab} className="animate-in fade-in zoom-in-[0.99] slide-in-from-bottom-4 duration-500 ease-out fill-mode-both flex flex-col flex-1">
+                        {activeTab === "overview" ? (
                         <div className="flex flex-col bg-[#f9f9f9]/50 min-h-[500px]">
                             {/* Stat Banner */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-5 bg-white border-b border-gray-200/80">
@@ -832,6 +833,7 @@ export default function Index({ events, divisions }: EventsProps) {
                             </div>
                         </>
                     )}
+                    </div>
                 </div>
             </div>
 

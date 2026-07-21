@@ -1,8 +1,9 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren } from 'react';
 
 export default function Guest({ children }: PropsWithChildren) {
+    const { url } = usePage();
     return (
         <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,rgba(250,250,250,1)_0%,rgba(243,244,246,1)_100%)] text-slate-900 dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_34%),linear-gradient(180deg,rgba(9,9,11,1)_0%,rgba(3,7,18,1)_100%)] dark:text-slate-100">
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -21,7 +22,7 @@ export default function Guest({ children }: PropsWithChildren) {
                     </Link>
                 </div>
 
-                <div className="w-full max-w-md rounded-[1.75rem] border border-slate-200/80 bg-white/90 px-6 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/80 dark:shadow-[0_24px_80px_rgba(0,0,0,0.45)] sm:px-8 ">
+                <div key={url} className="w-full max-w-md rounded-[1.75rem] border border-slate-200/80 bg-white/90 px-6 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/80 dark:shadow-[0_24px_80px_rgba(0,0,0,0.45)] sm:px-8 animate-in fade-in zoom-in-[0.99] slide-in-from-bottom-6 duration-500 ease-out fill-mode-both">
                     {children}
                 </div>
             </div>

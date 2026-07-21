@@ -51,8 +51,8 @@ export default function VerifyOtp({ email }: { email: string }) {
                 </div>
 
                 <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-300">
-                    <strong>Mode Development:</strong> Cek{' '}
-                    untuk kode OTP Anda.
+                    Cek{' '}
+                    kode OTP Anda.
                 </div>
 
                 <input type="hidden" name="email" value={data.email} />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { dashboard, login } from '@/routes';
+import { useInView } from '@/hooks/useInView';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 import { 
     ChevronLeft, 
@@ -69,6 +70,11 @@ interface PageProps {
 
 export default function Welcome() {
     const { auth, publicDocuments = [], recentProjects = [], upcomingEvents = [] } = usePage<PageProps>().props;
+
+    const heroAnim = useInView<HTMLElement>();
+    const eventAnim = useInView<HTMLElement>();
+    const docsAnim = useInView<HTMLElement>();
+    const footerAnim = useInView<HTMLElement>();
 
     // Carousel Activities
     const defaultActivities = [
@@ -220,71 +226,83 @@ export default function Welcome() {
             {/* Top Header Navigation */}
             <header className="sticky top-0 z-50 w-full bg-[#F9F9F9]/95 backdrop-blur-md transition-colors border-b border-gray-200/60 shadow-xs animate-in fade-in slide-in-from-top-4 duration-700">
                 <div className="w-full px-4 sm:px-6 md:px-8 h-18 sm:h-20 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
-                        <img 
-                            src="/logo.png" 
-                            alt="PRAJA Logo" 
-                            className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105" 
+                    <Link
+                        href="/"
+                        className="flex items-center gap-2 sm:gap-2.5 group shrink-0"
+                    >
+                        <img
+                            src="/logo.png"
+                            alt="PRAJA Logo"
+                            className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
                         />
                         <span className="text-xl sm:text-2xl md:text-[26px] font-black tracking-widest text-slate-900 uppercase">
                             PRAJA
                         </span>
                     </Link>
-
-                    <nav className="flex items-center gap-3 shrink-0">
-                        {auth.user ? (
-                            <Link
-                                href={dashboard()}
-                                className="bg-[#901418] hover:bg-[#7a1014] text-white px-5 sm:px-7 py-2 sm:py-2.5 rounded-full font-semibold shadow hover:shadow-md transition-all text-xs sm:text-sm tracking-wide flex items-center gap-1.5"
-                            >
-                                Dashboard
-                            </Link>
-                        ) : (
-                            <Link
-                                href={login()}
-                                className="bg-[#901418] hover:bg-[#7a1014] text-white px-5 sm:px-7 py-2 sm:py-2.5 rounded-full font-semibold shadow hover:shadow-md transition-all text-xs sm:text-sm tracking-wide active:scale-95"
-                            >
-                                Masuk
-                            </Link>
-                        )}
-                    </nav>
                 </div>
             </header>
 
             {/* Hero Section */}
-            <section className="pt-10 sm:pt-14 pb-8 px-3 sm:px-6 md:px-8 w-full text-center relative animate-in fade-in zoom-in-95 duration-700 delay-150 fill-mode-both">
-                <div className="max-w-3xl mx-auto">
-                    <h1 className="text-3xl sm:text-4xl md:text-[44px] font-bold text-slate-900 tracking-tight leading-tight">
-                        Bangun Kolaborasi yang Lebih Terstruktur
-                    </h1>
-                    <p className="mt-3.5 text-xs sm:text-sm text-slate-500 leading-relaxed font-normal max-w-xl mx-auto">
-                        Optimalkan produktivitas tim dengan sistem manajemen kegiatan yang dirancang untuk mendukung koordinasi, transparansi, dan efektivitas kerja.
-                    </p>
-                </div>
+            <section 
+                ref={heroAnim.ref}
+                className={`min-h-screen flex flex-col items-center justify-center pt-20 pb-24 sm:pb-32 px-3 sm:px-6 md:px-8 w-full text-center relative overflow-hidden duration-700 delay-150 fill-mode-both ${
+                    heroAnim.isInView ? 'animate-in fade-in zoom-in-95' : 'opacity-0'
+                }`}
+            >
+                {/* Background Image */}
+                <img
+                    src="/images/gku.jpg"
+                    alt="Gedung Kampus Telkom University"
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
 
-                {/* Full-width responsive 3D Carousel Slider with reduced side padding */}
-                <div className="mt-10 relative w-full max-w-6xl mx-auto flex items-center justify-center min-h-[260px] sm:min-h-[340px]">
-                    
+                {/* Overlay gradasi gelap ke merah PRAJA */}
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-900/65 via-slate-900/50 to-[#901418]/70" />
+
+                {/* Konten di atas overlay */}
+                <div className="max-w-3xl mx-auto relative z-10">
+                    <h1 className="text-3xl sm:text-4xl md:text-[52px] font-bold text-white tracking-tight leading-tight">
+                        Bangun Kolaborasi Bersama PRAJA
+                    </h1>
+                    <p className="mt-3.5 text-medium sm:text-sm text-white/85 leading-relaxed font-bold max-w-xl mx-auto">
+                        PRAJA adalah portal terpadu yang dirancang untuk
+                        mendukung pengelolaan aktivitas dan sumber daya
+                        akademik. Melalui satu platform, pengguna dapat
+                        mengakses informasi kebijakan, mengelola event, memantau
+                        proyek, serta berkolaborasi secara lebih efektif.
+                    </p>
+                    <div className="mt-6">
+                        <Link
+                            href={login()}
+                            className="inline-block bg-white hover:bg-gray-100 text-[#901418] px-8 py-2.5 rounded-2xl font-semibold shadow-md hover:shadow-lg transition-all text-sm tracking-wide active:scale-95"
+                        >
+                            Masuk
+                        </Link>
+                    </div>
                 </div>
             </section>
 
-            {/* Red Book/Ribbon Divider using exact file uploaded by user (/images/red-ribbon.png) with #901418 accent */}
-            <div className="w-full relative overflow-hidden leading-none z-10 -mt-2 sm:-mt-6 flex justify-center">
-                <img 
-                    src="/images/red-ribbon.png" 
-                    alt="Telkom Red Ribbon Divider" 
-                    className="w-full max-w-full h-auto object-cover sm:object-fill max-h-[220px] sm:max-h-[280px] select-none pointer-events-none block" 
+            <div className="w-full relative z-60 flex justify-center pointer-events-none -mt-[180px] -mb-[180px] sm:-mt-[180px] sm:-mb-[180px]">
+                <img
+                    src="/images/red-ribbon.png"
+                    alt="Telkom Red Ribbon Divider"
+                    className="w-full max-w-full h-auto object-cover sm:object-fill max-h-[220px] sm:max-h-[280px] select-none block"
                 />
             </div>
 
             {/* Event Mendatang Section */}
-            <section className="pt-6 sm:pt-8 pb-16 px-3 sm:px-6 md:px-8 w-full">
-                <div className="text-center max-w-2xl mx-auto mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <section ref={eventAnim.ref} className="pt-[130px] sm:pt-[280px] pb-16 px-3 sm:px-6 md:px-8 w-full relative z-20">
+                <div className={`text-center max-w-2xl mx-auto mb-10 duration-700 ${
+                    eventAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-4' : 'opacity-0'
+                }`}>
                     <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
                         Event Mendatang
                     </h2>
                     <p className="mt-2.5 text-xs sm:text-sm text-slate-500 leading-relaxed">
-                        Tetap terhubung dengan berbagai kegiatan akademik dan pengembangan diri. Temukan informasi mengenai seminar, workshop, pelatihan, dan acara lainnya yang akan segera berlangsung.
+                        Tetap terhubung dengan berbagai kegiatan akademik dan
+                        pengembangan diri. Temukan informasi mengenai seminar,
+                        workshop, pelatihan, dan acara lainnya yang akan segera
+                        berlangsung.
                     </p>
                 </div>
 
@@ -292,8 +310,13 @@ export default function Welcome() {
                     {eventsList.map((ev, idx) => (
                         <div
                             key={ev.id || idx}
-                            className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#901418]/50 transition-all duration-300 flex flex-col group w-full animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
-                            style={{ animationDelay: `${(idx + 1) * 150}ms`, animationDuration: '700ms' }}
+                            className={`bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#901418]/50 transition-all duration-300 flex flex-col group w-full fill-mode-both ${
+                                eventAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-8' : 'opacity-0'
+                            }`}
+                            style={{
+                                animationDelay: eventAnim.isInView ? `${(idx + 1) * 150}ms` : undefined,
+                                animationDuration: "700ms",
+                            }}
                         >
                             <div className="h-44 sm:h-48 w-full overflow-hidden relative bg-gray-100 flex items-center justify-center">
                                 {ev.image ? (
@@ -304,14 +327,17 @@ export default function Welcome() {
                                     />
                                 ) : (
                                     <div className="p-6 text-center w-full flex flex-col items-center justify-center bg-gray-100/90 h-full">
-                                        <span className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Agenda Kegiatan</span>
-                                        <span className="text-gray-600 font-bold text-base sm:text-lg line-clamp-3 leading-snug">{ev.title}</span>
+                                        <span className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+                                            Agenda Kegiatan
+                                        </span>
+                                        <span className="text-gray-600 font-bold text-base sm:text-lg line-clamp-3 leading-snug">
+                                            {ev.title}
+                                        </span>
                                     </div>
                                 )}
                             </div>
 
                             <div className="p-4 sm:p-5 flex items-center gap-4 flex-1 bg-white">
-                                {/* Date Box exactly matching #901418 */}
                                 <div className="flex flex-col items-center justify-center min-w-[50px] text-[#901418] font-bold shrink-0">
                                     <span className="text-[11px] font-semibold leading-none">
                                         {ev.month}
@@ -321,10 +347,8 @@ export default function Welcome() {
                                     </span>
                                 </div>
 
-                                {/* Divider vertical */}
                                 <div className="w-[1px] h-8 bg-gray-200 shrink-0" />
 
-                                {/* Event Details */}
                                 <div className="flex-1 min-w-0">
                                     <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-snug line-clamp-1 group-hover:text-[#901418] transition-colors">
                                         {ev.title}
@@ -340,42 +364,60 @@ export default function Welcome() {
             </section>
 
             {/* Document Kebijakan Section with clean white theme & #901418 accent */}
-            <section className="py-12 sm:py-16 px-3 sm:px-6 md:px-8 w-full">
-                <div className="text-center max-w-2xl mx-auto mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <section ref={docsAnim.ref} className="py-12 sm:py-16 px-3 sm:px-6 md:px-8 w-full">
+                <div className={`text-center max-w-2xl mx-auto mb-10 duration-700 ${
+                    docsAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-4' : 'opacity-0'
+                }`}>
                     <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
                         Document Kebijakan
                     </h2>
                     <p className="mt-2.5 text-xs sm:text-sm text-slate-500 leading-relaxed">
-                        Akses berbagai dokumen kebijakan dan pedoman resmi yang tersusun secara terpusat untuk mendukung tata kelola dan pengambilan keputusan yang lebih efektif.
+                        Akses berbagai dokumen kebijakan dan pedoman resmi yang
+                        tersusun secara terpusat untuk mendukung tata kelola dan
+                        pengambilan keputusan yang lebih efektif.
                     </p>
                 </div>
 
                 {/* Grid of 4 Documents full-width across screen */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 items-stretch w-full">
                     {displayDocs.slice(0, 4).map((doc, idx) => {
-                        const isFeatured = idx === 1 || (idx === 0 && displayDocs.length === 1);
-                        const latestVer = doc.versions && doc.versions.length > 0 ? doc.versions[0] : null;
+                        const isFeatured =
+                            idx === 1 ||
+                            (idx === 0 && displayDocs.length === 1);
+                        const latestVer =
+                            doc.versions && doc.versions.length > 0
+                                ? doc.versions[0]
+                                : null;
 
                         if (isFeatured) {
                             return (
                                 <div
                                     key={doc.id || idx}
                                     onClick={() => openDocReview(doc)}
-                                    className="bg-white text-slate-900 rounded-2xl p-6 shadow-md border-2 border-[#901418]/30 hover:border-[#901418] hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden min-h-[320px] sm:min-h-[340px] z-10 w-full group animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
-                                    style={{ animationDelay: `${(idx + 1) * 150}ms`, animationDuration: '700ms' }}
+                                    className={`bg-white text-slate-900 rounded-2xl p-6 shadow-md border-2 border-[#901418]/30 hover:border-[#901418] hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden min-h-[320px] sm:min-h-[340px] z-10 w-full group fill-mode-both ${
+                                        docsAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-8' : 'opacity-0'
+                                    }`}
+                                    style={{
+                                        animationDelay: docsAnim.isInView ? `${(idx + 1) * 150}ms` : undefined,
+                                        animationDuration: "700ms",
+                                    }}
                                 >
                                     <div className="text-center mt-2">
                                         <div className="inline-block px-2.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-widest bg-[#901418] text-white mb-2.5 shadow-2xs">
-                                            {doc.current_version || '2025'}
+                                            {doc.current_version || "2025"}
                                         </div>
                                         <p className="text-[10px] uppercase tracking-wider text-[#901418] font-extrabold">
                                             Laporan / Pedoman
                                         </p>
                                         <h3 className="text-lg sm:text-xl font-black tracking-tight leading-tight mt-1 text-slate-900 group-hover:text-[#901418] transition-colors">
-                                            {doc.title.includes('Tracer') ? 'TRACER STUDY' : doc.title}
+                                            {doc.title.includes("Tracer")
+                                                ? "TRACER STUDY"
+                                                : doc.title}
                                         </h3>
                                         <p className="text-xs text-slate-500 font-semibold mt-1">
-                                            {doc.title.includes('Tracer') ? '2025' : ''}
+                                            {doc.title.includes("Tracer")
+                                                ? "2025"
+                                                : ""}
                                         </p>
                                         <div className="inline-block mt-2.5 px-3 py-1 rounded-full bg-red-50 border border-red-100 text-[#901418] text-[10px] font-bold">
                                             Kampus Bandung
@@ -384,12 +426,18 @@ export default function Welcome() {
 
                                     <div className="mt-6 text-center border-t border-gray-100 pt-3.5">
                                         <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">
-                                            {doc.description || 'Bridging Education and Workforce Evolution - Direktorat Penjaminan Mutu & Audit'}
+                                            {doc.description ||
+                                                "Bridging Education and Workforce Evolution - Direktorat Penjaminan Mutu & Audit"}
                                         </p>
                                         {latestVer && (
                                             <a
-                                                href={route('documents.download', latestVer.id)}
-                                                onClick={(e) => e.stopPropagation()}
+                                                href={route(
+                                                    "documents.download",
+                                                    latestVer.id,
+                                                )}
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
                                                 className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-[#901418] hover:bg-[#7a1014] text-white transition shadow-sm"
                                             >
                                                 <Download className="w-3.5 h-3.5" />
@@ -406,8 +454,13 @@ export default function Welcome() {
                             <div
                                 key={doc.id || idx}
                                 onClick={() => openDocReview(doc)}
-                                className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#901418]/60 transition-all flex flex-col items-center justify-center cursor-pointer min-h-[280px] sm:min-h-[300px] border border-gray-200/80 w-full group animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
-                                style={{ animationDelay: `${(idx + 1) * 150}ms`, animationDuration: '700ms' }}
+                                className={`bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#901418]/60 transition-all flex flex-col items-center justify-center cursor-pointer min-h-[280px] sm:min-h-[300px] border border-gray-200/80 w-full group fill-mode-both ${
+                                    docsAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-8' : 'opacity-0'
+                                }`}
+                                style={{
+                                    animationDelay: docsAnim.isInView ? `${(idx + 1) * 150}ms` : undefined,
+                                    animationDuration: "700ms",
+                                }}
                             >
                                 <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-red-50/80 border border-red-100 group-hover:bg-[#901418] transition-colors flex items-center justify-center text-[#901418] group-hover:text-white font-extrabold text-sm tracking-tight shadow-2xs">
                                     PDF
@@ -416,7 +469,7 @@ export default function Welcome() {
                                     {doc.title}
                                 </h4>
                                 <span className="text-[11px] text-slate-400 font-semibold mt-1">
-                                    {doc.current_version || 'v1.0'}
+                                    {doc.current_version || "v1.0"}
                                 </span>
                             </div>
                         );
@@ -435,22 +488,24 @@ export default function Welcome() {
             </section>
 
             {/* Footer Section exactly with #901418 */}
-            <footer className="mt-auto bg-[#901418] text-white pt-12 pb-10 px-4 sm:px-8 lg:px-12 shadow-inner">
-                <div className="w-full flex flex-col md:flex-row items-start justify-between gap-8">
+            <footer ref={footerAnim.ref} className={`mt-auto bg-[#901418] text-white pt-12 pb-10 px-4 sm:px-8 lg:px-12 shadow-inner duration-700 ${
+                footerAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-4' : 'opacity-0'
+            }`}>
+                <div className="w-full flex flex-col items-start gap-8">
+                    {" "}
                     {/* Logo & PRAJA text */}
                     <div className="flex items-center gap-3">
                         <div className="bg-white rounded-lg p-1.5 flex items-center justify-center shadow">
-                            <img 
-                                src="/logo.png" 
-                                alt="PRAJA Logo" 
-                                className="h-8 w-auto object-contain" 
+                            <img
+                                src="/logo.png"
+                                alt="PRAJA Logo"
+                                className="h-8 w-auto object-contain"
                             />
                         </div>
                         <span className="text-3xl font-black tracking-widest text-white uppercase">
                             PRAJA
                         </span>
                     </div>
-
                     {/* Contact & Address */}
                     <div className="space-y-3.5 text-xs sm:text-sm text-red-100/90">
                         <div className="flex items-center gap-3">
@@ -462,8 +517,8 @@ export default function Welcome() {
 
                         <div className="flex items-center gap-3">
                             <Mail className="w-4 h-4 text-white shrink-0" />
-                            <a 
-                                href="mailto:kampusmerdeka@telkomuniversity.ac.id" 
+                            <a
+                                href="mailto:kampusmerdeka@telkomuniversity.ac.id"
                                 className="font-medium underline underline-offset-4 hover:text-white transition"
                             >
                                 kampusmerdeka@telkomuniversity.ac.id
@@ -503,7 +558,10 @@ export default function Welcome() {
                             </div>
                         ) : (
                             filteredModalDocs.map((doc, idx) => {
-                                const latestVer = doc.versions && doc.versions.length > 0 ? doc.versions[0] : null;
+                                const latestVer =
+                                    doc.versions && doc.versions.length > 0
+                                        ? doc.versions[0]
+                                        : null;
                                 return (
                                     <div
                                         key={doc.id || idx}
@@ -520,14 +578,22 @@ export default function Welcome() {
                                                 <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-500">
                                                     {doc.document_number && (
                                                         <span className="font-semibold text-slate-600">
-                                                            {doc.document_number}
+                                                            {
+                                                                doc.document_number
+                                                            }
                                                         </span>
                                                     )}
                                                     <span>•</span>
-                                                    <span>{doc.category === 'kebijakan' ? 'Kebijakan' : 'Proses Bisnis'}</span>
+                                                    <span>
+                                                        {doc.category ===
+                                                        "kebijakan"
+                                                            ? "Kebijakan"
+                                                            : "Proses Bisnis"}
+                                                    </span>
                                                     <span>•</span>
                                                     <span className="text-[#901418] font-semibold">
-                                                        {doc.current_version || 'v1.0'}
+                                                        {doc.current_version ||
+                                                            "v1.0"}
                                                     </span>
                                                 </div>
                                             </div>
@@ -547,7 +613,10 @@ export default function Welcome() {
 
                                             {latestVer && (
                                                 <a
-                                                    href={route('documents.download', latestVer.id)}
+                                                    href={route(
+                                                        "documents.download",
+                                                        latestVer.id,
+                                                    )}
                                                     className="px-4 py-1.5 rounded-xl bg-[#901418] hover:bg-[#7a1014] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
                                                 >
                                                     <Download className="w-3.5 h-3.5" />
@@ -578,34 +647,45 @@ export default function Welcome() {
                                     </span>
                                     {selectedDocForReview.current_version && (
                                         <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">
-                                            {selectedDocForReview.current_version}
+                                            {
+                                                selectedDocForReview.current_version
+                                            }
                                         </span>
                                     )}
                                 </div>
 
                                 <div className="flex items-center gap-3">
-                                    {selectedDocForReview.versions && selectedDocForReview.versions.length > 0 && (
-                                        <a
-                                            href={route('documents.download', selectedDocForReview.versions[0].id)}
-                                            className="px-3 py-1.5 rounded bg-[#901418] hover:bg-[#7a1014] text-white text-xs font-semibold flex items-center gap-1.5 transition"
-                                        >
-                                            <Download className="w-3.5 h-3.5" />
-                                            Unduh Berkas
-                                        </a>
-                                    )}
+                                    {selectedDocForReview.versions &&
+                                        selectedDocForReview.versions.length >
+                                            0 && (
+                                            <a
+                                                href={route(
+                                                    "documents.download",
+                                                    selectedDocForReview
+                                                        .versions[0].id,
+                                                )}
+                                                className="px-3 py-1.5 rounded bg-[#901418] hover:bg-[#7a1014] text-white text-xs font-semibold flex items-center gap-1.5 transition"
+                                            >
+                                                <Download className="w-3.5 h-3.5" />
+                                                Unduh Berkas
+                                            </a>
+                                        )}
                                     <button
                                         onClick={() => setIsReviewOpen(false)}
                                         className="p-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition"
                                         title="Tutup"
-                                    >
-                                    </button>
+                                    ></button>
                                 </div>
                             </div>
 
                             <div className="flex-1 w-full h-full relative bg-slate-900 flex items-center justify-center">
-                                {selectedDocForReview.versions && selectedDocForReview.versions.length > 0 ? (
+                                {selectedDocForReview.versions &&
+                                selectedDocForReview.versions.length > 0 ? (
                                     <iframe
-                                        src={route('documents.preview', selectedDocForReview.versions[0].id)}
+                                        src={route(
+                                            "documents.preview",
+                                            selectedDocForReview.versions[0].id,
+                                        )}
                                         className="w-full h-full border-0 absolute inset-0"
                                         title={selectedDocForReview.title}
                                     />
@@ -614,8 +694,13 @@ export default function Welcome() {
                                         <div className="w-16 h-16 rounded-full bg-slate-800 text-slate-500 font-black flex items-center justify-center mx-auto mb-3 text-lg">
                                             PDF
                                         </div>
-                                        <p className="text-base font-semibold text-slate-300">Pratinjau langsung tidak tersedia</p>
-                                        <p className="text-xs mt-1 text-slate-500">Berkas dokumen ini belum diunggah atau berformat internal.</p>
+                                        <p className="text-base font-semibold text-slate-300">
+                                            Pratinjau langsung tidak tersedia
+                                        </p>
+                                        <p className="text-xs mt-1 text-slate-500">
+                                            Berkas dokumen ini belum diunggah
+                                            atau berformat internal.
+                                        </p>
                                     </div>
                                 )}
                             </div>

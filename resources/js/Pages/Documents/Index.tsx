@@ -285,19 +285,20 @@ export default function Index({ documents }: IndexProps) {
                 {/* Documents Table */}
                 <Card>
                     <CardContent className="p-0 overflow-x-auto">
-                        {filteredDocs.length === 0 ? (
-                            <div className="py-12 flex flex-col items-center justify-center text-muted-foreground">
-                                <FileText className="h-12 w-12 opacity-30 mb-3" />
-                                <p className="font-medium">
-                                    Tidak ada dokumen ditemukan
-                                </p>
-                            </div>
-                        ) : (
-                            <table className="w-full text-left text-sm border-collapse">
-                                <thead>
-                                    <tr className="border-b bg-slate-50 dark:bg-slate-900/50">
-                                        <th className="px-6 py-3.5 font-semibold text-slate-700 dark:text-slate-300">
-                                            Nama Dokumen
+                        <div key={`${filterCategory}-${filterStatus}`} className="animate-in fade-in zoom-in-[0.99] slide-in-from-bottom-4 duration-500 ease-out fill-mode-both min-w-full">
+                            {filteredDocs.length === 0 ? (
+                                <div className="py-12 flex flex-col items-center justify-center text-muted-foreground">
+                                    <FileText className="h-12 w-12 opacity-30 mb-3" />
+                                    <p className="font-medium">
+                                        Tidak ada dokumen ditemukan
+                                    </p>
+                                </div>
+                            ) : (
+                                <table className="w-full text-left text-sm border-collapse">
+                                    <thead>
+                                        <tr className="border-b bg-slate-50 dark:bg-slate-900/50">
+                                            <th className="px-6 py-3.5 font-semibold text-slate-700 dark:text-slate-300">
+                                                Nama Dokumen
                                         </th>
                                         <th className="px-6 py-3.5 font-semibold text-slate-700 dark:text-slate-300">
                                             Kategori
@@ -491,6 +492,7 @@ export default function Index({ documents }: IndexProps) {
                                 </tbody>
                             </table>
                         )}
+                        </div>
                     </CardContent>
                 </Card>
             </div>
