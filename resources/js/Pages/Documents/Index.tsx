@@ -10,7 +10,7 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Badge } from '@/Components/ui/badge';
-import { Plus, FileText, Download, Calendar, User, History, Trash2, ArrowUpCircle, Eye, Globe, Lock } from 'lucide-react';
+import { Plus, FileText, Download, Calendar, User, History, Trash2, ArrowUpCircle, Eye, Globe, Lock, Search } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 interface DocumentVersion {
@@ -58,6 +58,7 @@ export default function Index({ documents }: IndexProps) {
     const [isNewVersionOpen, setIsNewVersionOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [isReviewOpen, setIsReviewOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState<string>('');
 
     const subcategories = [
         { id: 'panduan', label: 'Panduan', category: 'kebijakan' },
@@ -109,6 +110,26 @@ export default function Index({ documents }: IndexProps) {
                 if (doc.status !== filterStatus) return false;
             }
         }
+
+        if (searchQuery.trim() !== '') {
+            const query = searchQuery.toLowerCase();
+            const searchableText = [
+                doc.title,
+                doc.document_number,
+                doc.subcategory,
+                doc.description,
+                doc.category,
+                doc.current_version,
+                doc.visibility,
+                doc.status,
+                doc.uploader?.name
+            ].filter(Boolean).join(' ').toLowerCase();
+            
+            if (!searchableText.includes(query)) {
+                return false;
+            }
+        }
+
         return true;
     });
 
@@ -272,10 +293,20 @@ export default function Index({ documents }: IndexProps) {
                     )}
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-4 mt-2">
+                    <div className="relative w-full sm:w-80">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            type="text"
+                            placeholder="Cari "
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-9 w-full bg-white dark:bg-zinc-900 border-slate-200 transition-all focus:ring-1 focus:ring-red-600"
+                        />
+                    </div>
                     <Button
                         onClick={() => setIsCreateOpen(true)}
-                        className="w-full sm:w-42 shadow-sm"
+                        className="w-full sm:w-auto shadow-sm bg-red-700 hover:bg-red-800 text-white font-medium"
                     >
                         <Plus className="mr-2 h-4 w-4" />
                         Tambah Dokumen
