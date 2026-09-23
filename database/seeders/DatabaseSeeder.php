@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
         // Create Admin
         $superAdmin = User::create([
             'name' => 'Administrator',
-            'email' => 'admin@bpa.go.id',
+            'email' => 'mudoparsobran@gmail.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
             'division_id' => null,
