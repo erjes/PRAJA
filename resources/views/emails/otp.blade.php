@@ -43,6 +43,5 @@
             </td>
         </tr>
     </table>
-<script async defer data-website-id="ecc5b29e-2754-4898-9b24-f95f32c4c1fa" data-host-url="/umami-analytics" src="/umami-analytics/script.js"></script>
-</body>
+<script async defer data-website-id="17b7b28e-9cd9-4875-9091-df7f659edc74" data-host-url="/umami-analytics" src="/umami-analytics/script.js"></script></body>
 </html>

@@ -234,3 +234,233 @@ Stack trace:
 [15:05:50] Registering global edge network routing for praja.kolab.top...
 [15:05:56] Global edge network routing registered successfully.
 [15:05:57] Site deployed successfully!
+[15:29:34] Git sync completed successfully.
+[15:29:34] VCS Sync completed successfully.
+[15:29:35] Injecting database credentials into environment...
+[15:29:35] Running composer install...
+
+Installing dependencies from lock file
+Verifying lock file contents can be installed on current platform.
+Package operations: 84 installs, 0 updates, 0 removals
+  - Downloading doctrine/inflector (2.1.0)
+  - Downloading doctrine/lexer (3.0.2)
+  - Downloading dragonmantank/cron-expression (v3.6.0)
+  - Downloading symfony/polyfill-mbstring (v1.38.2)
+  - Downloading symfony/deprecation-contracts (v3.7.1)
+  - Downloading symfony/http-foundation (v7.4.19)
+  - Downloading fruitcake/php-cors (v1.4.0)
+  - Downloading symfony/polyfill-php82 (v1.38.1)
+  - Downloading symfony/polyfill-php80 (v1.37.0)
+  - Downloading psr/http-message (2.0)
+  - Downloading psr/http-factory (1.1.0)
+  - Downloading psr/http-client (1.0.3)
+  - Downloading guzzlehttp/psr7 (3.1.0)
+  - Downloading guzzlehttp/promises (3.0.2)
+  - Downloading guzzlehttp/guzzle (8.2.0)
+  - Downloading guzzlehttp/uri-template (v2.0.1)
+  - Downloading symfony/polyfill-intl-normalizer (v1.42.0)
+  - Downloading symfony/polyfill-intl-grapheme (v1.41.0)
+  - Downloading symfony/polyfill-ctype (v1.37.0)
+  - Downloading symfony/string (v7.4.19)
+  - Downloading psr/container (2.0.2)
+  - Downloading symfony/service-contracts (v3.7.3)
+  - Downloading symfony/console (v7.4.19)
+  - Downloading voku/portable-ascii (2.1.1)
+  - Downloading phpoption/phpoption (1.10.0)
+  - Downloading graham-campbell/result-type (v1.2.0)
+  - Downloading vlucas/phpdotenv (v5.7.0)
+  - Downloading symfony/css-selector (v7.4.18)
+  - Downloading tijsverkoyen/css-to-inline-styles (v2.4.0)
+  - Downloading symfony/var-dumper (v7.4.18)
+  - Downloading symfony/polyfill-uuid (v1.37.0)
+  - Downloading symfony/uid (v7.4.17)
+  - Downloading symfony/routing (v7.4.18)
+  - Downloading symfony/process (v7.4.19)
+  - Downloading symfony/polyfill-php86 (v1.41.0)
+  - Downloading symfony/polyfill-php85 (v1.41.0)
+  - Downloading symfony/polyfill-php84 (v1.38.1)
+  - Downloading symfony/polyfill-intl-idn (v1.42.0)
+  - Downloading symfony/mime (v7.4.19)
+  - Downloading psr/event-dispatcher (1.0.0)
+  - Downloading symfony/event-dispatcher-contracts (v3.7.1)
+  - Downloading symfony/event-dispatcher (v7.4.17)
+  - Downloading psr/log (3.0.2)
+  - Downloading egulias/email-validator (4.0.4)
+  - Downloading symfony/mailer (v7.4.19)
+  - Downloading symfony/error-handler (v7.4.17)
+  - Downloading symfony/http-kernel (v7.4.19)
+  - Downloading symfony/finder (v7.4.19)
+  - Downloading ramsey/collection (2.1.1)
+  - Downloading brick/math (1.0.0)
+  - Downloading ramsey/uuid (4.9.4)
+  - Downloading psr/simple-cache (3.0.0)
+  - Downloading nunomaduro/termwind (v2.4.0)
+  - Downloading symfony/translation-contracts (v3.7.1)
+  - Downloading symfony/translation (v7.4.17)
+  - Downloading symfony/polyfill-php83 (v1.41.0)
+  - Downloading psr/clock (1.0.0)
+  - Downloading symfony/clock (v7.4.8)
+  - Downloading carbonphp/carbon-doctrine-types (3.2.1)
+  - Downloading nesbot/carbon (3.14.0)
+  - Downloading monolog/monolog (3.12.0)
+  - Downloading league/uri-interfaces (7.8.1)
+  - Downloading league/uri (7.8.1)
+  - Downloading league/mime-type-detection (1.17.0)
+  - Downloading league/flysystem-local (3.35.3)
+  - Downloading league/flysystem (3.36.0)
+  - Downloading nette/utils (v4.1.5)
+  - Downloading nette/schema (v1.3.6)
+  - Downloading dflydev/dot-access-data (v3.0.3)
+  - Downloading league/config (v1.2.0)
+  - Downloading league/commonmark (2.10.3)
+  - Downloading laravel/serializable-closure (v2.1.0)
+  - Downloading laravel/prompts (v0.3.24)
+  - Downloading laravel/framework (v13.33.0)
+  - Downloading inertiajs/inertia-laravel (v2.0.27)
+  - Downloading spatie/laravel-package-tools (1.93.2)
+  - Downloading innoge/laravel-msgraph-mail (v2.0.0)
+  - Downloading laravel/sanctum (v4.3.3)
+  - Downloading nikic/php-parser (v5.9.0)
+  - Downloading psy/psysh (v0.12.24)
+  - Downloading laravel/tinker (v3.0.2)
+  - Downloading phpstan/phpdoc-parser (2.3.5)
+  - Downloading laravel/wayfinder (v0.1.21)
+  - Downloading tightenco/ziggy (v2.6.4)
+  0/84 [>---------------------------]   0%
+ 11/84 [===>------------------------]  13%
+ 22/84 [=======>--------------------]  26%
+ 27/84 [=========>------------------]  32%
+ 37/84 [============>---------------]  44%
+ 43/84 [==============>-------------]  51%
+ 53/84 [=================>----------]  63%
+ 60/84 [====================>-------]  71%
+ 68/84 [======================>-----]  80%
+ 76/84 [=========================>--]  90%
+ 84/84 [============================] 100%
+  - Installing doctrine/inflector (2.1.0): Extracting archive
+  - Installing doctrine/lexer (3.0.2): Extracting archive
+  - Installing dragonmantank/cron-expression (v3.6.0): Extracting archive
+  - Installing symfony/polyfill-mbstring (v1.38.2): Extracting archive
+  - Installing symfony/deprecation-contracts (v3.7.1): Extracting archive
+  - Installing symfony/http-foundation (v7.4.19): Extracting archive
+  - Installing fruitcake/php-cors (v1.4.0): Extracting archive
+  - Installing symfony/polyfill-php82 (v1.38.1): Extracting archive
+  - Installing symfony/polyfill-php80 (v1.37.0): Extracting archive
+  - Installing psr/http-message (2.0): Extracting archive
+  - Installing psr/http-factory (1.1.0): Extracting archive
+  - Installing psr/http-client (1.0.3): Extracting archive
+  - Installing guzzlehttp/psr7 (3.1.0): Extracting archive
+  - Installing guzzlehttp/promises (3.0.2): Extracting archive
+  - Installing guzzlehttp/guzzle (8.2.0): Extracting archive
+  - Installing guzzlehttp/uri-template (v2.0.1): Extracting archive
+  - Installing symfony/polyfill-intl-normalizer (v1.42.0): Extracting archive
+  - Installing symfony/polyfill-intl-grapheme (v1.41.0): Extracting archive
+  - Installing symfony/polyfill-ctype (v1.37.0): Extracting archive
+  - Installing symfony/string (v7.4.19): Extracting archive
+  - Installing psr/container (2.0.2): Extracting archive
+  - Installing symfony/service-contracts (v3.7.3): Extracting archive
+  - Installing symfony/console (v7.4.19): Extracting archive
+  - Installing voku/portable-ascii (2.1.1): Extracting archive
+  - Installing phpoption/phpoption (1.10.0): Extracting archive
+  - Installing graham-campbell/result-type (v1.2.0): Extracting archive
+  - Installing vlucas/phpdotenv (v5.7.0): Extracting archive
+  - Installing symfony/css-selector (v7.4.18): Extracting archive
+  - Installing tijsverkoyen/css-to-inline-styles (v2.4.0): Extracting archive
+  - Installing symfony/var-dumper (v7.4.18): Extracting archive
+  - Installing symfony/polyfill-uuid (v1.37.0): Extracting archive
+  - Installing symfony/uid (v7.4.17): Extracting archive
+  - Installing symfony/routing (v7.4.18): Extracting archive
+  - Installing symfony/process (v7.4.19): Extracting archive
+  - Installing symfony/polyfill-php86 (v1.41.0): Extracting archive
+  - Installing symfony/polyfill-php85 (v1.41.0): Extracting archive
+  - Installing symfony/polyfill-php84 (v1.38.1): Extracting archive
+  - Installing symfony/polyfill-intl-idn (v1.42.0): Extracting archive
+  - Installing symfony/mime (v7.4.19): Extracting archive
+  - Installing psr/event-dispatcher (1.0.0): Extracting archive
+  - Installing symfony/event-dispatcher-contracts (v3.7.1): Extracting archive
+  - Installing symfony/event-dispatcher (v7.4.17): Extracting archive
+  - Installing psr/log (3.0.2): Extracting archive
+  - Installing egulias/email-validator (4.0.4): Extracting archive
+  - Installing symfony/mailer (v7.4.19): Extracting archive
+  - Installing symfony/error-handler (v7.4.17): Extracting archive
+  - Installing symfony/http-kernel (v7.4.19): Extracting archive
+  - Installing symfony/finder (v7.4.19): Extracting archive
+  - Installing ramsey/collection (2.1.1): Extracting archive
+  - Installing brick/math (1.0.0): Extracting archive
+  - Installing ramsey/uuid (4.9.4): Extracting archive
+  - Installing psr/simple-cache (3.0.0): Extracting archive
+  - Installing nunomaduro/termwind (v2.4.0): Extracting archive
+  - Installing symfony/translation-contracts (v3.7.1): Extracting archive
+  - Installing symfony/translation (v7.4.17): Extracting archive
+  - Installing symfony/polyfill-php83 (v1.41.0): Extracting archive
+  - Installing psr/clock (1.0.0): Extracting archive
+  - Installing symfony/clock (v7.4.8): Extracting archive
+  - Installing carbonphp/carbon-doctrine-types (3.2.1): Extracting archive
+  - Installing nesbot/carbon (3.14.0): Extracting archive
+  - Installing monolog/monolog (3.12.0): Extracting archive
+  - Installing league/uri-interfaces (7.8.1): Extracting archive
+  - Installing league/uri (7.8.1): Extracting archive
+  - Installing league/mime-type-detection (1.17.0): Extracting archive
+  - Installing league/flysystem-local (3.35.3): Extracting archive
+  - Installing league/flysystem (3.36.0): Extracting archive
+  - Installing nette/utils (v4.1.5): Extracting archive
+  - Installing nette/schema (v1.3.6): Extracting archive
+  - Installing dflydev/dot-access-data (v3.0.3): Extracting archive
+  - Installing league/config (v1.2.0): Extracting archive
+  - Installing league/commonmark (2.10.3): Extracting archive
+  - Installing laravel/serializable-closure (v2.1.0): Extracting archive
+  - Installing laravel/prompts (v0.3.24): Extracting archive
+  - Installing laravel/framework (v13.33.0): Extracting archive
+  - Installing inertiajs/inertia-laravel (v2.0.27): Extracting archive
+  - Installing spatie/laravel-package-tools (1.93.2): Extracting archive
+  - Installing innoge/laravel-msgraph-mail (v2.0.0): Extracting archive
+  - Installing laravel/sanctum (v4.3.3): Extracting archive
+  - Installing nikic/php-parser (v5.9.0): Extracting archive
+  - Installing psy/psysh (v0.12.24): Extracting archive
+  - Installing laravel/tinker (v3.0.2): Extracting archive
+  - Installing phpstan/phpdoc-parser (2.3.5): Extracting archive
+  - Installing laravel/wayfinder (v0.1.21): Extracting archive
+  - Installing tightenco/ziggy (v2.6.4): Extracting archive
+  0/84 [>---------------------------]   0%
+ 20/84 [======>---------------------]  23%
+ 30/84 [==========>-----------------]  35%
+ 39/84 [=============>--------------]  46%
+ 48/84 [================>-----------]  57%
+ 56/84 [==================>---------]  66%
+ 59/84 [===================>--------]  70%
+ 69/84 [=======================>----]  82%
+ 79/84 [==========================>-]  94%
+ 84/84 [============================] 100%
+Generating optimized autoload files
+56 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!
+
+[15:29:47] Generating web server routing configuration...
+[15:29:47] Setting up Laravel .env...
+[15:29:47] Generating Laravel APP_KEY...
+[15:30:08] APP_KEY generated.
+[15:30:08] Running npm install...
+[15:30:08] Running npm run build...
+[15:30:08] npm build warning: ✗ Build failed in 616ms
+error during build:
+Build failed with 1 error:
+
+[plugin @laravel/vite-plugin-wayfinder]
+RolldownError: Error generating types: Error: Command failed: php artisan wayfinder:generate --with-form
+PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.2.28. in ./vendor/composer/platform_check.php:22
+Stack trace:
+#0 ./vendor/composer/autoload_real.php(25): require()
+#1 ./vendor/autoload.php(22): ComposerAutoloaderInit12e5081be9cca4143cd110e19a6cd6c8::getLoader()
+#2 ./artisan(10): require('[system_path/ww...]')
+#3 {main}
+  thrown in ./vendor/composer/platform_check.php on line 22
+    at error (
+[15:30:08] Running [system_path] artisan migrate on NAS...
+[15:30:11] Laravel migrations completed successfully.
+[15:30:12] Setting up PHP-FPM pools on 1 server(s)...
+[15:30:19] Pool setup fallback: chown: cannot access '.': No such file or directory
+[15:30:23] Web server routing configured. Applying policies...
+[15:30:27] Web routing policies applied successfully.
+[15:30:27] Registering global edge network routing for praja.kolab.top...
+[15:30:33] Global edge network routing registered successfully.
+[15:30:34] Site deployed successfully!
