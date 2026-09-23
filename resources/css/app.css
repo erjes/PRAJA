@@ -1,0 +1,201 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@import 'tw-animate-css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    --font-sans:
+        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
+
+    --radius-lg: var(--radius);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-sm: calc(var(--radius) - 4px);
+
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+    --background: #f9f9f9;
+    --foreground: #1e1e1e;
+    --card: #ffffff;
+    --card-foreground: #1e1e1e;
+    --popover: #ffffff;
+    --popover-foreground: #1e1e1e;
+    --primary: #901418;
+    --primary-foreground: #ffffff;
+    --secondary: #f3f4f6;
+    --secondary-foreground: #901418;
+    --muted: #f3f4f6;
+    --muted-foreground: #6b7280;
+    --accent: #fbe8e8;
+    --accent-foreground: #901418;
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
+    --border: #e5e7eb;
+    --input: #e5e7eb;
+    --ring: #901418;
+    --chart-1: #901418;
+    --chart-2: #3b82f6;
+    --chart-3: #10b981;
+    --chart-4: #f59e0b;
+    --chart-5: #8b5cf6;
+    --radius: 0.625rem;
+    --sidebar: #ffffff;
+    --sidebar-foreground: #1e1e1e;
+    --sidebar-primary: #901418;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #fdf2f2;
+    --sidebar-accent-foreground: #901418;
+    --sidebar-border: #e5e7eb;
+    --sidebar-ring: #901418;
+}
+
+.dark {
+    --background: #f9f9f9;
+    --foreground: #1e1e1e;
+    --card: #ffffff;
+    --card-foreground: #1e1e1e;
+    --popover: #ffffff;
+    --popover-foreground: #1e1e1e;
+    --primary: #901418;
+    --primary-foreground: #ffffff;
+    --secondary: #f3f4f6;
+    --secondary-foreground: #901418;
+    --muted: #f3f4f6;
+    --muted-foreground: #6b7280;
+    --accent: #fbe8e8;
+    --accent-foreground: #901418;
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
+    --border: #e5e7eb;
+    --input: #e5e7eb;
+    --ring: #901418;
+    --chart-1: #901418;
+    --chart-2: #3b82f6;
+    --chart-3: #10b981;
+    --chart-4: #f59e0b;
+    --chart-5: #8b5cf6;
+    --sidebar: #ffffff;
+    --sidebar-foreground: #1e1e1e;
+    --sidebar-primary: #901418;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #fdf2f2;
+    --sidebar-accent-foreground: #901418;
+    --sidebar-border: #e5e7eb;
+    --sidebar-ring: #901418;
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    html {
+        font-size: 110%;
+    }
+
+    body {
+        @apply bg-background text-foreground antialiased;
+        background-color: #f9f9f9 !important;
+        color: #1e1e1e !important;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        opacity: 0.6;
+        cursor: pointer;
+    }
+
+    .dark input[type="date"]::-webkit-calendar-picker-indicator,
+    .dark input[type="time"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+    }
+
+    /* Custom White Scrollbar for Modals and Page */
+    * {
+        scrollbar-color: #d1d5db #ffffff;
+        scrollbar-width: thin;
+    }
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #ffffff !important;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #d1d5db !important;
+        border-radius: 9999px;
+        border: 2px solid #ffffff;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af !important;
+    }
+}
+
+@theme inline {
+    --color-sidebar:
+        var(--sidebar);
+    --color-sidebar-foreground:
+        var(--sidebar-foreground);
+    --color-sidebar-primary:
+        var(--sidebar-primary);
+    --color-sidebar-primary-foreground:
+        var(--sidebar-primary-foreground);
+    --color-sidebar-accent:
+        var(--sidebar-accent);
+    --color-sidebar-accent-foreground:
+        var(--sidebar-accent-foreground);
+    --color-sidebar-border:
+        var(--sidebar-border);
+    --color-sidebar-ring:
+        var(--sidebar-ring);
+}
