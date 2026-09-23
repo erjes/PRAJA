@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-<<<<<<< HEAD
 use App\Mail\OtpMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
@@ -43,25 +42,6 @@ class AuthService
         if (config('app.debug')) {
             Log::info("[DEBUG] OTP for {$user->email} is: {$otp}");
         }
-=======
-use App\Models\User;
-use Illuminate\Support\Facades\Log;
-
-class AuthService
-{
-    public function generateAndSendOtp(User $user)
-    {
-        $otp = (string) random_int(100000, 999999);
-        
-        $user->update([
-            'otp_code' => $otp,
-            'otp_expires_at' => now()->addMinutes(10),
-            'is_otp_verified' => false,
-        ]);
-
-        // Simulate sending email/sms by logging it
-        Log::info("OTP for {$user->email} is: {$otp}");
->>>>>>> 177c673a019c5270c9716a2c71ba96692b744c65
     }
 
     public function verifyOtp(string $email, string $otp): ?User
