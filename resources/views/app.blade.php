@@ -18,5 +18,6 @@
     </head>
     <body class="font-sans antialiased">
         @inertia
-    </body>
+    <script async defer data-website-id="ecc5b29e-2754-4898-9b24-f95f32c4c1fa" data-host-url="/umami-analytics" src="/umami-analytics/script.js"></script>
+</body>
 </html>
