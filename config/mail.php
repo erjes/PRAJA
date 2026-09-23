@@ -75,6 +75,7 @@ return [
             'channel' => env('MAIL_LOG_CHANNEL'),
         ],
 
+<<<<<<< HEAD
         // Digunakan untuk mengirim OTP melalui akun Microsoft 365 / Outlook
         // menggunakan Microsoft Graph API (OAuth2 client credentials, bukan
         // basic-auth SMTP yang sudah dinonaktifkan oleh Microsoft).
@@ -90,6 +91,8 @@ return [
             'save_to_sent_items' => env('MAIL_SAVE_TO_SENT_ITEMS', false),
         ],
 
+=======
+>>>>>>> 177c673a019c5270c9716a2c71ba96692b744c65
         'array' => [
             'transport' => 'array',
         ],
