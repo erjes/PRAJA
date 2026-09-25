@@ -1,4 +1,5 @@
 import DocumentController from './DocumentController'
+import PublicPageController from './PublicPageController'
 import DashboardController from './DashboardController'
 import ProfileController from './ProfileController'
 import NotificationController from './NotificationController'
@@ -11,6 +12,7 @@ import DocumentActivityLogController from './DocumentActivityLogController'
 import Auth from './Auth'
 const Controllers = {
     DocumentController: Object.assign(DocumentController, DocumentController),
+PublicPageController: Object.assign(PublicPageController, PublicPageController),
 DashboardController: Object.assign(DashboardController, DashboardController),
 ProfileController: Object.assign(ProfileController, ProfileController),
 NotificationController: Object.assign(NotificationController, NotificationController),

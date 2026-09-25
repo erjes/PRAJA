@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { dashboard, login } from '@/routes';
+import { login } from '@/routes';
+import PublicLayout from '@/Layouts/PublicLayout';
 import { useInView } from '@/hooks/useInView';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { Dialog, DialogContent } from '@/Components/ui/dialog';
 import { 
     ChevronLeft, 
     ChevronRight, 
     Download, 
-    Eye, 
-    MapPin, 
-    Mail, 
-    X, 
-    Search, 
-    BookOpen
+    Eye
 } from 'lucide-react';
 
 interface DocumentVersion {
@@ -74,7 +70,6 @@ export default function Welcome() {
     const heroAnim = useInView<HTMLElement>();
     const eventAnim = useInView<HTMLElement>();
     const docsAnim = useInView<HTMLElement>();
-    const footerAnim = useInView<HTMLElement>();
 
     // Carousel Activities
     const defaultActivities = [
@@ -202,45 +197,18 @@ export default function Welcome() {
 
     const displayDocs = publicDocuments.length > 0 ? publicDocuments : defaultDocs;
 
-    // Modal state for viewing all documents & fullscreen PDF preview
-    const [isAllDocsOpen, setIsAllDocsOpen] = useState(false);
+    // Modal state for fullscreen PDF preview (used on individual document cards)
     const [selectedDocForReview, setSelectedDocForReview] = useState<Document | null>(null);
     const [isReviewOpen, setIsReviewOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
 
     const openDocReview = (doc: Document) => {
         setSelectedDocForReview(doc);
         setIsReviewOpen(true);
     };
 
-    const filteredModalDocs = displayDocs.filter(d => 
-        d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (d.document_number && d.document_number.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (d.description && d.description.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-
     return (
-        <div className="min-h-screen bg-[#F9F9F9] text-[#1b1b18] font-sans antialiased overflow-x-hidden flex flex-col">
+        <PublicLayout active="beranda">
             <Head title="Selamat Datang - PRAJA" />
-
-            {/* Top Header Navigation */}
-            <header className="sticky top-0 z-50 w-full bg-[#F9F9F9]/95 backdrop-blur-md transition-colors border-b border-gray-200/60 shadow-xs animate-in fade-in slide-in-from-top-4 duration-700">
-                <div className="w-full px-4 sm:px-6 md:px-8 h-18 sm:h-20 flex items-center justify-between">
-                    <Link
-                        href="/"
-                        className="flex items-center gap-2 sm:gap-2.5 group shrink-0"
-                    >
-                        <img
-                            src="/logo.png"
-                            alt="PRAJA Logo"
-                            className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
-                        />
-                        <span className="text-xl sm:text-2xl md:text-[26px] font-black tracking-widest text-slate-900 uppercase">
-                            PRAJA
-                        </span>
-                    </Link>
-                </div>
-            </header>
 
             {/* Hero Section */}
             <section 
@@ -361,6 +329,15 @@ export default function Welcome() {
                         </div>
                     ))}
                 </div>
+
+                <div className="mt-10 text-center">
+                    <Link
+                        href="/agenda"
+                        className="inline-block bg-white hover:bg-slate-50 text-[#901418] border-2 border-[#901418] font-semibold px-8 py-2.5 rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm tracking-wide"
+                    >
+                        Lihat Semua Event
+                    </Link>
+                </div>
             </section>
 
             {/* Document Kebijakan Section with clean white theme & #901418 accent */}
@@ -478,159 +455,14 @@ export default function Welcome() {
 
                 {/* Lihat Selengkapnya Button */}
                 <div className="mt-10 text-center">
-                    <button
-                        onClick={() => setIsAllDocsOpen(true)}
-                        className="bg-[#901418] hover:bg-[#7a1014] text-white font-semibold px-8 py-2.5 rounded-full shadow hover:shadow-lg hover:-translate-y-0.5 transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm tracking-wide"
+                    <Link
+                        href="/dokumen"
+                        className="inline-block bg-[#901418] hover:bg-[#7a1014] text-white font-semibold px-8 py-2.5 rounded-full shadow hover:shadow-lg hover:-translate-y-0.5 transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm tracking-wide"
                     >
                         Lihat Selengkapnya
-                    </button>
+                    </Link>
                 </div>
             </section>
-
-            {/* Footer Section exactly with #901418 */}
-            <footer ref={footerAnim.ref} className={`mt-auto bg-[#901418] text-white pt-12 pb-10 px-4 sm:px-8 lg:px-12 shadow-inner duration-700 ${
-                footerAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-4' : 'opacity-0'
-            }`}>
-                <div className="w-full flex flex-col items-start gap-8">
-                    {" "}
-                    {/* Logo & PRAJA text */}
-                    <div className="flex items-center gap-3">
-                        <div className="bg-white rounded-lg p-1.5 flex items-center justify-center shadow">
-                            <img
-                                src="/logo.png"
-                                alt="PRAJA Logo"
-                                className="h-8 w-auto object-contain"
-                            />
-                        </div>
-                        <span className="text-3xl font-black tracking-widest text-white uppercase">
-                            PRAJA
-                        </span>
-                    </div>
-                    {/* Contact & Address */}
-                    <div className="space-y-3.5 text-xs sm:text-sm text-red-100/90">
-                        <div className="flex items-center gap-3">
-                            <MapPin className="w-4 h-4 text-white shrink-0" />
-                            <span className="font-medium">
-                                Gedung Tokong Nanas Telkom University
-                            </span>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                            <Mail className="w-4 h-4 text-white shrink-0" />
-                            <a
-                                href="mailto:kampusmerdeka@telkomuniversity.ac.id"
-                                className="font-medium underline underline-offset-4 hover:text-white transition"
-                            >
-                                kampusmerdeka@telkomuniversity.ac.id
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-
-            {/* All Public Documents Modal */}
-            <Dialog open={isAllDocsOpen} onOpenChange={setIsAllDocsOpen}>
-                <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col p-6 bg-white text-slate-900">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-extrabold flex items-center gap-2 text-slate-900">
-                            <BookOpen className="w-5 h-5 text-[#901418]" />
-                            Daftar Seluruh Dokumen Kebijakan & Pedoman Publik
-                        </DialogTitle>
-                    </DialogHeader>
-
-                    {/* Search Input */}
-                    <div className="relative my-2">
-                        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input
-                            type="text"
-                            placeholder="Cari nama dokumen, nomor dokumen, atau kata kunci..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#901418] text-slate-900"
-                        />
-                    </div>
-
-                    {/* Documents List */}
-                    <div className="flex-1 overflow-y-auto space-y-3 pr-1 mt-2">
-                        {filteredModalDocs.length === 0 ? (
-                            <div className="py-12 text-center text-sm text-slate-500">
-                                Dokumen tidak ditemukan.
-                            </div>
-                        ) : (
-                            filteredModalDocs.map((doc, idx) => {
-                                const latestVer =
-                                    doc.versions && doc.versions.length > 0
-                                        ? doc.versions[0]
-                                        : null;
-                                return (
-                                    <div
-                                        key={doc.id || idx}
-                                        className="p-4 rounded-2xl border border-slate-200 bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-red-500/40 transition shadow-sm"
-                                    >
-                                        <div className="flex items-start gap-3.5">
-                                            <div className="w-11 h-11 rounded-xl bg-red-50 text-[#901418] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                                                PDF
-                                            </div>
-                                            <div>
-                                                <h4 className="font-extrabold text-slate-900 text-sm sm:text-base leading-snug">
-                                                    {doc.title}
-                                                </h4>
-                                                <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-500">
-                                                    {doc.document_number && (
-                                                        <span className="font-semibold text-slate-600">
-                                                            {
-                                                                doc.document_number
-                                                            }
-                                                        </span>
-                                                    )}
-                                                    <span>•</span>
-                                                    <span>
-                                                        {doc.category ===
-                                                        "kebijakan"
-                                                            ? "Kebijakan"
-                                                            : "Proses Bisnis"}
-                                                    </span>
-                                                    <span>•</span>
-                                                    <span className="text-[#901418] font-semibold">
-                                                        {doc.current_version ||
-                                                            "v1.0"}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-2 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-0 border-slate-100">
-                                            <button
-                                                onClick={() => {
-                                                    setIsAllDocsOpen(false);
-                                                    openDocReview(doc);
-                                                }}
-                                                className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition text-slate-700 text-xs font-semibold flex items-center gap-1.5"
-                                            >
-                                                <Eye className="w-3.5 h-3.5 text-slate-500" />
-                                                Pratinjau
-                                            </button>
-
-                                            {latestVer && (
-                                                <a
-                                                    href={route(
-                                                        "documents.download",
-                                                        latestVer.id,
-                                                    )}
-                                                    className="px-4 py-1.5 rounded-xl bg-[#901418] hover:bg-[#7a1014] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
-                                                >
-                                                    <Download className="w-3.5 h-3.5" />
-                                                    Unduh
-                                                </a>
-                                            )}
-                                        </div>
-                                    </div>
-                                );
-                            })
-                        )}
-                    </div>
-                </DialogContent>
-            </Dialog>
 
             {/* Fullscreen PDF Preview Modal */}
             <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
@@ -708,6 +540,6 @@ export default function Welcome() {
                     )}
                 </DialogContent>
             </Dialog>
-        </div>
+        </PublicLayout>
     );
 }

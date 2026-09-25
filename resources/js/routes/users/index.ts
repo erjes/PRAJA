@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
- * @see routes/web.php:65
+ * @see routes/web.php:70
  * @route '/users/toggle-role'
  */
 export const toggleRole = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -14,7 +14,7 @@ toggleRole.definition = {
 } satisfies RouteDefinition<["post"]>
 
 /**
- * @see routes/web.php:65
+ * @see routes/web.php:70
  * @route '/users/toggle-role'
  */
 toggleRole.url = (options?: RouteQueryOptions) => {
@@ -22,7 +22,7 @@ toggleRole.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web.php:65
+ * @see routes/web.php:70
  * @route '/users/toggle-role'
  */
 toggleRole.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -31,7 +31,7 @@ toggleRole.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 })
 
     /**
- * @see routes/web.php:65
+ * @see routes/web.php:70
  * @route '/users/toggle-role'
  */
     const toggleRoleForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -40,7 +40,7 @@ toggleRole.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     })
 
             /**
- * @see routes/web.php:65
+ * @see routes/web.php:70
  * @route '/users/toggle-role'
  */
         toggleRoleForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

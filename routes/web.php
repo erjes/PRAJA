@@ -9,6 +9,7 @@ use App\Models\Document;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\PublicPageController;
 
 Route::get('/', function () {
     $publicDocuments = Document::with(['versions.creator', 'uploader'])
@@ -51,6 +52,10 @@ Route::get('/', function () {
 // Preview & Download untuk dokumen (Publik/Privat diperiksa di Controller)
 Route::get('/documents/preview/{version}', [DocumentController::class, 'preview'])->name('documents.preview');
 Route::get('/documents/download/{version}', [DocumentController::class, 'download'])->name('documents.download');
+
+// Halaman publik (tanpa login): daftar seluruh event & dokumen publik terbaru
+Route::get('/dokumen', [PublicPageController::class, 'documents'])->name('public.documents');
+Route::get('/agenda', [PublicPageController::class, 'events'])->name('public.events');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
