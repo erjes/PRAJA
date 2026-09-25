@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Rules\Recaptcha;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -27,9 +28,29 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Captcha wajib diisi HANYA kalau RECAPTCHA_SECRET_KEY sudah dikonfigurasi
+        // di server (production). Kalau belum diset (misalnya saat development
+        // awal atau menjalankan test), field ini opsional supaya tidak memblokir.
+        $captchaRules = config('services.recaptcha.secret_key')
+            ? ['required', new Recaptcha()]
+            : ['nullable', new Recaptcha()];
+
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'g-recaptcha-response' => $captchaRules,
+        ];
+    }
+
+    /**
+     * Custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'g-recaptcha-response.required' => 'Silakan selesaikan verifikasi CAPTCHA terlebih dahulu.',
         ];
     }
 
