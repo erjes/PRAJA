@@ -1,0 +1,1 @@
+import{t as e}from"./createLucideIcon-DF9v0i5B.js";var t=e(`ChevronRight`,[[`path`,{d:`m9 18 6-6-6-6`,key:`mthhwq`}]]);export{t};

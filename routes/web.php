@@ -53,7 +53,8 @@ Route::get('/', function () {
 Route::get('/documents/preview/{version}', [DocumentController::class, 'preview'])->name('documents.preview');
 Route::get('/documents/download/{version}', [DocumentController::class, 'download'])->name('documents.download');
 
-// Halaman publik (tanpa login): daftar seluruh event & dokumen publik terbaru
+// Halaman publik (tanpa login): tentang BPA, daftar seluruh event & dokumen publik terbaru
+Route::get('/tentang-bpa', [PublicPageController::class, 'about'])->name('public.about');
 Route::get('/dokumen', [PublicPageController::class, 'documents'])->name('public.documents');
 Route::get('/agenda', [PublicPageController::class, 'events'])->name('public.events');
 

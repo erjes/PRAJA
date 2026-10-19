@@ -11,6 +11,14 @@ use Inertia\Response;
 class PublicPageController extends Controller
 {
     /**
+     * Halaman publik: Tentang BPA.
+     */
+    public function about(): Response
+    {
+        return Inertia::render('About/PublicIndex');
+    }
+
+    /**
      * Halaman publik: seluruh dokumen dengan visibility "public" dan status "aktif".
      * Dokumen private hanya bisa dilihat setelah login (lihat DocumentController@index).
      */

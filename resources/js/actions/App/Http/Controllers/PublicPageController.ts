@@ -1,7 +1,85 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../wayfinder'
 /**
+* @see \App\Http\Controllers\PublicPageController::about
+ * @see app/Http/Controllers/PublicPageController.php:16
+ * @route '/tentang-bpa'
+ */
+export const about = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: about.url(options),
+    method: 'get',
+})
+
+about.definition = {
+    methods: ["get","head"],
+    url: '/tentang-bpa',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\PublicPageController::about
+ * @see app/Http/Controllers/PublicPageController.php:16
+ * @route '/tentang-bpa'
+ */
+about.url = (options?: RouteQueryOptions) => {
+    return about.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\PublicPageController::about
+ * @see app/Http/Controllers/PublicPageController.php:16
+ * @route '/tentang-bpa'
+ */
+about.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: about.url(options),
+    method: 'get',
+})
+/**
+* @see \App\Http\Controllers\PublicPageController::about
+ * @see app/Http/Controllers/PublicPageController.php:16
+ * @route '/tentang-bpa'
+ */
+about.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: about.url(options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Http\Controllers\PublicPageController::about
+ * @see app/Http/Controllers/PublicPageController.php:16
+ * @route '/tentang-bpa'
+ */
+    const aboutForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: about.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\PublicPageController::about
+ * @see app/Http/Controllers/PublicPageController.php:16
+ * @route '/tentang-bpa'
+ */
+        aboutForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: about.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\PublicPageController::about
+ * @see app/Http/Controllers/PublicPageController.php:16
+ * @route '/tentang-bpa'
+ */
+        aboutForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: about.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    about.form = aboutForm
+/**
 * @see \App\Http\Controllers\PublicPageController::documents
- * @see app/Http/Controllers/PublicPageController.php:17
+ * @see app/Http/Controllers/PublicPageController.php:25
  * @route '/dokumen'
  */
 export const documents = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +94,7 @@ documents.definition = {
 
 /**
 * @see \App\Http\Controllers\PublicPageController::documents
- * @see app/Http/Controllers/PublicPageController.php:17
+ * @see app/Http/Controllers/PublicPageController.php:25
  * @route '/dokumen'
  */
 documents.url = (options?: RouteQueryOptions) => {
@@ -25,7 +103,7 @@ documents.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\PublicPageController::documents
- * @see app/Http/Controllers/PublicPageController.php:17
+ * @see app/Http/Controllers/PublicPageController.php:25
  * @route '/dokumen'
  */
 documents.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +112,7 @@ documents.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\PublicPageController::documents
- * @see app/Http/Controllers/PublicPageController.php:17
+ * @see app/Http/Controllers/PublicPageController.php:25
  * @route '/dokumen'
  */
 documents.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +122,7 @@ documents.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\PublicPageController::documents
- * @see app/Http/Controllers/PublicPageController.php:17
+ * @see app/Http/Controllers/PublicPageController.php:25
  * @route '/dokumen'
  */
     const documentsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -54,7 +132,7 @@ documents.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\PublicPageController::documents
- * @see app/Http/Controllers/PublicPageController.php:17
+ * @see app/Http/Controllers/PublicPageController.php:25
  * @route '/dokumen'
  */
         documentsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -63,7 +141,7 @@ documents.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\PublicPageController::documents
- * @see app/Http/Controllers/PublicPageController.php:17
+ * @see app/Http/Controllers/PublicPageController.php:25
  * @route '/dokumen'
  */
         documentsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -79,7 +157,7 @@ documents.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     documents.form = documentsForm
 /**
 * @see \App\Http\Controllers\PublicPageController::events
- * @see app/Http/Controllers/PublicPageController.php:33
+ * @see app/Http/Controllers/PublicPageController.php:41
  * @route '/agenda'
  */
 export const events = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -94,7 +172,7 @@ events.definition = {
 
 /**
 * @see \App\Http\Controllers\PublicPageController::events
- * @see app/Http/Controllers/PublicPageController.php:33
+ * @see app/Http/Controllers/PublicPageController.php:41
  * @route '/agenda'
  */
 events.url = (options?: RouteQueryOptions) => {
@@ -103,7 +181,7 @@ events.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\PublicPageController::events
- * @see app/Http/Controllers/PublicPageController.php:33
+ * @see app/Http/Controllers/PublicPageController.php:41
  * @route '/agenda'
  */
 events.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -112,7 +190,7 @@ events.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\PublicPageController::events
- * @see app/Http/Controllers/PublicPageController.php:33
+ * @see app/Http/Controllers/PublicPageController.php:41
  * @route '/agenda'
  */
 events.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -122,7 +200,7 @@ events.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\PublicPageController::events
- * @see app/Http/Controllers/PublicPageController.php:33
+ * @see app/Http/Controllers/PublicPageController.php:41
  * @route '/agenda'
  */
     const eventsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -132,7 +210,7 @@ events.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\PublicPageController::events
- * @see app/Http/Controllers/PublicPageController.php:33
+ * @see app/Http/Controllers/PublicPageController.php:41
  * @route '/agenda'
  */
         eventsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -141,7 +219,7 @@ events.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\PublicPageController::events
- * @see app/Http/Controllers/PublicPageController.php:33
+ * @see app/Http/Controllers/PublicPageController.php:41
  * @route '/agenda'
  */
         eventsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -155,6 +233,6 @@ events.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
     
     events.form = eventsForm
-const PublicPageController = { documents, events }
+const PublicPageController = { about, documents, events }
 
 export default PublicPageController

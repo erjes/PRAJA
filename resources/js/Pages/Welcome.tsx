@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { login } from '@/routes';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { useInView } from '@/hooks/useInView';
 import { Dialog, DialogContent } from '@/Components/ui/dialog';
-import { 
-    ChevronLeft, 
-    ChevronRight, 
-    Download, 
-    Eye
+import {
+    Calendar,
+    FileText,
+    LayoutGrid,
+    ArrowUpRight,
+    Clock,
+    Search,
+    ChevronDown,
+    Download,
+    X,
 } from 'lucide-react';
 
 interface DocumentVersion {
@@ -24,10 +28,11 @@ interface Document {
     title: string;
     document_number?: string | null;
     description?: string | null;
-    category: 'kebijakan' | 'proses_bisnis';
-    subcategory: string;
+    category: 'kebijakan' | 'proses_bisnis' | string;
+    subcategory?: string | null;
     owner?: string | null;
     effective_date?: string | null;
+    created_at?: string | null;
     clause?: string | null;
     visibility: 'public' | 'private';
     status: 'aktif' | 'nonaktif' | 'draft';
@@ -36,21 +41,15 @@ interface Document {
     uploader?: { id: number; name: string } | null;
 }
 
-interface Project {
-    id: number;
-    title: string;
-    description?: string | null;
-    status: string;
-    start_date?: string | null;
-    division?: { id: number; name: string } | null;
-}
-
 interface EventItem {
     id: number;
     title: string;
     description?: string | null;
+    location?: string | null;
     start_time?: string | null;
     end_time?: string | null;
+    evidence_link?: string | null;
+    poster_path?: string | null;
     division?: { id: number; name: string } | null;
 }
 
@@ -59,162 +58,181 @@ interface PageProps {
         user?: { id: number; name: string; email: string; role?: string } | null;
     };
     publicDocuments?: Document[];
-    recentProjects?: Project[];
     upcomingEvents?: EventItem[];
     [key: string]: any;
 }
 
+const templateEvents: EventItem[] = [
+    {
+        id: -1,
+        title: 'Judul Event',
+        description: 'Deskripsi singkat mengenai kegiatan atau event akademik yang dipublikasikan.',
+        location: 'Lokasi Kegiatan',
+        start_time: null,
+        poster_path: null,
+        division: { id: 0, name: 'Kategori' },
+    },
+    {
+        id: -2,
+        title: 'Judul Event',
+        description: 'Deskripsi singkat mengenai kegiatan atau event akademik yang dipublikasikan.',
+        location: 'Lokasi Kegiatan',
+        start_time: null,
+        poster_path: null,
+        division: { id: 0, name: 'Kategori' },
+    },
+    {
+        id: -3,
+        title: 'Judul Event',
+        description: 'Deskripsi singkat mengenai kegiatan atau event akademik yang dipublikasikan.',
+        location: 'Lokasi Kegiatan',
+        start_time: null,
+        poster_path: null,
+        division: { id: 0, name: 'Kategori' },
+    },
+];
+
+const templateDocuments: Document[] = [
+    {
+        id: -1,
+        title: 'Judul Dokumen Publik',
+        category: 'Kategori',
+        subcategory: 'Subkategori',
+        visibility: 'public',
+        status: 'aktif',
+        current_version: 'v1.0',
+    },
+    {
+        id: -2,
+        title: 'Judul Dokumen Publik',
+        category: 'Kategori',
+        subcategory: 'Subkategori',
+        visibility: 'public',
+        status: 'aktif',
+        current_version: 'v1.0',
+    },
+    {
+        id: -3,
+        title: 'Judul Dokumen Publik',
+        category: 'Kategori',
+        subcategory: 'Subkategori',
+        visibility: 'public',
+        status: 'aktif',
+        current_version: 'v1.0',
+    },
+];
+
+function formatEventDate(dateStr?: string | null): string {
+    if (!dateStr) return 'DD MMM YYYY';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return 'DD MMM YYYY';
+    return d.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+    });
+}
+
+function formatEventTime(dateStr?: string | null): string {
+    if (!dateStr) return '00:00 WIB';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '00:00 WIB';
+    return `${d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
+}
+
+function formatDocCategory(category?: string | null, subcategory?: string | null): string {
+    if (subcategory) {
+        return subcategory.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+    if (category === 'kebijakan') return 'Kebijakan';
+    if (category === 'proses_bisnis') return 'Proses Bisnis';
+    return category || 'Kategori';
+}
+
 export default function Welcome() {
-    const { auth, publicDocuments = [], recentProjects = [], upcomingEvents = [] } = usePage<PageProps>().props;
+    const { publicDocuments = [], upcomingEvents = [] } = usePage<PageProps>().props;
 
     const heroAnim = useInView<HTMLElement>();
+    const aboutAnim = useInView<HTMLElement>();
     const eventAnim = useInView<HTMLElement>();
     const docsAnim = useInView<HTMLElement>();
 
-    // Carousel Activities
-    const defaultActivities = [
-        {
-            id: 101,
-            title: 'Market Day 2026',
-            image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80',
-        },
-        {
-            id: 102,
-            title: 'Audit Gedung Kuliah Bersama',
-            image: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80',
-        },
-        {
-            id: 103,
-            title: 'Sidang Senat Terbuka Wisuda',
-            image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80',
-        }
-    ];
+    // Search & filter state for Public Documents
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-    const activitiesList = recentProjects.length > 0 
-        ? recentProjects.map((p, idx) => ({
-            id: p.id,
-            title: p.title,
-            image: defaultActivities[idx % defaultActivities.length].image
-        }))
-        : defaultActivities;
-
-    const [activeSlide, setActiveSlide] = useState(0);
-
-    const nextSlide = () => {
-        setActiveSlide((prev) => (prev + 1) % activitiesList.length);
-    };
-
-    const prevSlide = () => {
-        setActiveSlide((prev) => (prev - 1 + activitiesList.length) % activitiesList.length);
-    };
-
-    // Events for Event Mendatang
-    const defaultEvents = [
-        {
-            id: 201,
-            title: 'Market Day 2026',
-            day: '20',
-            month: 'Nov',
-            location: 'Gedung Tokong Nanas, Telkom University',
-            image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=600&q=80'
-        },
-        {
-            id: 202,
-            title: 'Market Day 2026',
-            day: '20',
-            month: 'Nov',
-            location: 'Gedung Tokong Nanas, Telkom University',
-            image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=600&q=80'
-        },
-        {
-            id: 203,
-            title: 'Market Day 2026',
-            day: '20',
-            month: 'Nov',
-            location: 'Gedung Tokong Nanas, Telkom University',
-            image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=600&q=80'
-        }
-    ];
-
-    const eventsList = upcomingEvents.length > 0
-        ? upcomingEvents.slice(0, 3).map((e: any, idx) => {
-            const dateObj = e.start_time ? new Date(e.start_time) : new Date();
-            const day = dateObj.toLocaleDateString('id-ID', { day: '2-digit' });
-            const month = dateObj.toLocaleDateString('id-ID', { month: 'short' });
-            return {
-                id: e.id,
-                title: e.title,
-                day,
-                month,
-                location: e.division?.name ? `${e.division.name}, Telkom University` : 'Gedung Tokong Nanas, Telkom University',
-                image: e.poster_path ? e.poster_path : null
-            };
-        })
-        : defaultEvents;
-
-    // Sample fallback documents if database is empty
-    const defaultDocs: Document[] = [
-        {
-            id: 301,
-            title: 'Dokumen Kebijakan 1',
-            category: 'kebijakan',
-            subcategory: 'pedoman',
-            visibility: 'public',
-            status: 'aktif',
-            current_version: 'v1.0'
-        },
-        {
-            id: 302,
-            title: 'Laporan Tracer Study 2025 Kampus Bandung',
-            document_number: 'BPA/2025/TS/01',
-            description: 'Laporan komprehensif penelusuran lulusan dan relevansi kurikulum dengan kebutuhan industri digital masa kini.',
-            category: 'kebijakan',
-            subcategory: 'laporan_tahunan',
-            visibility: 'public',
-            status: 'aktif',
-            current_version: 'v1.0',
-            versions: [{ id: 1, version_number: 'v1.0', file_path: '', created_at: '2025-12-01' }]
-        },
-        {
-            id: 303,
-            title: 'Dokumen Kebijakan 2',
-            category: 'kebijakan',
-            subcategory: 'sop',
-            visibility: 'public',
-            status: 'aktif',
-            current_version: 'v1.0'
-        },
-        {
-            id: 304,
-            title: 'Dokumen Kebijakan 3',
-            category: 'kebijakan',
-            subcategory: 'panduan',
-            visibility: 'public',
-            status: 'aktif',
-            current_version: 'v1.0'
-        }
-    ];
-
-    const displayDocs = publicDocuments.length > 0 ? publicDocuments : defaultDocs;
-
-    // Modal state for fullscreen PDF preview (used on individual document cards)
+    // Modal state for fullscreen PDF preview
     const [selectedDocForReview, setSelectedDocForReview] = useState<Document | null>(null);
     const [isReviewOpen, setIsReviewOpen] = useState(false);
 
     const openDocReview = (doc: Document) => {
+        if (doc.id < 0) return;
         setSelectedDocForReview(doc);
         setIsReviewOpen(true);
     };
+
+    const eventsToDisplay =
+        upcomingEvents.length > 0 ? upcomingEvents.slice(0, 3) : templateEvents;
+
+    const filteredPublicDocs = publicDocuments.filter((doc) => {
+        if (selectedCategory !== 'all' && doc.category !== selectedCategory) {
+            return false;
+        }
+        if (searchQuery.trim() !== '') {
+            const q = searchQuery.toLowerCase();
+            const haystack = [doc.title, doc.document_number, doc.description, doc.category, doc.subcategory]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase();
+            if (!haystack.includes(q)) return false;
+        }
+        return true;
+    });
+
+    const docsToDisplay =
+        publicDocuments.length > 0 ? filteredPublicDocs.slice(0, 3) : templateDocuments;
+
+    const featureItems = [
+        {
+            icon: Calendar,
+            tag: 'EVENT MANAGEMENT',
+            title: 'Manajemen Event',
+            description:
+                'Temukan seminar, workshop, dan kegiatan akademik yang sudah dipublikasikan, lengkap dengan waktu dan lokasi.',
+            linkLabel: 'Jelajahi Event',
+            href: '#event',
+        },
+        {
+            icon: FileText,
+            tag: 'DOCUMENT MANAGEMENT',
+            title: 'Pengelolaan Dokumen',
+            description:
+                'Akses dokumen publik dengan kategori yang tertata, informasi berkas yang jelas, dan pilihan lihat atau unduh.',
+            linkLabel: 'Buka Dokumen Publik',
+            href: '#dokumen',
+        },
+        {
+            icon: LayoutGrid,
+            tag: 'CENTRALIZED INFORMATION',
+            title: 'Informasi Terpusat',
+            description:
+                'Satu pintu untuk menelusuri informasi akademik. Cari konten yang relevan tanpa berpindah-pindah kanal.',
+            linkLabel: 'Kembali ke Beranda',
+            href: '#beranda',
+        },
+    ];
 
     return (
         <PublicLayout active="beranda">
             <Head title="Selamat Datang - PRAJA" />
 
             {/* Hero Section */}
-            <section 
+            <section
                 ref={heroAnim.ref}
                 className={`min-h-screen flex flex-col items-center justify-center pt-20 pb-24 sm:pb-32 px-3 sm:px-6 md:px-8 w-full text-center relative overflow-hidden duration-700 delay-150 fill-mode-both ${
-                    heroAnim.isInView ? 'animate-in fade-in zoom-in-95' : 'opacity-0'
+                    heroAnim.isInView
+                        ? "animate-in fade-in zoom-in-95"
+                        : "opacity-0"
                 }`}
             >
                 {/* Background Image */}
@@ -223,33 +241,22 @@ export default function Welcome() {
                     alt="Gedung Kampus Telkom University"
                     className="absolute inset-0 w-full h-full object-cover"
                 />
-
                 {/* Overlay gradasi gelap ke merah PRAJA */}
                 <div className="absolute inset-0 bg-gradient-to-b from-slate-900/65 via-slate-900/50 to-[#901418]/70" />
-
                 {/* Konten di atas overlay */}
                 <div className="max-w-3xl mx-auto relative z-10">
                     <h1 className="text-3xl sm:text-4xl md:text-[52px] font-bold text-white tracking-tight leading-tight">
-                        Bangun Kolaborasi Bersama PRAJA
+                        Informasi Akademik, dalam Satu Ruang
                     </h1>
                     <p className="mt-3.5 text-medium sm:text-sm text-white/85 leading-relaxed font-bold max-w-xl mx-auto">
-                        PRAJA adalah portal terpadu yang dirancang untuk
-                        mendukung pengelolaan aktivitas dan sumber daya
-                        akademik. Melalui satu platform, pengguna dapat
-                        mengakses informasi kebijakan, mengelola event, memantau
-                        proyek, serta berkolaborasi secara lebih efektif.
+                        Jelajahi informasi kegiatan dan dokumen publik melalui
+                        portal Platform Rencana, Aktivitas, dan Jejaring
+                        Akademik (PRAJA). Temukan event akademik, dokumen
+                        kebijakan, dan informasi terpusat untuk komunitas Telkom
+                        University.
                     </p>
-                    <div className="mt-6">
-                        <Link
-                            href={login()}
-                            className="inline-block bg-white hover:bg-gray-100 text-[#901418] px-8 py-2.5 rounded-2xl font-semibold shadow-md hover:shadow-lg transition-all text-sm tracking-wide active:scale-95"
-                        >
-                            Masuk
-                        </Link>
-                    </div>
                 </div>
             </section>
-
             <div className="w-full relative z-60 flex justify-center pointer-events-none -mt-[180px] -mb-[180px] sm:-mt-[180px] sm:-mb-[180px]">
                 <img
                     src="/images/red-ribbon.png"
@@ -258,209 +265,344 @@ export default function Welcome() {
                 />
             </div>
 
-            {/* Event Mendatang Section */}
-            <section ref={eventAnim.ref} className="pt-[130px] sm:pt-[280px] pb-16 px-3 sm:px-6 md:px-8 w-full relative z-20">
-                <div className={`text-center max-w-2xl mx-auto mb-10 duration-700 ${
-                    eventAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-4' : 'opacity-0'
-                }`}>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-                        Event Mendatang
+            {/* Kenali PRAJA Section */}
+            <section
+                id="tentang"
+                ref={aboutAnim.ref}
+                className="pt-[130px] sm:pt-[280px] py-10 sm:py-14 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto w-full relative z-20"
+            >
+                <div
+                    className={`max-w-2xl mb-8 duration-700 ${
+                        aboutAnim.isInView
+                            ? "animate-in fade-in slide-in-from-bottom-4"
+                            : "opacity-0"
+                    }`}
+                >
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                        Kenali PRAJA
                     </h2>
-                    <p className="mt-2.5 text-xs sm:text-sm text-slate-500 leading-relaxed">
-                        Tetap terhubung dengan berbagai kegiatan akademik dan
-                        pengembangan diri. Temukan informasi mengenai seminar,
-                        workshop, pelatihan, dan acara lainnya yang akan segera
-                        berlangsung.
+                    <p className="mt-2 text-xs sm:text-sm text-slate-500 leading-relaxed">
+                        PRAJA menyatukan informasi event dan dokumen publik
+                        dalam pengalaman yang sederhana, tertata, dan mudah
+                        diakses oleh sivitas akademika maupun masyarakat.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 w-full">
-                    {eventsList.map((ev, idx) => (
-                        <div
-                            key={ev.id || idx}
-                            className={`bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#901418]/50 transition-all duration-300 flex flex-col group w-full fill-mode-both ${
-                                eventAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-8' : 'opacity-0'
-                            }`}
-                            style={{
-                                animationDelay: eventAnim.isInView ? `${(idx + 1) * 150}ms` : undefined,
-                                animationDuration: "700ms",
-                            }}
-                        >
-                            <div className="h-44 sm:h-48 w-full overflow-hidden relative bg-gray-100 flex items-center justify-center">
-                                {ev.image ? (
-                                    <img
-                                        src={ev.image}
-                                        alt={ev.title}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                    />
-                                ) : (
-                                    <div className="p-6 text-center w-full flex flex-col items-center justify-center bg-gray-100/90 h-full">
-                                        <span className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">
-                                            Agenda Kegiatan
-                                        </span>
-                                        <span className="text-gray-600 font-bold text-base sm:text-lg line-clamp-3 leading-snug">
-                                            {ev.title}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="p-4 sm:p-5 flex items-center gap-4 flex-1 bg-white">
-                                <div className="flex flex-col items-center justify-center min-w-[50px] text-[#901418] font-bold shrink-0">
-                                    <span className="text-[11px] font-semibold leading-none">
-                                        {ev.month}
-                                    </span>
-                                    <span className="text-xl sm:text-2xl font-black leading-tight mt-0.5">
-                                        {ev.day}
-                                    </span>
-                                </div>
-
-                                <div className="w-[1px] h-8 bg-gray-200 shrink-0" />
-
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-snug line-clamp-1 group-hover:text-[#901418] transition-colors">
-                                        {ev.title}
-                                    </h3>
-                                    <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 line-clamp-1">
-                                        {ev.location}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="mt-10 text-center">
-                    <Link
-                        href="/agenda"
-                        className="inline-block bg-white hover:bg-slate-50 text-[#901418] border-2 border-[#901418] font-semibold px-8 py-2.5 rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm tracking-wide"
-                    >
-                        Lihat Semua Event
-                    </Link>
-                </div>
-            </section>
-
-            {/* Document Kebijakan Section with clean white theme & #901418 accent */}
-            <section ref={docsAnim.ref} className="py-12 sm:py-16 px-3 sm:px-6 md:px-8 w-full">
-                <div className={`text-center max-w-2xl mx-auto mb-10 duration-700 ${
-                    docsAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-4' : 'opacity-0'
-                }`}>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-                        Document Kebijakan
-                    </h2>
-                    <p className="mt-2.5 text-xs sm:text-sm text-slate-500 leading-relaxed">
-                        Akses berbagai dokumen kebijakan dan pedoman resmi yang
-                        tersusun secara terpusat untuk mendukung tata kelola dan
-                        pengambilan keputusan yang lebih efektif.
-                    </p>
-                </div>
-
-                {/* Grid of 4 Documents full-width across screen */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 items-stretch w-full">
-                    {displayDocs.slice(0, 4).map((doc, idx) => {
-                        const isFeatured =
-                            idx === 1 ||
-                            (idx === 0 && displayDocs.length === 1);
-                        const latestVer =
-                            doc.versions && doc.versions.length > 0
-                                ? doc.versions[0]
-                                : null;
-
-                        if (isFeatured) {
-                            return (
-                                <div
-                                    key={doc.id || idx}
-                                    onClick={() => openDocReview(doc)}
-                                    className={`bg-white text-slate-900 rounded-2xl p-6 shadow-md border-2 border-[#901418]/30 hover:border-[#901418] hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden min-h-[320px] sm:min-h-[340px] z-10 w-full group fill-mode-both ${
-                                        docsAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-8' : 'opacity-0'
-                                    }`}
-                                    style={{
-                                        animationDelay: docsAnim.isInView ? `${(idx + 1) * 150}ms` : undefined,
-                                        animationDuration: "700ms",
-                                    }}
-                                >
-                                    <div className="text-center mt-2">
-                                        <div className="inline-block px-2.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-widest bg-[#901418] text-white mb-2.5 shadow-2xs">
-                                            {doc.current_version || "2025"}
-                                        </div>
-                                        <p className="text-[10px] uppercase tracking-wider text-[#901418] font-extrabold">
-                                            Laporan / Pedoman
-                                        </p>
-                                        <h3 className="text-lg sm:text-xl font-black tracking-tight leading-tight mt-1 text-slate-900 group-hover:text-[#901418] transition-colors">
-                                            {doc.title.includes("Tracer")
-                                                ? "TRACER STUDY"
-                                                : doc.title}
-                                        </h3>
-                                        <p className="text-xs text-slate-500 font-semibold mt-1">
-                                            {doc.title.includes("Tracer")
-                                                ? "2025"
-                                                : ""}
-                                        </p>
-                                        <div className="inline-block mt-2.5 px-3 py-1 rounded-full bg-red-50 border border-red-100 text-[#901418] text-[10px] font-bold">
-                                            Kampus Bandung
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-6 text-center border-t border-gray-100 pt-3.5">
-                                        <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">
-                                            {doc.description ||
-                                                "Bridging Education and Workforce Evolution - Direktorat Penjaminan Mutu & Audit"}
-                                        </p>
-                                        {latestVer && (
-                                            <a
-                                                href={route(
-                                                    "documents.download",
-                                                    latestVer.id,
-                                                )}
-                                                onClick={(e) =>
-                                                    e.stopPropagation()
-                                                }
-                                                className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-[#901418] hover:bg-[#7a1014] text-white transition shadow-sm"
-                                            >
-                                                <Download className="w-3.5 h-3.5" />
-                                                Unduh PDF
-                                            </a>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        }
-
-                        // Surrounding clean white cards with #901418 accent
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+                    {featureItems.map((item, idx) => {
+                        const IconComponent = item.icon;
                         return (
                             <div
-                                key={doc.id || idx}
-                                onClick={() => openDocReview(doc)}
-                                className={`bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#901418]/60 transition-all flex flex-col items-center justify-center cursor-pointer min-h-[280px] sm:min-h-[300px] border border-gray-200/80 w-full group fill-mode-both ${
-                                    docsAnim.isInView ? 'animate-in fade-in slide-in-from-bottom-8' : 'opacity-0'
+                                key={item.tag}
+                                className={`bg-[#FAFAFA] rounded-2xl p-6 border border-slate-200/70 hover:border-slate-300 transition-all flex flex-col justify-between fill-mode-both ${
+                                    aboutAnim.isInView
+                                        ? "animate-in fade-in slide-in-from-bottom-6"
+                                        : "opacity-0"
                                 }`}
                                 style={{
-                                    animationDelay: docsAnim.isInView ? `${(idx + 1) * 150}ms` : undefined,
-                                    animationDuration: "700ms",
+                                    animationDelay: aboutAnim.isInView
+                                        ? `${(idx + 1) * 120}ms`
+                                        : undefined,
+                                    animationDuration: "600ms",
                                 }}
                             >
-                                <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-red-50/80 border border-red-100 group-hover:bg-[#901418] transition-colors flex items-center justify-center text-[#901418] group-hover:text-white font-extrabold text-sm tracking-tight shadow-2xs">
-                                    PDF
+                                <div>
+                                    <div className="w-9 h-9 rounded-lg bg-white border border-slate-200/80 flex items-center justify-center text-[#b91c1c] shadow-2xs mb-4">
+                                        <IconComponent className="w-4 h-4" />
+                                    </div>
+                                    <span className="block text-[9px] font-bold uppercase tracking-wider text-[#b91c1c]">
+                                        {item.tag}
+                                    </span>
+                                    <h3 className="mt-1 text-base font-bold text-slate-900">
+                                        {item.title}
+                                    </h3>
+                                    <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                                        {item.description}
+                                    </p>
                                 </div>
-                                <h4 className="font-bold text-slate-800 text-sm mt-4 text-center line-clamp-2 group-hover:text-[#901418] transition-colors">
-                                    {doc.title}
-                                </h4>
-                                <span className="text-[11px] text-slate-400 font-semibold mt-1">
-                                    {doc.current_version || "v1.0"}
-                                </span>
+
+                                <div className="mt-5">
+                                    <a
+                                        href={item.href}
+                                        className="inline-flex items-center gap-1 text-[11px] font-bold text-[#b91c1c] hover:text-[#901418] transition-colors"
+                                    >
+                                        {item.linkLabel}
+                                        <ArrowUpRight className="w-3.5 h-3.5" />
+                                    </a>
+                                </div>
                             </div>
                         );
                     })}
                 </div>
+            </section>
 
-                {/* Lihat Selengkapnya Button */}
-                <div className="mt-10 text-center">
+            {/* Event Mendatang Section */}
+            <section
+                id="event"
+                ref={eventAnim.ref}
+                className="py-10 sm:py-14 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto w-full"
+            >
+                <div
+                    className={`flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 duration-700 ${
+                        eventAnim.isInView
+                            ? "animate-in fade-in slide-in-from-bottom-4"
+                            : "opacity-0"
+                    }`}
+                >
+                    <div className="max-w-lg">
+                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                            Event Mendatang
+                        </h2>
+                        <p className="mt-1.5 text-xs sm:text-sm text-slate-500 leading-relaxed">
+                            Daftar event akademik yang sedang berlangsung dan
+                            akan segera dibuka. Tampilkan hanya event yang sudah
+                            dipublikasikan.
+                        </p>
+                    </div>
+
+                    <Link
+                        href="/agenda"
+                        className="self-start sm:self-auto inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 font-semibold px-4 py-2 rounded-full shadow-2xs transition text-xs shrink-0"
+                    >
+                        Lihat Semua Event
+                    </Link>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+                    {eventsToDisplay.map((ev, idx) => (
+                        <div
+                            key={ev.id || idx}
+                            className={`bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group fill-mode-both ${
+                                eventAnim.isInView
+                                    ? "animate-in fade-in slide-in-from-bottom-6"
+                                    : "opacity-0"
+                            }`}
+                            style={{
+                                animationDelay: eventAnim.isInView
+                                    ? `${(idx + 1) * 120}ms`
+                                    : undefined,
+                                animationDuration: "600ms",
+                            }}
+                        >
+                            <div>
+                                {/* Thumbnail / Placeholder */}
+                                <div className="h-40 sm:h-44 w-full rounded-xl overflow-hidden bg-[#64707d] flex items-center justify-center relative">
+                                    {ev.poster_path ? (
+                                        <img
+                                            src={ev.poster_path}
+                                            alt={ev.title}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <span className="text-white/90 text-xs font-medium select-none">
+                                            Gambar
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Badge & Date */}
+                                <div className="mt-3.5 flex items-center gap-2">
+                                    <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-[#b91c1c] text-[10px] font-bold">
+                                        {ev.division?.name || "Kategori"}
+                                    </span>
+                                    <span className="text-[11px] text-slate-400 font-medium">
+                                        {formatEventDate(ev.start_time)}
+                                    </span>
+                                </div>
+
+                                {/* Title & Description */}
+                                <h3 className="mt-2 font-bold text-slate-900 text-sm sm:text-base leading-snug line-clamp-2">
+                                    {ev.title}
+                                </h3>
+                                <p className="mt-1.5 text-xs text-slate-500 leading-relaxed line-clamp-3">
+                                    {ev.description ||
+                                        "Deskripsi singkat mengenai kegiatan atau event akademik yang dipublikasikan."}
+                                </p>
+                            </div>
+
+                            <div className="mt-4 pt-2">
+                                {/* Time & Location */}
+                                <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mb-3">
+                                    <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                    <span>
+                                        {formatEventTime(ev.start_time)}
+                                    </span>
+                                    <span>•</span>
+                                    <span className="truncate">
+                                        {ev.location ||
+                                            ev.division?.name ||
+                                            "Lokasi Kegiatan"}
+                                    </span>
+                                </div>
+
+                                {ev.evidence_link ? (
+                                    <a
+                                        href={ev.evidence_link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center justify-center bg-[#b91c1c] hover:bg-[#901418] text-white text-[11px] font-semibold px-4 py-1.5 rounded-full transition"
+                                    >
+                                        Lihat Detail
+                                    </a>
+                                ) : (
+                                    <Link
+                                        href="/agenda"
+                                        className="inline-flex items-center justify-center bg-[#b91c1c] hover:bg-[#901418] text-white text-[11px] font-semibold px-4 py-1.5 rounded-full transition"
+                                    >
+                                        Lihat Detail
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Dokumen Publik Section */}
+            <section
+                id="dokumen"
+                ref={docsAnim.ref}
+                className="py-10 sm:py-14 pb-20 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto w-full"
+            >
+                <div
+                    className={`flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 duration-700 ${
+                        docsAnim.isInView
+                            ? "animate-in fade-in slide-in-from-bottom-4"
+                            : "opacity-0"
+                    }`}
+                >
+                    <div className="max-w-lg">
+                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                            Dokumen Publik
+                        </h2>
+                        <p className="mt-1.5 text-xs sm:text-sm text-slate-500 leading-relaxed">
+                            Cari dokumen kebijakan, pedoman, dan publikasi resmi
+                            yang diterbitkan oleh BPA. Tampilkan hanya dokumen
+                            yang sudah dipublikasikan.
+                        </p>
+                    </div>
+
                     <Link
                         href="/dokumen"
-                        className="inline-block bg-[#901418] hover:bg-[#7a1014] text-white font-semibold px-8 py-2.5 rounded-full shadow hover:shadow-lg hover:-translate-y-0.5 transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm tracking-wide"
+                        className="self-start sm:self-auto inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 font-semibold px-4 py-2 rounded-full shadow-2xs transition text-xs shrink-0"
                     >
-                        Lihat Selengkapnya
+                        Lihat Semua Dokumen
                     </Link>
+                </div>
+
+                {/* Search & Category Filter */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5">
+                    <div className="relative w-full sm:w-72">
+                        <Search className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                            type="text"
+                            placeholder="Cari dokumen, judul, atau kategori"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-9 pr-4 py-2 rounded-full border border-slate-200 bg-white text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#b91c1c]"
+                        />
+                    </div>
+
+                    <div className="relative w-full sm:w-auto">
+                        <select
+                            value={selectedCategory}
+                            onChange={(e) =>
+                                setSelectedCategory(e.target.value)
+                            }
+                            className="appearance-none w-full sm:w-auto pl-4 pr-8 py-2 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#b91c1c] cursor-pointer"
+                        >
+                            <option value="all">Semua Kategori</option>
+                            <option value="kebijakan">Kebijakan</option>
+                            <option value="proses_bisnis">Proses Bisnis</option>
+                        </select>
+                        <ChevronDown className="w-3.5 h-3.5 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    </div>
+                </div>
+
+                {/* Document Rows */}
+                <div className="space-y-3">
+                    {docsToDisplay.map((doc, idx) => {
+                        const latestVer =
+                            doc.versions && doc.versions.length > 0
+                                ? doc.versions[0]
+                                : null;
+                        const docDate = formatEventDate(
+                            doc.effective_date ||
+                                latestVer?.created_at ||
+                                doc.created_at,
+                        );
+                        const catLabel = formatDocCategory(
+                            doc.category,
+                            doc.subcategory,
+                        );
+
+                        return (
+                            <div
+                                key={doc.id || idx}
+                                className="bg-white rounded-2xl border border-slate-200/80 px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-slate-300 transition"
+                            >
+                                <div className="flex items-center gap-3.5 min-w-0">
+                                    <div className="w-9 h-9 rounded-lg bg-red-50 text-[#b91c1c] flex items-center justify-center shrink-0">
+                                        <FileText className="w-4 h-4" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <h3 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                                            {doc.title}
+                                        </h3>
+                                        <p className="text-[11px] text-slate-400 mt-0.5 flex flex-wrap items-center gap-1.5">
+                                            <span>{catLabel}</span>
+                                            <span>•</span>
+                                            <span>{docDate}</span>
+                                            <span>•</span>
+                                            <span>PDF</span>
+                                            <span>•</span>
+                                            <span>
+                                                {doc.current_version || "v1.0"}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                                    {doc.id > 0 ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => openDocReview(doc)}
+                                            className="px-3.5 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-[11px] font-semibold transition"
+                                        >
+                                            Lihat Dokumen
+                                        </button>
+                                    ) : (
+                                        <Link
+                                            href="/dokumen"
+                                            className="px-3.5 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-[11px] font-semibold transition"
+                                        >
+                                            Lihat Dokumen
+                                        </Link>
+                                    )}
+
+                                    {latestVer ? (
+                                        <a
+                                            href={route(
+                                                "documents.download",
+                                                latestVer.id,
+                                            )}
+                                            className="px-3.5 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-[11px] font-semibold transition"
+                                        >
+                                            Unduh
+                                        </a>
+                                    ) : (
+                                        <Link
+                                            href="/dokumen"
+                                            className="px-3.5 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-[11px] font-semibold transition"
+                                        >
+                                            Unduh
+                                        </Link>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </section>
 
@@ -506,7 +648,9 @@ export default function Welcome() {
                                         onClick={() => setIsReviewOpen(false)}
                                         className="p-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition"
                                         title="Tutup"
-                                    ></button>
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
                                 </div>
                             </div>
 
@@ -543,3 +687,4 @@ export default function Welcome() {
         </PublicLayout>
     );
 }
+
