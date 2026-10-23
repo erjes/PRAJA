@@ -179,6 +179,16 @@
     ::-webkit-scrollbar-thumb:hover {
         background: #9ca3af !important;
     }
+
+    /* Glassmorphism Effect - Reference: https://blog.logrocket.com/how-to-create-glassmorphism-effect-react/ */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.28);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.14);
+        border-radius: 28px;
+    }
 }
 
 @theme inline {
