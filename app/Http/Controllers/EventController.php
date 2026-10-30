@@ -15,17 +15,20 @@ class EventController extends Controller
     public function index(Request $request): Response
     {
         $user = $request->user();
-        
-        // Fetch events based on division/role
+        $activeRole = session('simulated_role', $user->role);
+
+        // Admins see every event. Staff only see company-wide events, events from
+        // their own division, and published (external) events.
         $eventsQuery = Event::with(['division', 'creator']);
-        
-        if ($user->role !== 'admin') {
+
+        if ($activeRole !== 'admin') {
             $eventsQuery->where(function ($query) use ($user) {
-                $query->whereNull('division_id')
+                $query->where('category', 'public')
+                      ->orWhereNull('division_id')
                       ->orWhere('division_id', $user->division_id);
             });
         }
-        
+
         $events = $eventsQuery->orderBy('start_time', 'asc')->get();
         $divisions = Division::all();
 
@@ -33,6 +36,19 @@ class EventController extends Controller
             'events' => $events,
             'divisions' => $divisions,
         ]);
+    }
+
+    /**
+     * Admins may manage every event, staff only the events they created.
+     */
+    private function authorizeEventManagement(Request $request, Event $event): void
+    {
+        $user = $request->user();
+        $activeRole = session('simulated_role', $user->role);
+
+        if ($activeRole !== 'admin' && $event->created_by !== $user->id) {
+            abort(403, 'Anda tidak memiliki izin untuk mengelola event ini.');
+        }
     }
 
     public function store(Request $request): RedirectResponse
@@ -88,7 +104,7 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event): RedirectResponse
     {
-        $user = $request->user();
+        $this->authorizeEventManagement($request, $event);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
