@@ -75,7 +75,7 @@ export default function Index({ projects, divisions, assignableUsers }: IndexPro
         status:      'planned',
         start_date:  new Date().toISOString().slice(0, 10),
         end_date:    '',
-        division_id: String(user.division_id || ''),
+        division_id: user.division_id ? String(user.division_id) : 'company',
         members:     [] as number[],
     });
 
@@ -251,11 +251,15 @@ export default function Index({ projects, divisions, assignableUsers }: IndexPro
                                     onValueChange={val => createForm.setData('division_id', val)}>
                                     <SelectTrigger id="division"><SelectValue placeholder="Pilih Divisi" /></SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem value="company">Umum / Semua Divisi (Company)</SelectItem>
                                         {divisions.map(div => (
                                             <SelectItem key={div.id} value={String(div.id)}>{div.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
+                                {createForm.errors.division_id && (
+                                    <p className="text-xs text-destructive">{createForm.errors.division_id}</p>
+                                )}
                             </div>
                         )}
 
