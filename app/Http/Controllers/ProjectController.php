@@ -51,9 +51,19 @@ class ProjectController extends Controller
             'status'      => 'required|in:planned,ongoing,completed,on_hold',
             'start_date'  => 'required|date',
             'end_date'    => 'nullable|date|after_or_equal:start_date',
+            'division_id' => 'nullable',
             'members'     => 'nullable|array',
             'members.*'   => 'exists:users,id',
         ]);
+
+        $rawDiv = $request->input('division_id');
+        $divisionId = ($rawDiv === 'company' || $rawDiv === '' || $rawDiv === 'null' || $rawDiv === null)
+            ? null
+            : (int) $rawDiv;
+
+        if ($divisionId === null && $user->division_id) {
+            $divisionId = $user->division_id;
+        }
 
         $project = Project::create([
             'title'       => $validated['title'],
@@ -61,7 +71,7 @@ class ProjectController extends Controller
             'status'      => $validated['status'],
             'start_date'  => $validated['start_date'],
             'end_date'    => $validated['end_date'] ?? null,
-            'division_id' => $user->division_id,
+            'division_id' => $divisionId,
             'created_by'  => $user->id,
         ]);
 
@@ -121,17 +131,27 @@ class ProjectController extends Controller
             'status'      => 'required|in:planned,ongoing,completed,on_hold',
             'start_date'  => 'required|date',
             'end_date'    => 'nullable|date|after_or_equal:start_date',
+            'division_id' => 'nullable',
             'members'     => 'nullable|array',
             'members.*'   => 'exists:users,id',
         ]);
 
-        $project->update([
+        $dataToUpdate = [
             'title'       => $validated['title'],
             'description' => $validated['description'],
             'status'      => $validated['status'],
             'start_date'  => $validated['start_date'],
             'end_date'    => $validated['end_date'] ?? null,
-        ]);
+        ];
+
+        if ($request->has('division_id')) {
+            $rawDiv = $request->input('division_id');
+            $dataToUpdate['division_id'] = ($rawDiv === 'company' || $rawDiv === '' || $rawDiv === 'null' || $rawDiv === null)
+                ? null
+                : (int) $rawDiv;
+        }
+
+        $project->update($dataToUpdate);
 
         // Sync members
         $project->members()->sync($validated['members'] ?? []);
