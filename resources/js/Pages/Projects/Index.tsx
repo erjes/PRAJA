@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
+import DatePicker from '@/Components/ui/date-picker';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
@@ -221,13 +222,13 @@ export default function Index({ projects, divisions, assignableUsers }: IndexPro
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <Label htmlFor="start_date">Tanggal Mulai</Label>
-                                <Input id="start_date" type="date" value={createForm.data.start_date}
-                                    onChange={e => createForm.setData('start_date', e.target.value)} required />
+                                <DatePicker id="start_date" value={createForm.data.start_date}
+                                    onChange={value => createForm.setData('start_date', value)} />
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="end_date">Tanggal Selesai (Opsional)</Label>
-                                <Input id="end_date" type="date" value={createForm.data.end_date}
-                                    onChange={e => createForm.setData('end_date', e.target.value)} />
+                                <DatePicker id="end_date" value={createForm.data.end_date}
+                                    onChange={value => createForm.setData('end_date', value)} allowClear />
                             </div>
                         </div>
                         <div className="space-y-1">

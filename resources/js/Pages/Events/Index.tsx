@@ -9,6 +9,7 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import TimePicker from '@/Components/ui/time-picker';
+import DatePicker from '@/Components/ui/date-picker';
 import {
     Plus,
     ChevronLeft,
@@ -253,8 +254,26 @@ export default function Index({ events, divisions }: EventsProps) {
         })
         .sort((a, b) => parseLocal(a.start_time).getTime() - parseLocal(b.start_time).getTime());
 
+    const isCreateTimeInvalid = () => {
+        if (!createForm.data.start_date || !createForm.data.end_date) return false;
+        const start = new Date(`${createForm.data.start_date}T${createForm.data.start_time_only || '08:00'}:00`).getTime();
+        const end = new Date(`${createForm.data.end_date}T${createForm.data.end_time_only || '17:00'}:00`).getTime();
+        return end <= start;
+    };
+
+    const isEditTimeInvalid = () => {
+        if (!editForm.data.start_date || !editForm.data.end_date) return false;
+        const start = new Date(`${editForm.data.start_date}T${editForm.data.start_time_only || '08:00'}:00`).getTime();
+        const end = new Date(`${editForm.data.end_date}T${editForm.data.end_time_only || '17:00'}:00`).getTime();
+        return end <= start;
+    };
+
     const handleCreateSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (isCreateTimeInvalid()) {
+            createForm.setError('end_time', 'Waktu selesai harus lebih besar dari waktu mulai.');
+            return;
+        }
         createForm.transform((data) => ({
             ...data,
             start_time: `${data.start_date} ${data.start_time_only || '08:00'}:00`,
@@ -275,6 +294,10 @@ export default function Index({ events, divisions }: EventsProps) {
     const handleEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedEvent) return;
+        if (isEditTimeInvalid()) {
+            editForm.setError('end_time', 'Waktu selesai harus lebih besar dari waktu mulai.');
+            return;
+        }
         editForm.transform((data) => ({
             ...data,
             _method: 'put',
@@ -920,13 +943,16 @@ export default function Index({ events, divisions }: EventsProps) {
                                         <Label htmlFor="create-start-date" className="text-[11px] font-normal text-gray-600">
                                             Tanggal
                                         </Label>
-                                        <Input
+                                        <DatePicker
                                             id="create-start-date"
-                                            type="date"
                                             value={createForm.data.start_date}
-                                            onChange={(e) => createForm.setData('start_date', e.target.value)}
-                                            required
-                                            className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-normal"
+                                            onChange={(newStart) => {
+                                                createForm.setData((prev) => ({
+                                                    ...prev,
+                                                    start_date: newStart,
+                                                    end_date: prev.end_date < newStart ? newStart : prev.end_date,
+                                                }));
+                                            }}
                                         />
                                     </div>
                                     <div className="sm:col-span-2 space-y-1">
@@ -961,13 +987,11 @@ export default function Index({ events, divisions }: EventsProps) {
                                         <Label htmlFor="create-end-date" className="text-[11px] font-normal text-gray-600">
                                             Tanggal
                                         </Label>
-                                        <Input
+                                        <DatePicker
                                             id="create-end-date"
-                                            type="date"
+                                            min={createForm.data.start_date}
                                             value={createForm.data.end_date}
-                                            onChange={(e) => createForm.setData('end_date', e.target.value)}
-                                            required
-                                            className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-normal"
+                                            onChange={(newEnd) => createForm.setData('end_date', newEnd)}
                                         />
                                     </div>
                                     <div className="sm:col-span-2 space-y-1">
@@ -982,6 +1006,14 @@ export default function Index({ events, divisions }: EventsProps) {
                                         />
                                     </div>
                                 </div>
+
+                                {isCreateTimeInvalid() && (
+                                    <div className="flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-50 p-2.5 rounded-xl border border-red-200 mt-2">
+                                        <AlertTriangle className="size-4 shrink-0 text-red-600" />
+                                        <span>Waktu selesai tidak boleh sama atau kurang dari waktu mulai.</span>
+                                    </div>
+                                )}
+
                                 <InputError
                                     message={
                                         createForm.errors.end_time ||
@@ -1022,8 +1054,8 @@ export default function Index({ events, divisions }: EventsProps) {
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={createForm.processing}
-                                className="bg-[#901418] hover:bg-[#781014] text-white rounded-xl px-6 font-bold shadow-xs"
+                                disabled={createForm.processing || isCreateTimeInvalid()}
+                                className="bg-[#901418] hover:bg-[#781014] text-white rounded-xl px-6 font-bold shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Simpan Event
                             </Button>
@@ -1291,13 +1323,16 @@ export default function Index({ events, divisions }: EventsProps) {
                                         <Label htmlFor="edit-start-date" className="text-[11px] font-normal text-gray-600">
                                             Tanggal
                                         </Label>
-                                        <Input
+                                        <DatePicker
                                             id="edit-start-date"
-                                            type="date"
                                             value={editForm.data.start_date}
-                                            onChange={(e) => editForm.setData('start_date', e.target.value)}
-                                            required
-                                            className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-normal"
+                                            onChange={(newStart) => {
+                                                editForm.setData((prev) => ({
+                                                    ...prev,
+                                                    start_date: newStart,
+                                                    end_date: prev.end_date < newStart ? newStart : prev.end_date,
+                                                }));
+                                            }}
                                         />
                                     </div>
                                     <div className="sm:col-span-2 space-y-1">
@@ -1325,13 +1360,11 @@ export default function Index({ events, divisions }: EventsProps) {
                                         <Label htmlFor="edit-end-date" className="text-[11px] font-normal text-gray-600">
                                             Tanggal
                                         </Label>
-                                        <Input
+                                        <DatePicker
                                             id="edit-end-date"
-                                            type="date"
+                                            min={editForm.data.start_date}
                                             value={editForm.data.end_date}
-                                            onChange={(e) => editForm.setData('end_date', e.target.value)}
-                                            required
-                                            className="rounded-xl border-gray-200 bg-white focus:border-[#901418] font-normal"
+                                            onChange={(newEnd) => editForm.setData('end_date', newEnd)}
                                         />
                                     </div>
                                     <div className="sm:col-span-2 space-y-1">
@@ -1346,6 +1379,22 @@ export default function Index({ events, divisions }: EventsProps) {
                                         />
                                     </div>
                                 </div>
+
+                                {isEditTimeInvalid() && (
+                                    <div className="flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-50 p-2.5 rounded-xl border border-red-200 mt-2">
+                                        <AlertTriangle className="size-4 shrink-0 text-red-600" />
+                                        <span>Waktu selesai tidak boleh sama atau kurang dari waktu mulai.</span>
+                                    </div>
+                                )}
+
+                                <InputError
+                                    message={
+                                        editForm.errors.end_time ||
+                                        editForm.errors.end_date ||
+                                        editForm.errors.end_time_only
+                                    }
+                                    className="mt-1"
+                                />
                             </div>
                         </div>
 
@@ -1376,8 +1425,8 @@ export default function Index({ events, divisions }: EventsProps) {
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={editForm.processing}
-                                className="bg-[#901418] hover:bg-[#781014] text-white rounded-xl px-6 font-bold shadow-xs"
+                                disabled={editForm.processing || isEditTimeInvalid()}
+                                className="bg-[#901418] hover:bg-[#781014] text-white rounded-xl px-6 font-bold shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Simpan Perubahan
                             </Button>

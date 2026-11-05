@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { ConfirmDialog } from '@/Components/ConfirmDialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
+import DatePicker from '@/Components/ui/date-picker';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
@@ -744,34 +745,6 @@ export default function Index({ documents }: IndexProps) {
                                 />
                             </div>
                         </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                                <Label htmlFor="effective_date" className="text-xs font-bold text-gray-700">
-                                    Tanggal Berlaku (Opsional)
-                                </Label>
-                                <Input
-                                    id="effective_date"
-                                    type="date"
-                                    value={createForm.data.effective_date}
-                                    onChange={(e) => createForm.setData('effective_date', e.target.value)}
-                                    className="rounded-xl border-gray-200 bg-white font-normal"
-                                />
-                            </div>
-
-                            <div className="space-y-1">
-                                <Label htmlFor="effective_time" className="text-xs font-bold text-gray-700">
-                                    Jam Berlaku (Opsional)
-                                </Label>
-                                <TimePicker
-                                    id="effective_time"
-                                    value={createForm.data.effective_time}
-                                    onChange={(val) => createForm.setData('effective_time', val)}
-                                    label="Enter time"
-                                />
-                            </div>
-                        </div>
-
                         <div className="space-y-1.5">
                             <Label htmlFor="file" className="text-xs font-bold text-gray-700">
                                 Berkas Dokumen

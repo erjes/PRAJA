@@ -59,11 +59,13 @@ class EventController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'start_time' => 'required|date',
-            'end_time' => 'required|date|after_or_equal:start_time',
+            'end_time' => 'required|date|after:start_time',
             'evidence_link' => 'nullable|string|max:2048',
             'location' => 'nullable|string|max:255',
             'category' => 'nullable|string|in:internal,public',
             'poster_file' => 'nullable|file|mimes:jpeg,jpg,png,webp|max:5120',
+        ], [
+            'end_time.after' => 'Waktu selesai harus lebih besar dari waktu mulai.',
         ]);
 
         $rawDiv = $request->input('division_id');
@@ -110,11 +112,13 @@ class EventController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'start_time' => 'required|date',
-            'end_time' => 'required|date|after_or_equal:start_time',
+            'end_time' => 'required|date|after:start_time',
             'evidence_link' => 'nullable|string|max:2048',
             'location' => 'nullable|string|max:255',
             'category' => 'nullable|string|in:internal,public',
             'poster_file' => 'nullable|file|mimes:jpeg,jpg,png,webp|max:5120',
+        ], [
+            'end_time.after' => 'Waktu selesai harus lebih besar dari waktu mulai.',
         ]);
 
         $rawDiv = $request->input('division_id');

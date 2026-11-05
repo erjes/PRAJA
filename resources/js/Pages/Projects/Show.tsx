@@ -6,6 +6,7 @@ import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
+import DatePicker from '@/Components/ui/date-picker';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
@@ -604,11 +605,11 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <Label>Tanggal Mulai</Label>
-                                <Input type="date" value={projectForm.data.start_date} onChange={e => projectForm.setData('start_date', e.target.value)} required />
+                                <DatePicker value={projectForm.data.start_date} onChange={(value) => projectForm.setData('start_date', value)} />
                             </div>
                             <div className="space-y-1">
                                 <Label>Tanggal Selesai</Label>
-                                <Input type="date" value={projectForm.data.end_date} onChange={e => projectForm.setData('end_date', e.target.value)} />
+                                <DatePicker value={projectForm.data.end_date} onChange={(value) => projectForm.setData('end_date', value)} allowClear />
                             </div>
                         </div>
                         <div className="space-y-1">
@@ -692,11 +693,11 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <Label>Tanggal Mulai</Label>
-                                <Input type="date" value={taskForm.data.start_date} onChange={e => taskForm.setData('start_date', e.target.value)} />
+                                <DatePicker value={taskForm.data.start_date} onChange={(value) => taskForm.setData('start_date', value)} allowClear />
                             </div>
                             <div className="space-y-1">
                                 <Label>Tenggat Waktu</Label>
-                                <Input type="date" value={taskForm.data.due_date} onChange={e => taskForm.setData('due_date', e.target.value)} />
+                                <DatePicker value={taskForm.data.due_date} onChange={(value) => taskForm.setData('due_date', value)} allowClear />
                             </div>
                         </div>
                         <div className="space-y-1">
@@ -758,11 +759,11 @@ export default function Show({ project, assignableUsers }: ShowProps) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <Label>Tanggal Mulai</Label>
-                                <Input type="date" value={editTaskForm.data.start_date} onChange={e => editTaskForm.setData('start_date', e.target.value)} />
+                                <DatePicker value={editTaskForm.data.start_date} onChange={(value) => editTaskForm.setData('start_date', value)} allowClear />
                             </div>
                             <div className="space-y-1">
                                 <Label>Tenggat Waktu</Label>
-                                <Input type="date" value={editTaskForm.data.due_date} onChange={e => editTaskForm.setData('due_date', e.target.value)} />
+                                <DatePicker value={editTaskForm.data.due_date} onChange={(value) => editTaskForm.setData('due_date', value)} allowClear />
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">

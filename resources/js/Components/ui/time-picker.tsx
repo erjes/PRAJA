@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Dialog, DialogContent } from '@/Components/ui/dialog';
 import { Clock } from 'lucide-react';
 
 interface TimePickerProps {
@@ -14,10 +13,13 @@ export function TimePicker({
     id,
     value = '08:00',
     onChange,
-    label,
+    label = 'Enter time',
     className = '',
 }: TimePickerProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [openUpwards, setOpenUpwards] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const tooltipRef = useRef<HTMLDivElement>(null);
 
     // Parse incoming HH:mm 24h into 12h parts
     const parse24To12 = (val: string) => {
@@ -49,7 +51,7 @@ export function TimePicker({
     const hourInputRef = useRef<HTMLInputElement>(null);
     const minuteInputRef = useRef<HTMLInputElement>(null);
 
-    // Sync with external value changes when dialog opens
+    // When tooltip opens, synchronize state with current value
     useEffect(() => {
         if (isOpen) {
             const parsed = parse24To12(value);
@@ -57,11 +59,53 @@ export function TimePicker({
             setMinute(parsed.minute);
             setPeriod(parsed.period);
             setActiveField('hour');
+
+            // Detect collision with bottom of viewport/dialog
+            if (containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                const spaceBelow = window.innerHeight - rect.bottom;
+                if (spaceBelow < 270 && rect.top > 270) {
+                    setOpenUpwards(true);
+                } else {
+                    setOpenUpwards(false);
+                }
+            }
+
             setTimeout(() => {
                 hourInputRef.current?.select();
-            }, 50);
+            }, 60);
         }
     }, [isOpen, value]);
+
+    // Handle click outside to close tooltip
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+            if (
+                containerRef.current &&
+                !containerRef.current.contains(e.target as Node)
+            ) {
+                setIsOpen(false);
+            }
+        };
+
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
+        document.addEventListener('keydown', handleEscape);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
+            document.removeEventListener('keydown', handleEscape);
+        };
+    }, [isOpen]);
 
     const format12To24 = (h12Str: string, mStr: string, p: 'AM' | 'PM') => {
         let h = parseInt(h12Str, 10);
@@ -87,17 +131,17 @@ export function TimePicker({
 
         const num = parseInt(raw, 10);
         if (num > 12) {
-            // If user typed e.g. 15, clamp to 12
             setHour('12');
             setActiveField('minute');
-            minuteInputRef.current?.select();
+            setTimeout(() => {
+                minuteInputRef.current?.select();
+            }, 10);
             return;
         }
 
         const formatted = String(num);
         setHour(formatted);
 
-        // If two digits entered or first digit >= 2 (since max hour is 12)
         if (raw.length === 2 || num > 1) {
             setHour(String(num).padStart(2, '0'));
             setActiveField('minute');
@@ -198,160 +242,176 @@ export function TimePicker({
         setIsOpen(false);
     };
 
-    // Format for display button
     const current12 = parse24To12(value);
-    const displayFormatted = `${current12.hour}:${current12.minute} ${current12.period} (${value})`;
 
     return (
-        <div className="w-full">
-            {/* Trigger Button */}
-            <button
-                type="button"
+        <div ref={containerRef} className="relative w-full">
+            {/* The single clickable input box */}
+            <div
                 id={id}
-                onClick={() => setIsOpen(true)}
-                className={`w-full h-11 flex items-center justify-between px-3.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50/80 focus:border-[#890A00] focus:ring-1 focus:ring-[#890A00] transition-all text-xs font-normal text-gray-800 shadow-2xs ${className}`}
+                tabIndex={0}
+                role="button"
+                onClick={() => setIsOpen((prev) => !prev)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setIsOpen((prev) => !prev);
+                    }
+                }}
+                className={`w-full h-11 flex items-center justify-between px-3.5 rounded-xl border bg-white cursor-pointer transition-all select-none ${
+                    isOpen
+                        ? 'border-[#890A00] ring-2 ring-[#890A00]/15'
+                        : 'border-gray-200 hover:border-gray-300'
+                } ${className}`}
             >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2">
                     <Clock className="size-4 text-[#890A00] shrink-0" />
                     <span className="font-bold text-gray-900 text-sm">
                         {current12.hour}:{current12.minute}
                     </span>
-                    <span className="text-xs font-normal text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+                    <span className="text-xs font-normal text-gray-500">
                         {current12.period}
                     </span>
                 </div>
 
-                <span className="text-[11px] font-bold text-[#890A00] bg-red-50 hover:bg-red-100 px-2 py-1 rounded-md transition-colors">
-                    Pilih Jam
+                <span className="text-xs font-normal text-gray-400">
+                    {value}
                 </span>
-            </button>
+            </div>
 
-            {/* Time Picker Dialog UI matching the Material 3 reference with #890A00 */}
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogContent className="sm:max-w-[340px] p-0 border-0 bg-transparent shadow-none overflow-visible [&>button]:hidden">
-                    <div className="bg-[#f7f6f8] border border-gray-200/90 rounded-[28px] p-6 shadow-2xl w-full max-w-[340px] mx-auto select-none animate-in fade-in zoom-in-95 duration-200">
-                        {/* Header Title */}
-                        <div className="text-xs font-bold text-gray-700 tracking-wide mb-5">
-                            {label || 'Enter time'}
+            {/* Tooltip / Popover floating card */}
+            {isOpen && (
+                <div
+                    ref={tooltipRef}
+                    className={`absolute z-[90] right-0 ${
+                        openUpwards ? 'bottom-full mb-2' : 'top-full mt-2'
+                    } w-[305px] bg-[#f7f6f8] border border-gray-200/90 rounded-[24px] p-5 shadow-2xl select-none animate-in fade-in zoom-in-95 duration-150`}
+                >
+                    {/* Header Title */}
+                    <div className="text-xs font-bold text-gray-700 tracking-wide mb-4">
+                        {label}
+                    </div>
+
+                    {/* Digits & AM/PM Container */}
+                    <div className="flex items-start justify-center gap-2 mb-2">
+                        {/* Hour Box */}
+                        <div className="flex flex-col items-center">
+                            <div
+                                onClick={() => {
+                                    setActiveField('hour');
+                                    hourInputRef.current?.select();
+                                }}
+                                className={`w-20 h-18 sm:w-22 sm:h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                                    activeField === 'hour'
+                                        ? 'bg-[#890A00]/15 border-2 border-[#890A00] text-[#890A00]'
+                                        : 'bg-gray-200/70 hover:bg-gray-200 border-2 border-transparent text-gray-900'
+                                }`}
+                            >
+                                <input
+                                    ref={hourInputRef}
+                                    type="text"
+                                    inputMode="numeric"
+                                    maxLength={2}
+                                    value={hour}
+                                    onChange={handleHourChange}
+                                    onBlur={handleHourBlur}
+                                    onFocus={() => setActiveField('hour')}
+                                    onKeyDown={handleHourKeyDown}
+                                    className="w-full text-center bg-transparent text-4xl sm:text-5xl font-normal outline-none focus:outline-none cursor-pointer select-all caret-[#890A00]"
+                                />
+                            </div>
+                            <span className="text-xs font-normal text-gray-500 mt-1.5">
+                                Hour
+                            </span>
                         </div>
 
-                        {/* Digits & AM/PM Container */}
-                        <div className="flex items-start justify-center gap-2 mb-2">
-                            {/* Hour Box */}
-                            <div className="flex flex-col items-center">
-                                <div
-                                    onClick={() => {
-                                        setActiveField('hour');
-                                        hourInputRef.current?.select();
-                                    }}
-                                    className={`w-24 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                                        activeField === 'hour'
-                                            ? 'bg-[#890A00]/15 border-2 border-[#890A00] text-[#890A00]'
-                                            : 'bg-gray-200/70 hover:bg-gray-200 border-2 border-transparent text-gray-900'
-                                    }`}
-                                >
-                                    <input
-                                        ref={hourInputRef}
-                                        type="text"
-                                        inputMode="numeric"
-                                        maxLength={2}
-                                        value={hour}
-                                        onChange={handleHourChange}
-                                        onBlur={handleHourBlur}
-                                        onFocus={() => setActiveField('hour')}
-                                        onKeyDown={handleHourKeyDown}
-                                        className="w-full text-center bg-transparent text-5xl font-normal outline-none focus:outline-none cursor-pointer select-all caret-[#890A00]"
-                                    />
-                                </div>
-                                <span className="text-xs font-normal text-gray-500 mt-2">Hour</span>
-                            </div>
-
-                            {/* Separator Colon */}
-                            <div className="text-4xl font-bold text-gray-900 h-20 flex items-center px-0.5 select-none">
-                                :
-                            </div>
-
-                            {/* Minute Box */}
-                            <div className="flex flex-col items-center">
-                                <div
-                                    onClick={() => {
-                                        setActiveField('minute');
-                                        minuteInputRef.current?.select();
-                                    }}
-                                    className={`w-24 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                                        activeField === 'minute'
-                                            ? 'bg-[#890A00]/15 border-2 border-[#890A00] text-[#890A00]'
-                                            : 'bg-gray-200/70 hover:bg-gray-200 border-2 border-transparent text-gray-900'
-                                    }`}
-                                >
-                                    <input
-                                        ref={minuteInputRef}
-                                        type="text"
-                                        inputMode="numeric"
-                                        maxLength={2}
-                                        value={minute}
-                                        onChange={handleMinuteChange}
-                                        onBlur={handleMinuteBlur}
-                                        onFocus={() => setActiveField('minute')}
-                                        onKeyDown={handleMinuteKeyDown}
-                                        className="w-full text-center bg-transparent text-5xl font-normal outline-none focus:outline-none cursor-pointer select-all caret-[#890A00]"
-                                    />
-                                </div>
-                                <span className="text-xs font-normal text-gray-500 mt-2">Minute</span>
-                            </div>
-
-                            {/* AM / PM Toggle */}
-                            <div className="flex flex-col w-14 h-20 rounded-2xl border border-gray-300 overflow-hidden shrink-0 ml-1">
-                                <button
-                                    type="button"
-                                    onClick={() => setPeriod('AM')}
-                                    className={`flex-1 text-xs transition-colors flex items-center justify-center ${
-                                        period === 'AM'
-                                            ? 'bg-[#890A00]/20 text-[#890A00] font-bold border-b border-gray-300'
-                                            : 'bg-white hover:bg-gray-50 text-gray-700 font-normal border-b border-gray-300'
-                                    }`}
-                                >
-                                    AM
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setPeriod('PM')}
-                                    className={`flex-1 text-xs transition-colors flex items-center justify-center ${
-                                        period === 'PM'
-                                            ? 'bg-[#890A00]/20 text-[#890A00] font-bold'
-                                            : 'bg-white hover:bg-gray-50 text-gray-700 font-normal'
-                                    }`}
-                                >
-                                    PM
-                                </button>
-                            </div>
+                        {/* Separator Colon */}
+                        <div className="text-3xl sm:text-4xl font-bold text-gray-900 h-18 sm:h-20 flex items-center px-0.5 select-none">
+                            :
                         </div>
 
-                        {/* Bottom Actions Bar */}
-                        <div className="flex items-center justify-between pt-4 mt-2">
-                            <div className="text-[#890A00] p-1">
-                                <Clock className="size-5 text-[#890A00]" />
+                        {/* Minute Box */}
+                        <div className="flex flex-col items-center">
+                            <div
+                                onClick={() => {
+                                    setActiveField('minute');
+                                    minuteInputRef.current?.select();
+                                }}
+                                className={`w-20 h-18 sm:w-22 sm:h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                                    activeField === 'minute'
+                                        ? 'bg-[#890A00]/15 border-2 border-[#890A00] text-[#890A00]'
+                                        : 'bg-gray-200/70 hover:bg-gray-200 border-2 border-transparent text-gray-900'
+                                }`}
+                            >
+                                <input
+                                    ref={minuteInputRef}
+                                    type="text"
+                                    inputMode="numeric"
+                                    maxLength={2}
+                                    value={minute}
+                                    onChange={handleMinuteChange}
+                                    onBlur={handleMinuteBlur}
+                                    onFocus={() => setActiveField('minute')}
+                                    onKeyDown={handleMinuteKeyDown}
+                                    className="w-full text-center bg-transparent text-4xl sm:text-5xl font-normal outline-none focus:outline-none cursor-pointer select-all caret-[#890A00]"
+                                />
                             </div>
-                            <div className="flex items-center gap-4">
-                                <button
-                                    type="button"
-                                    onClick={handleCancel}
-                                    className="text-xs font-bold text-[#890A00] hover:bg-[#890A00]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleOk}
-                                    className="text-xs font-bold text-[#890A00] hover:bg-[#890A00]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                                >
-                                    OK
-                                </button>
-                            </div>
+                            <span className="text-xs font-normal text-gray-500 mt-1.5">
+                                Minute
+                            </span>
+                        </div>
+
+                        {/* AM / PM Segmented Control */}
+                        <div className="flex flex-col w-13 h-18 sm:h-20 rounded-2xl border border-gray-300 overflow-hidden shrink-0 ml-1">
+                            <button
+                                type="button"
+                                onClick={() => setPeriod('AM')}
+                                className={`flex-1 text-xs transition-colors flex items-center justify-center ${
+                                    period === 'AM'
+                                        ? 'bg-[#890A00]/20 text-[#890A00] font-bold border-b border-gray-300'
+                                        : 'bg-white hover:bg-gray-50 text-gray-700 font-normal border-b border-gray-300'
+                                }`}
+                            >
+                                AM
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setPeriod('PM')}
+                                className={`flex-1 text-xs transition-colors flex items-center justify-center ${
+                                    period === 'PM'
+                                        ? 'bg-[#890A00]/20 text-[#890A00] font-bold'
+                                        : 'bg-white hover:bg-gray-50 text-gray-700 font-normal'
+                                }`}
+                            >
+                                PM
+                            </button>
                         </div>
                     </div>
-                </DialogContent>
-            </Dialog>
+
+                    {/* Bottom Actions Bar */}
+                    <div className="flex items-center justify-between pt-3 mt-1">
+                        <div className="text-[#890A00] p-0.5">
+                            <Clock className="size-5 text-[#890A00]" />
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button
+                                type="button"
+                                onClick={handleCancel}
+                                className="text-xs font-bold text-[#890A00] hover:bg-[#890A00]/10 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleOk}
+                                className="text-xs font-bold text-[#890A00] hover:bg-[#890A00]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                            >
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

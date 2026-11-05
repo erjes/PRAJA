@@ -409,7 +409,7 @@ edit.head = (args: { division: string | number } | [division: string | number ] 
  * @see app/Http/Controllers/DivisionController.php:45
  * @route '/divisions/{division}'
  */
-export const update = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -424,7 +424,7 @@ update.definition = {
  * @see app/Http/Controllers/DivisionController.php:45
  * @route '/divisions/{division}'
  */
-update.url = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+update.url = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { division: args }
     }
@@ -457,7 +457,7 @@ update.url = (args: { division: string | number | { id: string | number } } | [d
  * @see app/Http/Controllers/DivisionController.php:45
  * @route '/divisions/{division}'
  */
-update.put = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -466,7 +466,7 @@ update.put = (args: { division: string | number | { id: string | number } } | [d
  * @see app/Http/Controllers/DivisionController.php:45
  * @route '/divisions/{division}'
  */
-update.patch = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+update.patch = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: update.url(args, options),
     method: 'patch',
 })
@@ -476,7 +476,7 @@ update.patch = (args: { division: string | number | { id: string | number } } | 
  * @see app/Http/Controllers/DivisionController.php:45
  * @route '/divisions/{division}'
  */
-    const updateForm = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    const updateForm = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
         action: update.url(args, {
                     [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                         _method: 'PUT',
@@ -491,7 +491,7 @@ update.patch = (args: { division: string | number | { id: string | number } } | 
  * @see app/Http/Controllers/DivisionController.php:45
  * @route '/divisions/{division}'
  */
-        updateForm.put = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        updateForm.put = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
             action: update.url(args, {
                         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                             _method: 'PUT',
@@ -505,7 +505,7 @@ update.patch = (args: { division: string | number | { id: string | number } } | 
  * @see app/Http/Controllers/DivisionController.php:45
  * @route '/divisions/{division}'
  */
-        updateForm.patch = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        updateForm.patch = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
             action: update.url(args, {
                         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                             _method: 'PATCH',
@@ -521,7 +521,7 @@ update.patch = (args: { division: string | number | { id: string | number } } | 
  * @see app/Http/Controllers/DivisionController.php:66
  * @route '/divisions/{division}'
  */
-export const destroy = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+export const destroy = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -536,7 +536,7 @@ destroy.definition = {
  * @see app/Http/Controllers/DivisionController.php:66
  * @route '/divisions/{division}'
  */
-destroy.url = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+destroy.url = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { division: args }
     }
@@ -569,7 +569,7 @@ destroy.url = (args: { division: string | number | { id: string | number } } | [
  * @see app/Http/Controllers/DivisionController.php:66
  * @route '/divisions/{division}'
  */
-destroy.delete = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+destroy.delete = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -579,7 +579,7 @@ destroy.delete = (args: { division: string | number | { id: string | number } } 
  * @see app/Http/Controllers/DivisionController.php:66
  * @route '/divisions/{division}'
  */
-    const destroyForm = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    const destroyForm = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
         action: destroy.url(args, {
                     [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                         _method: 'DELETE',
@@ -594,7 +594,7 @@ destroy.delete = (args: { division: string | number | { id: string | number } } 
  * @see app/Http/Controllers/DivisionController.php:66
  * @route '/divisions/{division}'
  */
-        destroyForm.delete = (args: { division: string | number | { id: string | number } } | [division: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        destroyForm.delete = (args: { division: number | { id: number } } | [division: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
             action: destroy.url(args, {
                         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                             _method: 'DELETE',

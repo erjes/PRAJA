@@ -409,7 +409,7 @@ edit.head = (args: { task: string | number } | [task: string | number ] | string
  * @see app/Http/Controllers/TaskController.php:89
  * @route '/tasks/{task}'
  */
-export const update = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -424,7 +424,7 @@ update.definition = {
  * @see app/Http/Controllers/TaskController.php:89
  * @route '/tasks/{task}'
  */
-update.url = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+update.url = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { task: args }
     }
@@ -457,7 +457,7 @@ update.url = (args: { task: string | number | { id: string | number } } | [task:
  * @see app/Http/Controllers/TaskController.php:89
  * @route '/tasks/{task}'
  */
-update.put = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -466,7 +466,7 @@ update.put = (args: { task: string | number | { id: string | number } } | [task:
  * @see app/Http/Controllers/TaskController.php:89
  * @route '/tasks/{task}'
  */
-update.patch = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+update.patch = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: update.url(args, options),
     method: 'patch',
 })
@@ -476,7 +476,7 @@ update.patch = (args: { task: string | number | { id: string | number } } | [tas
  * @see app/Http/Controllers/TaskController.php:89
  * @route '/tasks/{task}'
  */
-    const updateForm = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    const updateForm = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
         action: update.url(args, {
                     [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                         _method: 'PUT',
@@ -491,7 +491,7 @@ update.patch = (args: { task: string | number | { id: string | number } } | [tas
  * @see app/Http/Controllers/TaskController.php:89
  * @route '/tasks/{task}'
  */
-        updateForm.put = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        updateForm.put = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
             action: update.url(args, {
                         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                             _method: 'PUT',
@@ -505,7 +505,7 @@ update.patch = (args: { task: string | number | { id: string | number } } | [tas
  * @see app/Http/Controllers/TaskController.php:89
  * @route '/tasks/{task}'
  */
-        updateForm.patch = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        updateForm.patch = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
             action: update.url(args, {
                         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                             _method: 'PATCH',
@@ -521,7 +521,7 @@ update.patch = (args: { task: string | number | { id: string | number } } | [tas
  * @see app/Http/Controllers/TaskController.php:152
  * @route '/tasks/{task}'
  */
-export const destroy = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+export const destroy = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -536,7 +536,7 @@ destroy.definition = {
  * @see app/Http/Controllers/TaskController.php:152
  * @route '/tasks/{task}'
  */
-destroy.url = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+destroy.url = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { task: args }
     }
@@ -569,7 +569,7 @@ destroy.url = (args: { task: string | number | { id: string | number } } | [task
  * @see app/Http/Controllers/TaskController.php:152
  * @route '/tasks/{task}'
  */
-destroy.delete = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+destroy.delete = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -579,7 +579,7 @@ destroy.delete = (args: { task: string | number | { id: string | number } } | [t
  * @see app/Http/Controllers/TaskController.php:152
  * @route '/tasks/{task}'
  */
-    const destroyForm = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    const destroyForm = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
         action: destroy.url(args, {
                     [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                         _method: 'DELETE',
@@ -594,7 +594,7 @@ destroy.delete = (args: { task: string | number | { id: string | number } } | [t
  * @see app/Http/Controllers/TaskController.php:152
  * @route '/tasks/{task}'
  */
-        destroyForm.delete = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        destroyForm.delete = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
             action: destroy.url(args, {
                         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                             _method: 'DELETE',
@@ -610,7 +610,7 @@ destroy.delete = (args: { task: string | number | { id: string | number } } | [t
  * @see app/Http/Controllers/TaskController.php:300
  * @route '/tasks/{task}/status'
  */
-export const status = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+export const status = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: status.url(args, options),
     method: 'post',
 })
@@ -625,7 +625,7 @@ status.definition = {
  * @see app/Http/Controllers/TaskController.php:300
  * @route '/tasks/{task}/status'
  */
-status.url = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+status.url = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { task: args }
     }
@@ -658,7 +658,7 @@ status.url = (args: { task: string | number | { id: string | number } } | [task:
  * @see app/Http/Controllers/TaskController.php:300
  * @route '/tasks/{task}/status'
  */
-status.post = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+status.post = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: status.url(args, options),
     method: 'post',
 })
@@ -668,7 +668,7 @@ status.post = (args: { task: string | number | { id: string | number } } | [task
  * @see app/Http/Controllers/TaskController.php:300
  * @route '/tasks/{task}/status'
  */
-    const statusForm = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    const statusForm = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
         action: status.url(args, options),
         method: 'post',
     })
@@ -678,7 +678,7 @@ status.post = (args: { task: string | number | { id: string | number } } | [task
  * @see app/Http/Controllers/TaskController.php:300
  * @route '/tasks/{task}/status'
  */
-        statusForm.post = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        statusForm.post = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
             action: status.url(args, options),
             method: 'post',
         })
@@ -689,7 +689,7 @@ status.post = (args: { task: string | number | { id: string | number } } | [task
  * @see app/Http/Controllers/TaskController.php:168
  * @route '/tasks/{task}/submit'
  */
-export const submit = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+export const submit = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: submit.url(args, options),
     method: 'post',
 })
@@ -704,7 +704,7 @@ submit.definition = {
  * @see app/Http/Controllers/TaskController.php:168
  * @route '/tasks/{task}/submit'
  */
-submit.url = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+submit.url = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { task: args }
     }
@@ -737,7 +737,7 @@ submit.url = (args: { task: string | number | { id: string | number } } | [task:
  * @see app/Http/Controllers/TaskController.php:168
  * @route '/tasks/{task}/submit'
  */
-submit.post = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+submit.post = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: submit.url(args, options),
     method: 'post',
 })
@@ -747,7 +747,7 @@ submit.post = (args: { task: string | number | { id: string | number } } | [task
  * @see app/Http/Controllers/TaskController.php:168
  * @route '/tasks/{task}/submit'
  */
-    const submitForm = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    const submitForm = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
         action: submit.url(args, options),
         method: 'post',
     })
@@ -757,7 +757,7 @@ submit.post = (args: { task: string | number | { id: string | number } } | [task
  * @see app/Http/Controllers/TaskController.php:168
  * @route '/tasks/{task}/submit'
  */
-        submitForm.post = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        submitForm.post = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
             action: submit.url(args, options),
             method: 'post',
         })
@@ -768,7 +768,7 @@ submit.post = (args: { task: string | number | { id: string | number } } | [task
  * @see app/Http/Controllers/TaskController.php:207
  * @route '/tasks/{task}/approve'
  */
-export const approve = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+export const approve = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: approve.url(args, options),
     method: 'post',
 })
@@ -783,7 +783,7 @@ approve.definition = {
  * @see app/Http/Controllers/TaskController.php:207
  * @route '/tasks/{task}/approve'
  */
-approve.url = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+approve.url = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { task: args }
     }
@@ -816,7 +816,7 @@ approve.url = (args: { task: string | number | { id: string | number } } | [task
  * @see app/Http/Controllers/TaskController.php:207
  * @route '/tasks/{task}/approve'
  */
-approve.post = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+approve.post = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: approve.url(args, options),
     method: 'post',
 })
@@ -826,7 +826,7 @@ approve.post = (args: { task: string | number | { id: string | number } } | [tas
  * @see app/Http/Controllers/TaskController.php:207
  * @route '/tasks/{task}/approve'
  */
-    const approveForm = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    const approveForm = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
         action: approve.url(args, options),
         method: 'post',
     })
@@ -836,7 +836,7 @@ approve.post = (args: { task: string | number | { id: string | number } } | [tas
  * @see app/Http/Controllers/TaskController.php:207
  * @route '/tasks/{task}/approve'
  */
-        approveForm.post = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        approveForm.post = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
             action: approve.url(args, options),
             method: 'post',
         })
@@ -847,7 +847,7 @@ approve.post = (args: { task: string | number | { id: string | number } } | [tas
  * @see app/Http/Controllers/TaskController.php:237
  * @route '/tasks/{task}/revision'
  */
-export const revision = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+export const revision = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: revision.url(args, options),
     method: 'post',
 })
@@ -862,7 +862,7 @@ revision.definition = {
  * @see app/Http/Controllers/TaskController.php:237
  * @route '/tasks/{task}/revision'
  */
-revision.url = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+revision.url = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { task: args }
     }
@@ -895,7 +895,7 @@ revision.url = (args: { task: string | number | { id: string | number } } | [tas
  * @see app/Http/Controllers/TaskController.php:237
  * @route '/tasks/{task}/revision'
  */
-revision.post = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+revision.post = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: revision.url(args, options),
     method: 'post',
 })
@@ -905,7 +905,7 @@ revision.post = (args: { task: string | number | { id: string | number } } | [ta
  * @see app/Http/Controllers/TaskController.php:237
  * @route '/tasks/{task}/revision'
  */
-    const revisionForm = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    const revisionForm = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
         action: revision.url(args, options),
         method: 'post',
     })
@@ -915,7 +915,7 @@ revision.post = (args: { task: string | number | { id: string | number } } | [ta
  * @see app/Http/Controllers/TaskController.php:237
  * @route '/tasks/{task}/revision'
  */
-        revisionForm.post = (args: { task: string | number | { id: string | number } } | [task: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        revisionForm.post = (args: { task: number | { id: number } } | [task: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
             action: revision.url(args, options),
             method: 'post',
         })
